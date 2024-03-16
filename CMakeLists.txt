@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_COMPILER "g++")
 # set(CMAKE_CXX_EXTENSIONS OFF)
 
-project(test LANGUAGES C CXX VERSION 1.0.0)
+project(gol LANGUAGES C CXX VERSION 1.0.0)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -20,7 +20,7 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 add_subdirectory(includes)
-add_executable(test src/main.cpp src/square.cpp)
+add_executable(gol src/main.cpp src/square.cpp src/grid.cpp)
 
-target_link_libraries(test ${OpenGL_gl_LIBRARY} glfw glad)
+target_link_libraries(gol ${OpenGL_gl_LIBRARY} glfw glad)
 include_directories(${CMAKE_SOURCE_DIR}/includes)

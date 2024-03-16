@@ -10,6 +10,7 @@
 // #include "camera.h"
 // #include "cube.h"
 #include "square.hpp"
+#include "grid.hpp"
 
 #define GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
@@ -37,7 +38,7 @@ void draw_floor(Square square, Shader shader_program);
 void draw_grid(Square square, Shader shader_program);
 // glm::mat4 track_camera(glm::mat4 model, glm::vec3 *position, int i);
 
-std::string GAME_NAME = "C-GOL";
+std::string GAME_NAME = "C GoL";
 std::string VERSION = "v0.0.1";
 std::string GAME_VERSION_NAME = VERSION + " | " + GAME_NAME;
 
@@ -67,10 +68,10 @@ bool chase = false;
 // float far = 100.f;
 // glm::mat4 projection; // = glm::perspective(glm::radians(camera.zoom), (float) width / (float) height, near, far);
 
-const int SQUARE_SIZE = 9;
-const int GAP = 1;
-glm::vec3 red = glm::vec3(1.f, 0.f, 0.f);
-glm::vec3 blue = glm::vec3(0.f, 0.f, 1.f);
+// const int SQUARE_SIZE = 9;
+// const int GAP = 1;
+// glm::vec3 red = glm::vec3(1.f, 0.f, 0.f);
+// glm::vec3 blue = glm::vec3(0.f, 0.f, 1.f);
 
 int main(int argc, char *argv[]) {
 
@@ -128,8 +129,9 @@ int main(int argc, char *argv[]) {
     }
 
     Shader shader_program("shaders/shader.vert", "shaders/shader.frag");
-    Square square(shader_program, h_pixels(SQUARE_SIZE), red);
-    // Square square(shader_program, h_pixels(SQUARE_SIZE));
+    Square square(shader_program, h_pixels(SQUARE_SIZE));
+    // Grid grid(&square, &shader_program, width);
+    Grid grid(square, shader_program, width);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -152,7 +154,8 @@ int main(int argc, char *argv[]) {
 
             glm::mat4 model = glm::mat4(1.0f);
 
-            draw_grid(square, shader_program);
+            grid.draw();
+            // draw_grid(square, shader_program);
             // draw_floor(square, shader_program);
 
             // for (unsigned int i = 0; i < 10; i++) {
@@ -327,9 +330,9 @@ void draw_grid(Square square, Shader shader_program) {
 
             shader_program.set_mat4("model", model);
 
-            ((i % 2 == 1 && j % 2 == 1) || (i % 2 == 0 && j % 2 == 0))
-                ? square.set_color(blue)
-                : square.set_color(red);
+            // ((i % 2 == 1 && j % 2 == 1) || (i % 2 == 0 && j % 2 == 0))
+            //     ? square.set_color(blue)
+            //     : square.set_color(red);
 
             square.draw(GL_TRIANGLES);
             
