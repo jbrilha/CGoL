@@ -1,9 +1,9 @@
-#include "shaders.hpp"
+// #include "shaders.hpp"
 #include "square.hpp"
-
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+//
+// #include <glad/glad.h>
+// #include <glm/glm.hpp>
+// #include <glm/gtc/matrix_transform.hpp>
 
 Square::Square(Shader shader_program, float size) : shader_program(shader_program), size(size), color_set(false) {
     init();
