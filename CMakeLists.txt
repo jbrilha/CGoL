@@ -20,7 +20,7 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 add_subdirectory(includes)
-add_executable(gol src/main.cpp src/square.cpp src/grid.cpp)
+add_executable(gol src/main.cpp src/square.cpp src/gol.cpp)
 
 target_link_libraries(gol ${OpenGL_gl_LIBRARY} glfw glad)
 include_directories(${CMAKE_SOURCE_DIR}/includes)
