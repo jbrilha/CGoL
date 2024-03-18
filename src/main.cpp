@@ -1,3 +1,11 @@
+#include <mach-o/dyld.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <libproc.h>
+#include <string>
+#include <unistd.h>
 #include "gol.hpp"
 #include "shaders.hpp"
 
@@ -27,8 +35,8 @@ int nb_frames = 0;
 int last_time = 0;
 
 // viewport settings
-int win_width = 500;
-int win_height = 500;
+int win_width = 1400;
+int win_height = 900;
 
 bool seeding = true;
 bool ready = false;
@@ -39,7 +47,24 @@ float delta_time = 0.f;
 float last_frame = 0.f;
 
 int counter = 0;
-int delay = 15;
+int delay = 10;
+
+std::string get_executable_path(){
+    char path[1024];
+    uint32_t size = sizeof(path);
+    if (_NSGetExecutablePath(path, &size) == 0)
+        printf("executable path is %s\n", path);
+    else
+        printf("buffer too small; need size %u\n", size);
+
+    std::string str(path);
+    std::string path_str = path;
+
+    std::string clean_path(path_str.c_str(), path_str.c_str() + path_str.rfind("/"));
+    std::string cleanest_path(clean_path.c_str(), clean_path.c_str() + clean_path.rfind("/"));
+
+    return cleanest_path;
+}
 
 int main(int argc, char *argv[]) {
 
@@ -79,8 +104,10 @@ int main(int argc, char *argv[]) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         exit(EXIT_FAILURE);
     }
+    
+    std::string path_str = get_executable_path();
 
-    Shader shader_program("shaders/shader.vert", "shaders/shader.frag");
+    Shader shader_program((path_str + "/shaders/shader.vert").c_str(), (path_str + "/shaders/shader.frag").c_str());
     Gol gol(shader_program, win_width, win_height);
 
     glEnable(GL_DEPTH_TEST);
@@ -101,11 +128,17 @@ int main(int argc, char *argv[]) {
         glClearColor(0.4f, 0.4f, 0.4f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if(update_size) {
-            gol.update_dimensions(win_width, win_height);
-            update_size = false;
-            std::cout << "updated dimensions" << std::endl;
-        }
+ 
+        // std::cout << "\r"
+        //     << "The current path " << p << " decomposes into:\n"
+        //     << "root-path " << p.root_path() << '\n'
+        //     << "relative path " << p.relative_path() << std::flush;
+
+        // if(update_size) {
+        //     gol.update_dimensions(win_width, win_height);
+        //     update_size = false;
+        //     std::cout << "updated dimensions" << std::endl;
+        // }
 
         if (counter > delay) {
             if (!seeding && ready) {
