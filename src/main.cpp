@@ -16,7 +16,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
 static void display_FPS(GLFWwindow *window, double current_time);
 static void process_mouse_input(GLFWwindow *window, Gol *gol);
 
-float pixels_to_float(int pixels);
+// float pixels_to_float(int pixels);
 
 std::string GAME_NAME = "C GoL";
 std::string VERSION = "v0.9";
@@ -27,18 +27,19 @@ int nb_frames = 0;
 int last_time = 0;
 
 // viewport settings
-int width = 500;
-int height = 500;
+int win_width = 500;
+int win_height = 500;
 
 bool seeding = true;
 bool ready = false;
 bool pressing = false;
+bool update_size = false;
 
 float delta_time = 0.f;
 float last_frame = 0.f;
 
 int counter = 0;
-int delay = 10;
+int delay = 15;
 
 int main(int argc, char *argv[]) {
 
@@ -53,7 +54,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     GLFWwindow *window =
-        glfwCreateWindow(width, height, GAME_VERSION_NAME.c_str(), NULL, NULL);
+        glfwCreateWindow(win_width, win_height, GAME_VERSION_NAME.c_str(), NULL, NULL);
 
     if (!window) {
         std::cout << "Failed to initialize GLFW" << std::endl;
@@ -80,7 +81,7 @@ int main(int argc, char *argv[]) {
     }
 
     Shader shader_program("shaders/shader.vert", "shaders/shader.frag");
-    Gol gol(shader_program, width);
+    Gol gol(shader_program, win_width, win_height);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -99,6 +100,12 @@ int main(int argc, char *argv[]) {
 
         glClearColor(0.4f, 0.4f, 0.4f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        if(update_size) {
+            gol.update_dimensions(win_width, win_height);
+            update_size = false;
+            std::cout << "updated dimensions" << std::endl;
+        }
 
         if (counter > delay) {
             if (!seeding && ready) {
@@ -151,6 +158,11 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
+
+    win_width = width;
+    win_height = height;
+
+    update_size = true;
 }
 
 static void error_callback(int error, const char *description) {
@@ -159,7 +171,11 @@ static void error_callback(int error, const char *description) {
 
 void display_FPS(GLFWwindow *window, double current_time) {
     std::string NAME_FPS =
-        GAME_VERSION_NAME + " - " + std::to_string(nb_frames) + " FPS";
+        GAME_VERSION_NAME + " - " + std::to_string(nb_frames) + " FPS | tickrate: " + std::to_string(delay) + ((ready && !seeding)? " | simulation running!" : " | seeding!");
+
+    if(nb_frames < 60) {
+        delay = std::min(delay, nb_frames / 4);
+    }
 
     nb_frames = 0;
     last_time = current_time;
@@ -167,4 +183,4 @@ void display_FPS(GLFWwindow *window, double current_time) {
     glfwSetWindowTitle(window, NAME_FPS.c_str());
 }
 
-float pixels_to_float(int pixels) { return 2.f * float(pixels) / width; }
+// float pixels_to_float(int pixels) { return 2.f * float(pixels) / height; }

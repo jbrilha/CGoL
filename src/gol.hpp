@@ -2,6 +2,7 @@
 #define GOL_HPP
 
 #include "shaders.hpp"
+// #include "rect.hpp"
 #include "square.hpp"
 
 #include <glad/glad.h>
@@ -9,13 +10,15 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 
-static const int SQUARE_SIZE = 9;
+static const int SQUARE_SIZE = 4;
 static const int GAP = 1;
 
 class Gol {
   public:
-    Gol(Shader shader_program, int win_size);
+    // Gol(Shader shader_program, int win_size);
+    Gol(Shader shader_program, int win_width, int win_height);
     void update();
+    void update_dimensions(int win_width, int win_height);
 
     void draw();
     void render_cell(bool alive, int row, int col, glm::vec3 color1, glm::vec3 color2);
@@ -27,7 +30,9 @@ class Gol {
     int apply_rules(int row, int col);
 
     const Shader shader_program;
-    const int win_size;
+    // const int win_size;
+    float win_height;
+    float win_width;
     Square *square;
     int cell_size;
     int rows;
@@ -38,6 +43,6 @@ class Gol {
     std::vector<std::vector<int>> cells;
     std::vector<std::vector<int>> update_cells;
 
-    float pxls_to_float(int pixels);
+    float pxls_to_float(int pixels, int total_pixels);
 };
 #endif
