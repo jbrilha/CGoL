@@ -2,7 +2,6 @@
 #define GOL_HPP
 
 #include "shaders.hpp"
-// #include "rect.hpp"
 #include "square.hpp"
 
 #include <glad/glad.h>
@@ -15,7 +14,6 @@ static const int GAP = 1;
 
 class Gol {
   public:
-    // Gol(Shader shader_program, int win_size);
     Gol(Shader shader_program, int win_width, int win_height);
     void update();
     void update_dimensions(int win_width, int win_height);
@@ -30,7 +28,6 @@ class Gol {
     int apply_rules(int row, int col);
 
     const Shader shader_program;
-    // const int win_size;
     float win_height;
     float win_width;
     Square *square;
