@@ -15,18 +15,18 @@ static const int GAP = 1;
 class Gol {
   public:
     Gol(Shader shader_program, int win_size);
+    void update();
+
     void draw();
-    bool seeding;
+    void render_cell(bool alive, int row, int col, glm::vec3 color1, glm::vec3 color2);
     void set_value(double x_pos, double y_pos, int val);
+    void toggle_value(double x_pos, double y_pos);
 
   private:
-    void init();
     bool inbounds(int row, int col);
-    void apply_rules(int row, int col);
-    int counter = 0;
-    int delay = 20;
+    int apply_rules(int row, int col);
 
-    Shader shader_program;
+    const Shader shader_program;
     const int win_size;
     Square *square;
     int cell_size;
@@ -34,7 +34,9 @@ class Gol {
     int cols;
     float origin_x;
     float origin_y;
+
     std::vector<std::vector<int>> cells;
+    std::vector<std::vector<int>> update_cells;
 
     float pxls_to_float(int pixels);
 };

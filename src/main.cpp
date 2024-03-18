@@ -1,6 +1,5 @@
-#include "shaders.hpp"
-#include "square.hpp"
 #include "gol.hpp"
+#include "shaders.hpp"
 
 #define GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
@@ -32,9 +31,14 @@ int width = 500;
 int height = 500;
 
 bool seeding = true;
+bool ready = false;
+bool pressing = false;
 
 float delta_time = 0.f;
 float last_frame = 0.f;
+
+int counter = 0;
+int delay = 10;
 
 int main(int argc, char *argv[]) {
 
@@ -50,7 +54,6 @@ int main(int argc, char *argv[]) {
 
     GLFWwindow *window =
         glfwCreateWindow(width, height, GAME_VERSION_NAME.c_str(), NULL, NULL);
-
 
     if (!window) {
         std::cout << "Failed to initialize GLFW" << std::endl;
@@ -77,12 +80,12 @@ int main(int argc, char *argv[]) {
     }
 
     Shader shader_program("shaders/shader.vert", "shaders/shader.frag");
-    Square square(shader_program, pixels_to_float(SQUARE_SIZE));
     Gol gol(shader_program, width);
 
     glEnable(GL_DEPTH_TEST);
 
     while (!glfwWindowShouldClose(window)) {
+        counter++;
         process_mouse_input(window, &gol);
 
         float current_frame = static_cast<float>(glfwGetTime());
@@ -97,8 +100,12 @@ int main(int argc, char *argv[]) {
         glClearColor(0.4f, 0.4f, 0.4f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        gol.seeding = seeding;
-
+        if (counter > delay) {
+            if (!seeding && ready) {
+                gol.update();
+            }
+            counter = 0;
+        }
         gol.draw();
 
         glfwSwapBuffers(window);
@@ -116,14 +123,20 @@ static void process_mouse_input(GLFWwindow *window, Gol *gol) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
-    if (state == GLFW_PRESS)
-    {
-        double xpos, ypos;
-        glfwGetCursorPos(window, &xpos, &ypos);
-
-        if(seeding)
-            gol->set_value(xpos, ypos, 1);
+    double x_pos, y_pos;
+    glfwGetCursorPos(window, &x_pos, &y_pos);
+    int m1_state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+    if (m1_state == GLFW_PRESS) {
+        gol->set_value(x_pos, y_pos, 1);
+        seeding = true;
+    }
+    int m2_state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
+    if (m2_state == GLFW_PRESS) {
+        gol->set_value(x_pos, y_pos, 0);
+        seeding = true;
+    }
+    if (m2_state == GLFW_RELEASE && m1_state == GLFW_RELEASE) {
+        seeding = false;
     }
 }
 
@@ -131,19 +144,18 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
                          int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
-    if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
-        seeding = false;
+    if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
+        ready = !ready;
+    }
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
-    
 }
 
 static void error_callback(int error, const char *description) {
     fprintf(stderr, "Error: %s\n", description);
 }
-
 
 void display_FPS(GLFWwindow *window, double current_time) {
     std::string NAME_FPS =
@@ -155,6 +167,4 @@ void display_FPS(GLFWwindow *window, double current_time) {
     glfwSetWindowTitle(window, NAME_FPS.c_str());
 }
 
-float pixels_to_float(int pixels) {
-    return 2.f * float(pixels) / width;
-}
+float pixels_to_float(int pixels) { return 2.f * float(pixels) / width; }

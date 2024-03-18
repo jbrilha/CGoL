@@ -1,16 +1,9 @@
-// #include "shaders.hpp"
 #include "square.hpp"
-//
-// #include <glad/glad.h>
-// #include <glm/glm.hpp>
-// #include <glm/gtc/matrix_transform.hpp>
 
 Square::Square(Shader shader_program, float size) : shader_program(shader_program), size(size), color_set(false) {
     init();
-    // init(DEFAULT_COLOR);
 }
 Square::Square(Shader shader_program, float size, glm::vec3 color) : shader_program(shader_program), size(size), color_set(true), color(color) {
-    // init(color);
     init();
 }
 
@@ -29,8 +22,6 @@ void Square::draw(unsigned int primitive) {
 }
 
 void Square::init() {
-    // set_color(color);
-
     static const unsigned int indices[INDICES_NR] = {
         0, 1, 3,
         1, 2, 3
