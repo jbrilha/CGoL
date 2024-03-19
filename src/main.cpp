@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
     glfwMakeContextCurrent(window);
     // gladLoadGL();
     // limit frame_rate to display (kinda like V-Sync?)
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
 
     Shader shader_program((path_str + "/shaders/shader.vert").c_str(), (path_str + "/shaders/shader.frag").c_str());
     Gol gol(shader_program, win_width, win_height);
-    cell_count = (win_width / gol.cell_size) * (win_height / gol.cell_size);
+    cell_count = gol.cell_count;
 
     glEnable(GL_DEPTH_TEST);
 
