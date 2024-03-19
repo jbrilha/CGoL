@@ -9,7 +9,7 @@ Gol::Gol(Shader shader_program, int win_width, int win_height)
     : shader_program(shader_program), win_height(win_height), win_width(win_width),
       cell_size(SQUARE_SIZE + GAP), rows(win_height / cell_size), cols(win_width / cell_size),
       cell_count((win_width / cell_size) * (win_height / cell_size)),
-      cells(rows, std::vector<int>(cols, 0)), update_cells(cells) {
+      cells(cell_count, 0), update_cells(cells) {
 
     origin_x = -1.f + pxls_to_float(cell_size, win_width) / 2;
     origin_y = 1.f - pxls_to_float(cell_size, win_height) / 2;
@@ -21,26 +21,18 @@ void Gol::update_dimensions(int win_width, int win_height) {
     this->win_height = win_height;
     rows = win_height / cell_size;
     cols = win_width / cell_size;
-    // square = nullptr;
-    // TODO: update cells vector otherwise it crashes when trying to size window up
-
-    // square = new Square(shader_program, pxls_to_float(SQUARE_SIZE - GAP, std::min(win_height - GAP, win_width- GAP)));
 }
 
 void Gol::prepare_shaders() {
     glm::vec2 offsets[cell_count];
-    glm::vec2 states[cell_count];
     int i = 0;
 
     for (int row = 0; row < rows; row++) {
         for (int col = 0; col < cols; col++) {
-            offsets[i] = {
+            offsets[i++] = {
                 origin_x + pxls_to_float(cell_size, win_width) * col,
                 origin_y - pxls_to_float(cell_size, win_height) * row
             };
-
-            states[i] = {0, 0};
-            i++;
         }
     }
 
@@ -51,7 +43,7 @@ void Gol::prepare_shaders() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * (cell_count), &offsets[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBOs[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * (cell_count), &states[0], GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(int) * (cell_count), &cells[0], GL_STREAM_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -91,75 +83,67 @@ void Gol::prepare_shaders() {
 
     glEnableVertexAttribArray(3);
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBOs[1]); // this attribute comes from a different vertex buffer
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glVertexAttribPointer(3, 1, GL_INT, GL_FALSE, 1 * sizeof(int), (void*)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glVertexAttribDivisor(3, 1); // tell OpenGL this is an instanced vertex attribute.
 }
 
 void Gol::update_states() {
-    glm::vec2 states[cell_count];
-    int i = 0;
-    for(auto &row : cells) {
-        for(auto &col : row) {
-            states[i++] = { col, 0 };
-        }
-    }
-
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBOs[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * (cell_count), &states[0], GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(int) * (cell_count), &cells[0], GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Gol::update() {
-    update_cells = cells;
-    glm::vec2 states[cell_count];
-
-    int i = 0;
     char alive = 0;
 
-    for (int row = 0; row < rows; row++) {
-        for (int col = 0; col < cols; col++) {
-            alive = cells[row][col] ? 1 : 0;
+    for(int offset = 0; offset < cell_count; offset++) {
+        alive = cells[offset];
 
-            char neighbors = apply_rules(row, col);
+        char neighbors = apply_rules(offset);
 
-            if (alive && (neighbors < 2 || neighbors > 3)){
-                update_cells[row][col] = 0;
-            } 
-            if (!alive && neighbors == 3) {
-                update_cells[row][col] = 1;
-            }
-            states[i++] = { alive, 0 };
+        if (alive && (neighbors < 2 || neighbors > 3)){
+            update_cells[offset] = 0;
+        } 
+        else if (!alive && neighbors == 3) {
+            update_cells[offset] = 1;
+        } else {
+            update_cells[offset] = alive;
         }
+
     }
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBOs[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * (cell_count), &states[0], GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
     cells = update_cells;
+
+    update_states();
 }
 
 
 void Gol::set_value(double x_pos, double y_pos, int val) {
     int col = floor(((int)x_pos - GAP) % (int)(win_width)) / cell_size;
     int row = floor(((int)y_pos - 2 * GAP) % (int)(win_height)) / cell_size;
+    int offset = row * cols + col;
 
-    if (inbounds(row, col)) {
-        cells[row][col] = val;
+    if ( offset >= 0 && offset < cell_count) {
+        cells[offset] = val;
+        update_states();
     }
-    update_states();
 }
 
 
-char Gol::apply_rules(int row, int col) {
+char Gol::apply_rules(int offset) {
     char neighbors = 0;
+    int row = offset / cols;
+    int col = offset % cols;
+
     for (char i = -1; i < 2; i++) {
         for (char j = -1; j < 2; j++) {
             if (i == 0 && j == 0) continue;
 
             int neigh_row = (row + i + rows) % rows;
             int neigh_col = (col + j + cols) % cols;
+            int offset = neigh_row * cols + neigh_col;
 
-            if (inbounds(neigh_row, neigh_col) && cells[neigh_row][neigh_col]) {
+            if ( offset >= 0 && offset < cell_count && cells[offset]) {
                 neighbors++;
             }
         }
@@ -176,5 +160,4 @@ void Gol::draw() {
     glBindVertexArray(0);
 }
 
-bool Gol::inbounds(int row, int col) { return row >= 0 && row < rows && col >= 0 && col < cols; }
 float Gol::pxls_to_float(int pixels, int total_pixels) { return 2 * (float(pixels) / total_pixels); }

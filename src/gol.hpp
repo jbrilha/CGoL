@@ -2,7 +2,6 @@
 #define GOL_HPP
 
 #include "shaders.hpp"
-#include "square.hpp"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -28,8 +27,9 @@ class Gol {
     int cell_count;
 
   private:
-    bool inbounds(int row, int col);
-    char apply_rules(int row, int col);
+    // bool inbounds(int row, int col);
+    bool inbounds(int offset);
+    char apply_rules(int offset);
     float pxls_to_float(int pixels, int total_pixels);
     void prepare_shaders();
 
@@ -43,8 +43,10 @@ class Gol {
     unsigned int quadVAO;
     unsigned int instanceVBOs[2];
 
-    std::vector<std::vector<int>> cells;
-    std::vector<std::vector<int>> update_cells;
+    // std::vector<std::vector<int>> cells;
+    // std::vector<std::vector<int>> update_cells;
+    std::vector<int> cells;
+    std::vector<int> update_cells;
 
 };
 #endif
