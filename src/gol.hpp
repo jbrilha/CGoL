@@ -24,6 +24,8 @@ class Gol {
     void set_value(double x_pos, double y_pos, int val);
     void toggle_value(double x_pos, double y_pos);
 
+    const int cell_size;
+
   private:
     bool inbounds(int row, int col);
     int apply_rules(int row, int col);
@@ -33,7 +35,6 @@ class Gol {
     float win_height;
     float win_width;
     Square *square;
-    int cell_size;
     int rows;
     int cols;
     float origin_x;

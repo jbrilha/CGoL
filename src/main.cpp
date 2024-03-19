@@ -34,8 +34,9 @@ int nb_frames = 0;
 int last_time = 0;
 
 // viewport settings
-int win_width = 1200;
+int win_width = 800;
 int win_height = 800;
+int cell_count = 0;
 
 bool seeding = true;
 bool ready = false;
@@ -108,6 +109,7 @@ int main(int argc, char *argv[]) {
 
     Shader shader_program((path_str + "/shaders/shader.vert").c_str(), (path_str + "/shaders/shader.frag").c_str());
     Gol gol(shader_program, win_width, win_height);
+    cell_count = (win_width / gol.cell_size) * (win_height / gol.cell_size);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -203,7 +205,9 @@ static void error_callback(int error, const char *description) {
 
 void display_FPS(GLFWwindow *window, double current_time) {
     std::string NAME_FPS =
-        GAME_VERSION_NAME + " - " + std::to_string(nb_frames) + " FPS | tickrate: " + std::to_string(delay) + ((ready && !seeding)? " | simulation running!" : " | seeding!");
+        GAME_VERSION_NAME + " - " + std::to_string(nb_frames) + " FPS | tickrate: " + std::to_string(delay)
+                + " | " + std::to_string(cell_count) + " cells" + ((cell_count > 50000) ? " (woah)" : "")
+                + ((ready && !seeding)? " | simulation running!" : " | seeding!");
 
     if(nb_frames < 60) {
         delay = std::min(delay, nb_frames / 4);

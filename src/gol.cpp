@@ -48,8 +48,8 @@ void Gol::prepare_shaders() {
 
             states[i] = state;
             offsets[i] = offset;
-            std::cout << i << " || " << offsets[i].x << " / " << offsets[i].y << " || sz: " << offsets->length() << std::endl;
-            std::cout << i << " || " << states[i].x << " / " << states[i].y << " || sz: " << states->length() << std::endl;
+            // std::cout << i << " || " << offsets[i].x << " / " << offsets[i].y << " || sz: " << offsets->length() << std::endl;
+            // std::cout << i << " || " << states[i].x << " / " << states[i].y << " || sz: " << states->length() << std::endl;
             i++;
         }
     }
@@ -119,7 +119,7 @@ void Gol::update_states() {
             state.y = 0;
 
             states[i] = state;
-            std::cout << i << " || " << states[i].x << " / " << states[i].y << " || sz: " << states->length() << std::endl;
+            // std::cout << i << " || " << states[i].x << " / " << states[i].y << " || sz: " << states->length() << std::endl;
             i++;
         }
     }
@@ -146,7 +146,7 @@ void Gol::update() {
             int neighbors = apply_rules(row, col);
 
             if (alive && (neighbors < 2 || neighbors > 3)){
-                std::cout << "Alive!" << std::endl;
+                // std::cout << "Alive!" << std::endl;
                 update_cells[row][col] = 0;
             } 
             if (!alive && neighbors == 3) {
