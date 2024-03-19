@@ -34,7 +34,7 @@ int nb_frames = 0;
 int last_time = 0;
 
 // viewport settings
-int win_width = 1400;
+int win_width = 1500;
 int win_height = 800;
 int cell_count = 0;
 

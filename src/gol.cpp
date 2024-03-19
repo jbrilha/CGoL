@@ -128,25 +128,41 @@ void Gol::update_states() {
 
 void Gol::update() {
     update_cells = cells;
+    glm::vec2 states[rows * cols];
+    // states[5] = glm::vec2(1.f);
+    int i = 0;
     int alive = 0;
+    glm::vec2 state;
     for (int row = 0; row < rows; row++) {
         for (int col = 0; col < cols; col++) {
-            glm::vec2 state;
+            // state.y = 1;
             alive = cells[row][col] ? 1 : 0;
+            state.x = alive;
 
             int neighbors = apply_rules(row, col);
 
             if (alive && (neighbors < 2 || neighbors > 3)){
                 // std::cout << "Alive!" << std::endl;
                 update_cells[row][col] = 0;
+                // state.x = 0;
             } 
             if (!alive && neighbors == 3) {
                 update_cells[row][col] = 1;
+                // state.x = 1;
             }
+            states[i] = state;
+            // if( i == 5 || i == 4)
+                // std::cout << "\r" << i << " || " << states[i].x << " / " << states[i].y << " || sz: " << states->length() << std::flush;
+                // std::cout  << i << " || " << state.x << " / " << state.y << std::endl;
+                // std::cout  << i << " || " << states[i].x << " / " << states[i].y << " || sz: " << states->length() << std::endl;
+            i++;
         }
     }
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBOs[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * (rows * cols), &states[0], GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     cells = update_cells;
-    update_states();
+    // update_states();
 }
 
 
