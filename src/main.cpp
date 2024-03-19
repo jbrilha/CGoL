@@ -35,7 +35,7 @@ int last_time = 0;
 
 // viewport settings
 int win_width = 1500;
-int win_height = 800;
+int win_height = 900;
 int cell_count = 0;
 
 bool seeding = true;
