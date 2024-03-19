@@ -16,6 +16,7 @@ class Gol {
   public:
     Gol(Shader shader_program, int win_width, int win_height);
     void update();
+    void update_states();
     void update_dimensions(int win_width, int win_height);
 
     void draw();
@@ -26,8 +27,9 @@ class Gol {
   private:
     bool inbounds(int row, int col);
     int apply_rules(int row, int col);
+    void prepare_shaders();
 
-    const Shader shader_program;
+    Shader shader_program;
     float win_height;
     float win_width;
     Square *square;
@@ -36,6 +38,10 @@ class Gol {
     int cols;
     float origin_x;
     float origin_y;
+    unsigned int quadVAO;
+    unsigned int instanceVBOs[2];
+
+    std::vector<int> states_vec;
 
     std::vector<std::vector<int>> cells;
     std::vector<std::vector<int>> update_cells;

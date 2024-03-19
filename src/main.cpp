@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 #include <libproc.h>
 #include <string>
 #include <unistd.h>
@@ -35,8 +34,8 @@ int nb_frames = 0;
 int last_time = 0;
 
 // viewport settings
-int win_width = 1400;
-int win_height = 900;
+int win_width = 1200;
+int win_height = 800;
 
 bool seeding = true;
 bool ready = false;

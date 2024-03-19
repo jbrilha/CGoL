@@ -28,11 +28,11 @@ void Square::init() {
     };
 
     static const float vert = size / 2;
-    static float vertices[12] = {
-        vert,  vert, 0.f,  // top right
-        vert, -vert, 0.f,  // bot right
-       -vert, -vert, 0.f,  // bot left
-       -vert,  vert, 0.f,  // top left
+    static float vertices[8] = {
+        vert,  vert,  // top right
+        vert, -vert,  // bot right
+       -vert, -vert,  // bot left
+       -vert,  vert,  // top left
     };
 
     glGenVertexArrays(1, &VAO);
@@ -49,7 +49,7 @@ void Square::init() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
                  GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
                           (void *)0);
     glEnableVertexAttribArray(0);
 
