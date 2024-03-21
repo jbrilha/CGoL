@@ -8,7 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 
-static const int SQUARE_SIZE = 1;
+static const int SQUARE_SIZE = 4;
 static const int GAP = 1;
 
 class Gol {

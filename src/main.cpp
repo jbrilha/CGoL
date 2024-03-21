@@ -206,12 +206,9 @@ static void error_callback(int error, const char *description) {
 void display_FPS(GLFWwindow *window, double current_time) {
     std::string NAME_FPS =
         GAME_VERSION_NAME + " - " + std::to_string(nb_frames) + " FPS | tickrate: " + std::to_string(delay)
-                + " | " + std::to_string(cell_count) + " cells" + ((cell_count > 50000) ? " (woah)" : "")
-                + ((ready && !seeding)? " | simulation running!" : " | seeding!");
+                + " | " + std::to_string(cell_count) + " cells" + ((ready && !seeding)? " | simulation running!" : " | seeding!");
 
-    if(nb_frames < 60) {
-        delay = std::min(delay, nb_frames / 4);
-    }
+    delay = std::max(delay, nb_frames / 10);
 
     nb_frames = 0;
     last_time = current_time;
