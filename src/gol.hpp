@@ -23,6 +23,7 @@ class Gol {
     void set_value(double x_pos, double y_pos, int val);
     void toggle_value(double x_pos, double y_pos);
 
+    bool plague;
     const int cell_size;
     int cell_count;
 

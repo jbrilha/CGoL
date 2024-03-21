@@ -8,7 +8,7 @@ glm::vec3 grey = glm::vec3(0.3f, 0.3f, 0.3f);
 Gol::Gol(Shader shader_program, int win_width, int win_height)
     : shader_program(shader_program), win_height(win_height), win_width(win_width),
       cell_size(SQUARE_SIZE + GAP), rows(win_height / cell_size), cols(win_width / cell_size),
-      cell_count((win_width / cell_size) * (win_height / cell_size)),
+      cell_count((win_width / cell_size) * (win_height / cell_size)), plague(false),
       cells(cell_count, 0), update_cells(cells) {
 
     origin_x = -1.f + pxls_to_float(cell_size, win_width) / 2;
@@ -103,16 +103,25 @@ void Gol::update() {
         char neighbors = apply_rules(offset);
 
         if (alive && (neighbors < 2 || neighbors > 3)){
-            update_cells[offset] = 0;
+            if(!plague)
+                update_cells[offset] = 0;
+            else
+                cells[offset] = 0;
         } 
         else if (!alive && neighbors == 3) {
-            update_cells[offset] = 1;
+            if(!plague)
+                update_cells[offset] = 1;
+            else
+                cells[offset] = 1;
         } else {
-            update_cells[offset] = alive;
+            if(!plague)
+                update_cells[offset] = alive;
+            else
+                cells[offset] = alive;
         }
-
     }
-    cells = update_cells;
+    if(!plague)
+        cells = update_cells;
 
     update_states();
 }

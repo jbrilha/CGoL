@@ -42,6 +42,7 @@ bool seeding = true;
 bool ready = false;
 bool pressing = false;
 bool update_size = false;
+bool plague = false;
 
 float delta_time = 0.f;
 float last_frame = 0.f;
@@ -129,18 +130,8 @@ int main(int argc, char *argv[]) {
         glClearColor(0.4f, 0.4f, 0.4f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        gol.plague = plague;
  
-        // std::cout << "\r"
-        //     << "The current path " << p << " decomposes into:\n"
-        //     << "root-path " << p.root_path() << '\n'
-        //     << "relative path " << p.relative_path() << std::flush;
-
-        // if(update_size) {
-        //     gol.update_dimensions(win_width, win_height);
-        //     update_size = false;
-        //     std::cout << "updated dimensions" << std::endl;
-        // }
-
         if (counter > delay) {
             if (!seeding && ready) {
                 gol.update();
@@ -188,6 +179,9 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
     if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
         ready = !ready;
     }
+    if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+        plague = !plague;
+    }
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
@@ -206,7 +200,8 @@ static void error_callback(int error, const char *description) {
 void display_FPS(GLFWwindow *window, double current_time) {
     std::string NAME_FPS =
         GAME_VERSION_NAME + " - " + std::to_string(nb_frames) + " FPS | tickrate: " + std::to_string(delay)
-                + " | " + std::to_string(cell_count) + " cells" + ((ready && !seeding)? " | simulation running!" : " | seeding!");
+                + " | " + std::to_string(cell_count) + " cells"
+                + " | " + ((ready && !seeding)? (plague ?  "plague!" : "life!") : "seeding!");
 
     delay = std::max(delay, nb_frames / 10);
 
