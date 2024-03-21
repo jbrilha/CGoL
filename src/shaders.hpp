@@ -12,6 +12,7 @@ class Shader {
   public:
     unsigned int program_ID;
 
+    Shader() {};
     Shader(const char *vert_path, const char *frag_path) {
         std::string vert_code;
         std::string frag_code;
