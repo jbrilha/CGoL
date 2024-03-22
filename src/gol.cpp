@@ -1,14 +1,13 @@
 #include "gol.hpp"
 #include "shaders.hpp"
+#include <algorithm>
+//
+// glm::vec3 red = glm::vec3(1.f, 0.f, 0.f);
+// glm::vec3 green = glm::vec3(0.f, 1.f, 0.f);
+// glm::vec3 blue = glm::vec3(0.f, 0.f, 1.f);
+// glm::vec3 grey = glm::vec3(0.3f, 0.3f, 0.3f);
 
-glm::vec3 red = glm::vec3(1.f, 0.f, 0.f);
-glm::vec3 green = glm::vec3(0.f, 1.f, 0.f);
-glm::vec3 blue = glm::vec3(0.f, 0.f, 1.f);
-glm::vec3 grey = glm::vec3(0.3f, 0.3f, 0.3f);
-
-Gol::Gol() : cell_size(SQUARE_SIZE + GAP) {
-    std::cout << "empty constructor for gol" << std::endl;
-}
+Gol::Gol() : cell_size(SQUARE_SIZE + GAP) {}
 
 Gol::Gol(std::string path_str, int win_width, int win_height)
     : shader_program((path_str + "/shaders/shader.vert").c_str(),
@@ -18,13 +17,7 @@ Gol::Gol(std::string path_str, int win_width, int win_height)
       cols(win_width / cell_size),
       cell_count((win_width / cell_size) * (win_height / cell_size)),
       plague(false), cells(cell_count, 0), update_cells(cells) {
-    std::cout << "NOT empty constructor for gol" << std::endl;
 
-    // std::cout << "GOL constructor: " << win_width << " | hei: " << win_height
-    //           << " | cc: " << cell_count << std::endl;
-    // /*shader_program = new*/ Shader shader_program((path_str +
-    // "/shaders/shader.vert").c_str(), (path_str +
-    // "/shaders/shader.frag").c_str());
     origin_x = -1.f + pxls_to_float(cell_size, win_width) / 2;
     origin_y = 1.f - pxls_to_float(cell_size, win_height) / 2;
     prepare_shaders();
@@ -33,8 +26,33 @@ Gol::Gol(std::string path_str, int win_width, int win_height)
 void Gol::update_dimensions(int win_width, int win_height) {
     this->win_width = win_width;
     this->win_height = win_height;
+
     rows = win_height / cell_size;
     cols = win_width / cell_size;
+
+    int new_cell_count = (win_width / cell_size) * (win_height / cell_size);
+    std::vector<int>new_cells (new_cell_count, 0);
+    if(new_cell_count > cell_count) {
+        int offset = (new_cell_count - cell_count) / 2;
+
+        std::copy(cells.begin(), cells.end(), new_cells.begin() + offset);
+
+        // cells = std::vector<int>(new_cell_count, 0);
+        cells = new_cells;
+    }
+    else {
+        std::copy(cells.begin(), cells.begin() + new_cell_count, new_cells.begin());
+        // cells = std::vector<int>(new_cell_count, 0);
+        cells = new_cells;
+        // cells.shrink_to_fit();
+    }
+    cell_count = new_cell_count;
+    update_cells = std::vector<int>(cell_count, 0);
+
+    origin_x = -1.f + pxls_to_float(cell_size, win_width) / 2;
+    origin_y = 1.f - pxls_to_float(cell_size, win_height) / 2;
+
+    prepare_shaders();
 }
 
 void Gol::prepare_shaders() {
@@ -49,8 +67,6 @@ void Gol::prepare_shaders() {
         }
     }
 
-    std::cout << "instanced!" << std::endl;
-
     glGenBuffers(2, instanceVBOs);
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBOs[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * (cell_count), &offsets[0],
@@ -61,11 +77,9 @@ void Gol::prepare_shaders() {
                  GL_STREAM_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    static const float x_vert = pxls_to_float(SQUARE_SIZE, win_width) / 2;
-    static const float y_vert = pxls_to_float(SQUARE_SIZE, win_height) / 2;
-    static const float quadVertices[12] = {
+    float x_vert = pxls_to_float(SQUARE_SIZE, win_width) / 2;
+    float y_vert = pxls_to_float(SQUARE_SIZE, win_height) / 2;
+    float quadVertices[12] = {
         -x_vert, y_vert,  // top right
         x_vert,  -y_vert, // bot right
         -x_vert, -y_vert, // bot left
@@ -74,10 +88,6 @@ void Gol::prepare_shaders() {
         x_vert,  -y_vert, x_vert, y_vert,
     };
 
-    std::cout << "GOL prep wid: " << win_width << " | hei: " << win_height
-              << " | cc: " << cell_count << " | x: " << x_vert << " | y: " << y_vert 
-              << " | cells: " << cells.size() 
-              << " | sp: " << shader_program.program_ID << std::endl;
     unsigned int quadVBO;
     glGenVertexArrays(1, &quadVAO);
     glGenBuffers(1, &quadVBO);
@@ -116,8 +126,6 @@ void Gol::prepare_shaders() {
 }
 
 void Gol::update_states() {
-    // std::cout << "GOL states wid: " << win_width << " | hei: " << win_height
-    // << " | cc: " << cell_count << std::endl;
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBOs[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(int) * (cell_count), &cells[0],
                  GL_DYNAMIC_DRAW);
@@ -126,17 +134,9 @@ void Gol::update_states() {
 
 void Gol::update() {
     char alive = 0;
-    // std::cout << "GOL updt wid: " << win_width << " | hei: " << win_height <<
-    // " | cc: " << cell_count << std::endl;
 
     for (int offset = 0; offset < cell_count; offset++) {
         alive = cells[offset];
-        if (alive)
-            std::cout << "\r"
-                      << "alive!" << std::flush;
-        else
-            std::cout << "\r"
-                      << "dead!" << std::flush;
 
         char neighbors = apply_rules(offset);
 
@@ -167,14 +167,18 @@ void Gol::set_value(double x_pos, double y_pos, int val) {
     int col = floor(((int)x_pos - GAP) % (int)(win_width)) / cell_size;
     int row = floor(((int)y_pos - 2 * GAP) % (int)(win_height)) / cell_size;
     int offset = row * cols + col;
-    // std::cout << "\r" << "offset: " << offset << " | col: " << col << " |
-    // row: " << row << " | cell count " << cell_count << std::flush;
 
     if (offset >= 0 && offset < cell_count) {
-        // std::cout << "\r" << "set val: " << val << std::flush;
         cells[offset] = val;
         update_states();
     }
+}
+
+void Gol::fill_random() {
+    for(int &cell : cells) {
+        cell = (rand() % 100) < 25 ? 1 : 0;
+    }
+    update_states();
 }
 
 char Gol::apply_rules(int offset) {
@@ -207,6 +211,14 @@ void Gol::draw() {
     glDrawArraysInstanced(GL_TRIANGLES, 0, 6, cell_count);
     glBindVertexArray(0);
 }
+
+void Gol::clear() {
+    cells.clear();
+    cells = std::vector<int>(cell_count, 0);
+    update_states();
+}
+
+void Gol::toggle_plague() { plague = !plague; }
 
 float Gol::pxls_to_float(int pixels, int total_pixels) {
     return 2 * (float(pixels) / total_pixels);

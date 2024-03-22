@@ -1,7 +1,29 @@
 #include "simulation.hpp"
+#include <string>
 
-Simulation::Simulation() : path_str(get_executable_path()), win_width(WIN_WIDTH), win_height(WIN_HEIGHT)
-{
+int nb_frames;
+int last_time;
+
+// viewport settings
+int cell_count;
+
+bool seeding;
+bool ready;
+// bool pressing;
+bool update_size;
+bool plague;
+
+float delta_time;
+float last_frame;
+
+int counter;
+int delay;
+Simulation::Simulation()
+    : path_str(get_executable_path()), win_width(WIN_WIDTH), FPS(""),
+      win_height(WIN_HEIGHT), nb_frames(0), last_time(0), cell_count(0),
+      seeding(true), ready(false), update_size(false), plague(false),
+      delta_time(0.f), last_frame(0.f), counter(0), delay(10) {
+
     if (path_str.empty()) {
         std::cerr << "Error: Failed to retrieve executable path" << std::endl;
         exit(EXIT_FAILURE);
@@ -9,6 +31,7 @@ Simulation::Simulation() : path_str(get_executable_path()), win_width(WIN_WIDTH)
 
     init_GLFW();
 }
+
 Simulation::~Simulation() {
     delete life;
     life = nullptr;
@@ -16,9 +39,10 @@ Simulation::~Simulation() {
 
 void Simulation::init_life() {
     life = new Gol(path_str, win_width, win_height);
+    cell_count = life->cell_count;
 }
 
-bool Simulation::run(){
+bool Simulation::run() {
     while (!glfwWindowShouldClose(window)) {
         counter++;
         process_mouse_input();
@@ -30,12 +54,18 @@ bool Simulation::run(){
         double current_time = glfwGetTime();
         nb_frames++;
         if (current_time - last_time >= 1.0)
-            display_FPS(window, current_time);
+            update_FPS(current_time);
+
+        update_title_bar();
 
         glClearColor(0.4f, 0.4f, 0.4f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        life->plague = plague;
+        if (update_size) {
+            life->update_dimensions(win_width / 2, win_height / 2);
+            cell_count = life->cell_count;
+            update_size = false;
+        }
 
         if (counter > delay) {
             if (!seeding && ready) {
@@ -56,7 +86,7 @@ bool Simulation::run(){
     return false;
 }
 
-std::string Simulation::get_executable_path(){
+std::string Simulation::get_executable_path() {
     char path[1024];
     uint32_t size = sizeof(path);
     if (_NSGetExecutablePath(path, &size) == 0)
@@ -67,13 +97,16 @@ std::string Simulation::get_executable_path(){
     std::string str(path);
     std::string path_str = path;
 
-    std::string clean_path(path_str.c_str(), path_str.c_str() + path_str.rfind("/"));
-    std::string cleanest_path(clean_path.c_str(), clean_path.c_str() + clean_path.rfind("/"));
+    // there's definitely a better way to do this but whatever
+    std::string clean_path(path_str.c_str(),
+                           path_str.c_str() + path_str.rfind("/"));
+    std::string cleanest_path(clean_path.c_str(),
+                              clean_path.c_str() + clean_path.rfind("/"));
 
     return cleanest_path;
 }
 
- void Simulation::process_mouse_input() {
+void Simulation::process_mouse_input() {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
@@ -97,30 +130,35 @@ std::string Simulation::get_executable_path(){
 void Simulation::set_callbacks() {
     glfwSetWindowUserPointer(window, this);
 
-    glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-        Simulation* instance = static_cast<Simulation*>(glfwGetWindowUserPointer(window));
+    glfwSetKeyCallback(window, [](GLFWwindow *window, int key, int scancode,
+                                  int action, int mods) {
+        Simulation *instance =
+            static_cast<Simulation *>(glfwGetWindowUserPointer(window));
         if (instance)
             instance->key_callback(window, key, scancode, action, mods);
     });
-    glfwSetErrorCallback([](int error, const char* description) {
-        GLFWwindow* curr_window = glfwGetCurrentContext();
+    glfwSetErrorCallback([](int error, const char *description) {
+        GLFWwindow *curr_window = glfwGetCurrentContext();
         if (curr_window != nullptr) {
-            Simulation* instance = static_cast<Simulation*>(glfwGetWindowUserPointer(curr_window));
+            Simulation *instance = static_cast<Simulation *>(
+                glfwGetWindowUserPointer(curr_window));
             if (instance)
                 instance->error_callback(error, description);
         } else {
             fprintf(stderr, "Error (No window available): %s\n", description);
         }
     });
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-        Simulation* instance = static_cast<Simulation*>(glfwGetWindowUserPointer(window));
-        if (instance)
-            instance->framebuffer_size_callback(window, width, height);
-    });
+    glfwSetFramebufferSizeCallback(
+        window, [](GLFWwindow *window, int width, int height) {
+            Simulation *instance =
+                static_cast<Simulation *>(glfwGetWindowUserPointer(window));
+            if (instance)
+                instance->framebuffer_size_callback(window, width, height);
+        });
 }
 
-void Simulation::key_callback(GLFWwindow *window, int key, int scancode, int action,
-                         int mods) {
+void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
+                              int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
@@ -128,32 +166,45 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode, int act
     }
     if (key == GLFW_KEY_P && action == GLFW_PRESS) {
         plague = !plague;
+        life->toggle_plague();
+    }
+    if (key == GLFW_KEY_C && action == GLFW_PRESS) {
+        life->clear();
+    }
+    if (key == GLFW_KEY_R && action == GLFW_PRESS) {
+        life->fill_random();
     }
 }
 
-void Simulation::framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+void Simulation::framebuffer_size_callback(GLFWwindow *window, int width,
+                                           int height) {
     glViewport(0, 0, width, height);
 
     win_width = width;
     win_height = height;
 
-    // update_size = true;
+    update_size = true;
 }
 
 void Simulation::error_callback(int error, const char *description) {
     fprintf(stderr, "Error: %s\n", description);
 }
 
-void Simulation::display_FPS(GLFWwindow *window, double current_time) {
-    std::string NAME_FPS =
-        GAME_VERSION_NAME + " - " + std::to_string(nb_frames) + " FPS | tickrate: " + std::to_string(delay)
-                + " | " + std::to_string(cell_count) + " cells"
-                + " | " + ((ready && !seeding)? (plague ?  "plague!" : "life!") : "seeding!");
-
+void Simulation::update_FPS(double current_time) {
     delay = std::max(delay, nb_frames / 10);
+
+    FPS = std::to_string(nb_frames);
 
     nb_frames = 0;
     last_time = current_time;
+}
+
+void Simulation::update_title_bar() {
+    std::string NAME_FPS =
+        GAME_VERSION_NAME + " - " + FPS + " FPS | tickrate: "
+        + std::to_string(delay) + " | " +
+        std::to_string(cell_count) + " cells" + " | " +
+        ((ready && !seeding) ? (plague ? "plague!" : "life!") : "seeding!");
 
     glfwSetWindowTitle(window, NAME_FPS.c_str());
 }
@@ -169,9 +220,8 @@ void Simulation::init_GLFW() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    window =
-        glfwCreateWindow(win_width, win_height, GAME_VERSION_NAME.c_str(), NULL, NULL);
-        std::cout << window << std::endl;
+    window = glfwCreateWindow(win_width, win_height, GAME_VERSION_NAME.c_str(),
+                              NULL, NULL);
 
     if (!window) {
         std::cout << window << "Failed to initialize GLFW" << std::endl;
