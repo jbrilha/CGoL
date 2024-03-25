@@ -22,8 +22,10 @@ find_package(OpenGL REQUIRED)
 
 include_directories(${OPENGL_INCLUDE_DIR})
 
-add_subdirectory(includes)
-add_executable(cgol src/main.cpp src/simulation.cpp src/automaton.cpp src/life.cpp src/seeds.cpp src/brain.cpp src/disease.cpp)
+add_subdirectory(includes automata)
+file(GLOB SOURCES "src/*.cpp")
+# add_executable(cgol src/main.cpp src/simulation.cpp src/automaton.cpp src/life.cpp src/seeds.cpp src/brain.cpp src/disease.cpp src/sand.cpp)
+add_executable(cgol ${SOURCES})
 
 target_link_libraries(cgol ${OpenGL_gl_LIBRARY} glfw glad)
 include_directories(${CMAKE_SOURCE_DIR}/includes)
