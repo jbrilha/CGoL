@@ -26,4 +26,8 @@ Copy into your terminal while on the parent directory:
 cmake -B build --fresh && cmake --build build
 ```
 
-If everything goes as it's supposed to, you should find the built executable in the bin directory
+If everything goes as it's supposed to, you should find the built executable in the bin directory.
+To run it:
+```sh
+./bin/cgol
+```
