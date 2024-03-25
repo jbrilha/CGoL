@@ -1,11 +1,11 @@
-#include "disease.hpp"
-Disease::Disease(std::string path_str, int win_width, int win_height)
-        : Automaton(path_str, win_width, win_height) {
+#include "lfod.hpp"
+LFod::LFod(std::string path_str, int win_width, int win_height)
+    : Automaton(path_str, win_width, win_height) {
 
     set_cell_colors();
 };
 
-void Disease::update() {
+void LFod::update() {
     int state = 0;
 
     for (int offset = 0; offset < cell_count; offset++) {
@@ -13,9 +13,9 @@ void Disease::update() {
 
         int neighbors = apply_rules(offset);
 
-        if (state && (neighbors >= 3 && neighbors <= 6)) {
+        if (state && !neighbors) {
             update_cells[offset] = 1;
-        } else if (!state && (neighbors == 3 || neighbors == 6)) {
+        } else if (!state && neighbors == 2) {
             update_cells[offset] = 1;
         } else {
             update_cells[offset] = 0;
@@ -26,7 +26,7 @@ void Disease::update() {
     update_states();
 }
 
-int Disease::apply_rules(int offset) {
+int LFod::apply_rules(int offset) {
     int neighbors = 0;
     int row = offset / cols;
     int col = offset % cols;
@@ -49,14 +49,14 @@ int Disease::apply_rules(int offset) {
     return neighbors;
 }
 
-void Disease::set_cell_colors() {
+void LFod::set_cell_colors() {
     shader_program.set_vec3("color0", grey);
-    shader_program.set_vec3("color1", light_blue);
+    shader_program.set_vec3("color1", red);
 }
 
-std::string Disease::get_type() {
+std::string LFod::get_type() {
     std::string type_name = typeid(*this).name();
     std::string clean_name(type_name.begin() + 1, type_name.end());
 
-    return "3: " + clean_name;
+    return "4: " + clean_name;
 }

@@ -9,6 +9,9 @@
 #include "disease.hpp"
 #include "brain.hpp"
 #include "seeds.hpp"
+#include "rule90.hpp"
+#include "lfod.hpp"
+#include "day_n_nite.hpp"
 
 #define GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
@@ -17,8 +20,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-const int WIN_WIDTH = 1500;
-const int WIN_HEIGHT = 800;
+const int WIN_WIDTH = 800;
+const int WIN_HEIGHT = 600;
 
 class Simulation {
   public:
@@ -68,6 +71,7 @@ class Simulation {
     bool update_size;
     bool plague;
     bool step;
+    bool immovable;
 
     float delta_time;
     float last_frame;

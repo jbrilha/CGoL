@@ -60,5 +60,5 @@ std::string Brain::get_type() {
     std::string type_name = typeid(*this).name();
     std::string clean_name(type_name.begin() + 1, type_name.end());
 
-    return clean_name;
+    return "1: " + clean_name;
 }

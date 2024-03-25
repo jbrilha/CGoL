@@ -7,6 +7,7 @@ layout (location = 2) in int aState;
 uniform vec3 color0;
 uniform vec3 color1;
 uniform vec3 color2;
+uniform vec3 color3;
 
 out vec3 color;
 
@@ -17,4 +18,5 @@ void main()
     if(aState == 0) { color = color0; }
     else if(aState == 1) { color = color1; }
     else if(aState == 2) { color = color2; }
+    else if(aState == 3) { color = color3; }
 }

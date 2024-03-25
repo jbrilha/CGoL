@@ -4,7 +4,7 @@ Simulation::Simulation()
     : path_str(get_executable_path()), win_height(WIN_HEIGHT),
       win_width(WIN_WIDTH), automaton(nullptr), nb_frames(0), last_time(0),
       FPS(""), cell_count(0), seeding(true), ready(false), update_size(false),
-      plague(false), delta_time(0.f), last_frame(0.f), counter(0), delay(10) {
+      plague(false), immovable(false), delta_time(0.f), last_frame(0.f), counter(0), delay(10) {
 
     if (path_str.empty()) {
         std::cerr << "Error: Failed to retrieve executable path" << std::endl;
@@ -27,7 +27,7 @@ void Simulation::set_automaton(Automaton *automaton) {
 }
 
 void Simulation::init() {
-    automaton = new Brain(path_str, win_width, win_height);
+    automaton = new Life(path_str, win_width, win_height);
     cell_count = automaton->get_cell_count();
 }
 
@@ -109,6 +109,8 @@ void Simulation::process_mouse_input() {
     glfwGetCursorPos(window, &x_pos, &y_pos);
     int m1_state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
     if (m1_state == GLFW_PRESS) {
+        // int val = immovable ? 2 : 1;
+
         automaton->set_value(x_pos, y_pos, 1);
         seeding = true;
     }
@@ -171,30 +173,50 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
     if (key == GLFW_KEY_R && action == GLFW_PRESS) {
         automaton->fill_random();
     }
-    if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-        set_automaton(new Seeds(path_str, win_width, win_height));
-        ready = false;
-        plague = false;
-    }
-    if (key == GLFW_KEY_L && action == GLFW_PRESS) {
-        set_automaton(new Life(path_str, win_width, win_height));
-        ready = false;
-        plague = false;
-    }
-    if (key == GLFW_KEY_B && action == GLFW_PRESS) {
-        set_automaton(new Brain(path_str, win_width, win_height));
-        ready = false;
-        plague = false;
-    }
-    if (key == GLFW_KEY_D && action == GLFW_PRESS) {
-        set_automaton(new Disease(path_str, win_width, win_height));
-        ready = false;
-        plague = false;
-    }
+    // if(automaton->get_type().find("Sand") != std::string::npos) {
+    //     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) { 
+    //         immovable = !immovable;
+    //     }
+    // }
     if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) { 
         step = true;
     }
 
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
+        set_automaton(new Brain(path_str, win_width, win_height));
+        ready = false;
+        plague = false;
+    }
+    if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
+        set_automaton(new DayNNite(path_str, win_width, win_height));
+        ready = false;
+        plague = false;
+    }
+    if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
+        set_automaton(new Disease(path_str, win_width, win_height));
+        ready = false;
+        plague = false;
+    }
+    if (key == GLFW_KEY_4 && action == GLFW_PRESS) {
+        set_automaton(new LFod(path_str, win_width, win_height));
+        ready = false;
+        plague = false;
+    }
+    if (key == GLFW_KEY_5 && action == GLFW_PRESS) {
+        set_automaton(new Life(path_str, win_width, win_height));
+        ready = false;
+        plague = false;
+    }
+    if (key == GLFW_KEY_6 && action == GLFW_PRESS) {
+        set_automaton(new Rule90(path_str, win_width, win_height));
+        ready = false;
+        plague = false;
+    }
+    if (key == GLFW_KEY_7 && action == GLFW_PRESS) {
+        set_automaton(new Seeds(path_str, win_width, win_height));
+        ready = false;
+        plague = false;
+    }
 }
 
 void Simulation::framebuffer_size_callback(GLFWwindow *window, int width,
@@ -224,7 +246,8 @@ void Simulation::update_title_bar() {
     std::string NAME_FPS =
         GAME_VERSION_NAME + " - " + FPS +
         " FPS | tickrate: " + std::to_string(delay) + " | " +
-        std::to_string(cell_count) + " cells" + " | " + automaton->get_type();
+        std::to_string(cell_count) + " cells" + " | " + automaton->get_type()
+        + (immovable ? "*" : "");
         // ((ready && !seeding) ? (plague ? "plague!" : "automaton!")
         //                      : "seeding!");
 
