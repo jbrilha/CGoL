@@ -8,7 +8,7 @@ set(CMAKE_CXX_COMPILER "g++")
 # add_compile_options(-Wall -Wextra -Wpedantic)
 add_compile_options(-Wall)
 
-project(gol LANGUAGES C CXX VERSION 1.0.0)
+project(cgol LANGUAGES C CXX VERSION 1.0.0)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -23,7 +23,7 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 add_subdirectory(includes)
-add_executable(gol src/main.cpp src/simulation.cpp src/automaton.cpp src/life.cpp src/seeds.cpp src/brain.cpp src/disease.cpp)
+add_executable(cgol src/main.cpp src/simulation.cpp src/automaton.cpp src/life.cpp src/seeds.cpp src/brain.cpp src/disease.cpp)
 
-target_link_libraries(gol ${OpenGL_gl_LIBRARY} glfw glad)
+target_link_libraries(cgol ${OpenGL_gl_LIBRARY} glfw glad)
 include_directories(${CMAKE_SOURCE_DIR}/includes)
