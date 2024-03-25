@@ -4,7 +4,11 @@
 #include <libproc.h>
 #include <mach-o/dyld.h>
 
-#include "gol.hpp"
+#include "automaton.hpp"
+#include "life.hpp"
+#include "disease.hpp"
+#include "brain.hpp"
+#include "seeds.hpp"
 
 #define GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
@@ -13,17 +17,19 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-const int WIN_WIDTH = 600;
-const int WIN_HEIGHT = 400;
+const int WIN_WIDTH = 1500;
+const int WIN_HEIGHT = 800;
 
 class Simulation {
   public:
     Simulation();
     ~Simulation();
 
+    void set_automaton(Automaton *automaton);
+
     bool run();
 
-    void init_life();
+    void init();
 
   private:
     std::string get_executable_path();
@@ -31,7 +37,8 @@ class Simulation {
 
     int win_height;
     int win_width;
-    Gol *life;
+
+    Automaton *automaton;
 
     GLFWwindow *window;
     void init_GLFW();
@@ -47,7 +54,7 @@ class Simulation {
     void process_mouse_input();
 
     std::string GAME_NAME = "C GoL";
-    std::string VERSION = "v0.9";
+    std::string VERSION = "v1.1";
     std::string GAME_VERSION_NAME = VERSION + " | " + GAME_NAME;
 
     int nb_frames;
@@ -60,6 +67,7 @@ class Simulation {
     bool ready;
     bool update_size;
     bool plague;
+    bool step;
 
     float delta_time;
     float last_frame;

@@ -3,7 +3,7 @@
 int main(int argc, char *argv[]) {
     Simulation simulation;
 
-    simulation.init_life();
+    simulation.init();
 
     while(simulation.run());
 

@@ -1,28 +1,10 @@
 #include "simulation.hpp"
-#include <string>
 
-int nb_frames;
-int last_time;
-
-// viewport settings
-int cell_count;
-
-bool seeding;
-bool ready;
-// bool pressing;
-bool update_size;
-bool plague;
-
-float delta_time;
-float last_frame;
-
-int counter;
-int delay;
 Simulation::Simulation()
-    : path_str(get_executable_path()), win_width(WIN_WIDTH), FPS(""),
-      win_height(WIN_HEIGHT), nb_frames(0), last_time(0), cell_count(0),
-      seeding(true), ready(false), update_size(false), plague(false),
-      delta_time(0.f), last_frame(0.f), counter(0), delay(10) {
+    : path_str(get_executable_path()), win_height(WIN_HEIGHT),
+      win_width(WIN_WIDTH), automaton(nullptr), nb_frames(0), last_time(0),
+      FPS(""), cell_count(0), seeding(true), ready(false), update_size(false),
+      plague(false), delta_time(0.f), last_frame(0.f), counter(0), delay(10) {
 
     if (path_str.empty()) {
         std::cerr << "Error: Failed to retrieve executable path" << std::endl;
@@ -33,16 +15,24 @@ Simulation::Simulation()
 }
 
 Simulation::~Simulation() {
-    delete life;
-    life = nullptr;
+    delete automaton;
+    automaton = nullptr;
 }
 
-void Simulation::init_life() {
-    life = new Gol(path_str, win_width, win_height);
-    cell_count = life->cell_count;
+void Simulation::set_automaton(Automaton *automaton) {
+    if (this->automaton != nullptr) {
+        delete this->automaton;
+    }
+    this->automaton = automaton;
+}
+
+void Simulation::init() {
+    automaton = new Brain(path_str, win_width, win_height);
+    cell_count = automaton->get_cell_count();
 }
 
 bool Simulation::run() {
+    std::cout << "run" << std::endl;
     while (!glfwWindowShouldClose(window)) {
         counter++;
         process_mouse_input();
@@ -62,18 +52,23 @@ bool Simulation::run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (update_size) {
-            life->update_dimensions(win_width / 2, win_height / 2);
-            cell_count = life->cell_count;
+            automaton->update_dimensions(win_width / 2, win_height / 2);
+            cell_count = automaton->get_cell_count();
             update_size = false;
+        }
+
+        if(step) {
+            automaton->update();
+            step = false;
         }
 
         if (counter > delay) {
             if (!seeding && ready) {
-                life->update();
+                automaton->update();
             }
             counter = 0;
         }
-        life->draw();
+        automaton->draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -114,12 +109,12 @@ void Simulation::process_mouse_input() {
     glfwGetCursorPos(window, &x_pos, &y_pos);
     int m1_state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
     if (m1_state == GLFW_PRESS) {
-        life->set_value(x_pos, y_pos, 1);
+        automaton->set_value(x_pos, y_pos, 1);
         seeding = true;
     }
     int m2_state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
     if (m2_state == GLFW_PRESS) {
-        life->set_value(x_pos, y_pos, 0);
+        automaton->set_value(x_pos, y_pos, 0);
         seeding = true;
     }
     if (m2_state == GLFW_RELEASE && m1_state == GLFW_RELEASE) {
@@ -159,6 +154,7 @@ void Simulation::set_callbacks() {
 
 void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
                               int action, int mods) {
+
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
@@ -166,14 +162,39 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
     }
     if (key == GLFW_KEY_P && action == GLFW_PRESS) {
         plague = !plague;
-        life->toggle_plague();
+        automaton->toggle_plague();
     }
     if (key == GLFW_KEY_C && action == GLFW_PRESS) {
-        life->clear();
+        automaton->clear();
+        ready = false;
     }
     if (key == GLFW_KEY_R && action == GLFW_PRESS) {
-        life->fill_random();
+        automaton->fill_random();
     }
+    if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+        set_automaton(new Seeds(path_str, win_width, win_height));
+        ready = false;
+        plague = false;
+    }
+    if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+        set_automaton(new Life(path_str, win_width, win_height));
+        ready = false;
+        plague = false;
+    }
+    if (key == GLFW_KEY_B && action == GLFW_PRESS) {
+        set_automaton(new Brain(path_str, win_width, win_height));
+        ready = false;
+        plague = false;
+    }
+    if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+        set_automaton(new Disease(path_str, win_width, win_height));
+        ready = false;
+        plague = false;
+    }
+    if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) { 
+        step = true;
+    }
+
 }
 
 void Simulation::framebuffer_size_callback(GLFWwindow *window, int width,
@@ -201,10 +222,11 @@ void Simulation::update_FPS(double current_time) {
 
 void Simulation::update_title_bar() {
     std::string NAME_FPS =
-        GAME_VERSION_NAME + " - " + FPS + " FPS | tickrate: "
-        + std::to_string(delay) + " | " +
-        std::to_string(cell_count) + " cells" + " | " +
-        ((ready && !seeding) ? (plague ? "plague!" : "life!") : "seeding!");
+        GAME_VERSION_NAME + " - " + FPS +
+        " FPS | tickrate: " + std::to_string(delay) + " | " +
+        std::to_string(cell_count) + " cells" + " | " + automaton->get_type();
+        // ((ready && !seeding) ? (plague ? "plague!" : "automaton!")
+        //                      : "seeding!");
 
     glfwSetWindowTitle(window, NAME_FPS.c_str());
 }
