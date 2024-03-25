@@ -1,4 +1,5 @@
 # Seagull!
+![seagull](https://images.pexels.com/photos/56618/seagull-sky-holiday-bird-56618.jpeg)
 A "playground" for cellular automata. Initially just Conway's Game of Life (hence the name, C GoL...) \
 In C++ with raw OpenGL :D
 
