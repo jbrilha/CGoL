@@ -147,6 +147,8 @@ void Automaton::clear() {
     cells.clear();
     update_cells.clear();
     cells = std::vector<int>(cell_count, 0);
+    update_cells = std::vector<int>(cell_count, 0);
+
     update_states();
 }
 
