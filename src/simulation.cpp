@@ -198,7 +198,7 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         plague = false;
     }
     if (key == GLFW_KEY_4 && action == GLFW_PRESS) {
-        set_automaton(new LFod(path_str, win_width, win_height));
+        set_automaton(new LFoD(path_str, win_width, win_height));
         ready = false;
         plague = false;
     }

@@ -3,10 +3,10 @@
 
 #include "automaton.hpp"
 
-class LFod : public Automaton {
+class LFoD : public Automaton {
   public:
-    LFod(std::string path_str, int win_width, int win_height);
-    ~LFod() {};
+    LFoD(std::string path_str, int win_width, int win_height);
+    ~LFoD() {};
     void update() override;
     std::string get_type() override;
 

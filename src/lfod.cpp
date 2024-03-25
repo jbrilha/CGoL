@@ -1,11 +1,11 @@
 #include "lfod.hpp"
-LFod::LFod(std::string path_str, int win_width, int win_height)
+LFoD::LFoD(std::string path_str, int win_width, int win_height)
     : Automaton(path_str, win_width, win_height) {
 
     set_cell_colors();
 };
 
-void LFod::update() {
+void LFoD::update() {
     int state = 0;
 
     for (int offset = 0; offset < cell_count; offset++) {
@@ -26,7 +26,7 @@ void LFod::update() {
     update_states();
 }
 
-int LFod::apply_rules(int offset) {
+int LFoD::apply_rules(int offset) {
     int neighbors = 0;
     int row = offset / cols;
     int col = offset % cols;
@@ -49,12 +49,12 @@ int LFod::apply_rules(int offset) {
     return neighbors;
 }
 
-void LFod::set_cell_colors() {
+void LFoD::set_cell_colors() {
     shader_program.set_vec3("color0", grey);
     shader_program.set_vec3("color1", red);
 }
 
-std::string LFod::get_type() {
+std::string LFoD::get_type() {
     std::string type_name = typeid(*this).name();
     std::string clean_name(type_name.begin() + 1, type_name.end());
 
