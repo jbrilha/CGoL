@@ -5,13 +5,13 @@
 #include <mach-o/dyld.h>
 
 #include "automaton.hpp"
-#include "life.hpp"
-#include "disease.hpp"
 #include "brain.hpp"
-#include "seeds.hpp"
-#include "rule90.hpp"
-#include "lfod.hpp"
 #include "day_n_nite.hpp"
+#include "disease.hpp"
+#include "lfod.hpp"
+#include "life.hpp"
+#include "rule90.hpp"
+#include "seeds.hpp"
 
 #define GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
@@ -20,8 +20,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-const int WIN_WIDTH = 800;
-const int WIN_HEIGHT = 600;
+const int WIN_WIDTH = 1500;
+const int WIN_HEIGHT = 800;
 
 class Simulation {
   public:
@@ -48,13 +48,13 @@ class Simulation {
 
     void set_callbacks();
     void error_callback(int error, const char *description);
-    void framebuffer_size_callback(GLFWwindow *window, int width,
-                                          int height);
-    void key_callback(GLFWwindow *window, int key, int scancode,
-                             int action, int mods);
+    void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+    void key_callback(GLFWwindow *window, int key, int scancode, int action,
+                      int mods);
+    void drop_callback(GLFWwindow *window, int count, const char **paths);
     void update_FPS(double current_time);
     void update_title_bar();
-    void process_mouse_input();
+    void process_input();
 
     std::string GAME_NAME = "C GoL";
     std::string VERSION = "v1.1";
@@ -72,6 +72,7 @@ class Simulation {
     bool plague;
     bool step;
     bool immovable;
+    bool manual;
 
     float delta_time;
     float last_frame;

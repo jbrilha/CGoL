@@ -1,27 +1,31 @@
 #include "automaton.hpp"
 
-Automaton::Automaton(std::string path_str, int win_width, int win_height)
-    : win_height(win_height), win_width(win_width), cell_size(SQUARE_SIZE + GAP),
-      cell_count((win_width / cell_size) * (win_height / cell_size)), plague(false),
-      cells(cell_count, 0), update_cells(cells), rows(win_height / cell_size),
-      cols(win_width / cell_size), shader_program((path_str + "/shaders/shader.vert").c_str(),
+Automaton::Automaton(std::string path_str, int win_width, int win_height, int square_size)
+    : win_height(win_height), win_width(win_width), square_size(square_size),
+      cell_size(square_size + GAP),
+      cell_count((win_width / cell_size) * (win_height / cell_size)),
+      plague(false), cells(cell_count, 0), update_cells(cells),
+      rows(win_height / cell_size), cols(win_width / cell_size),
+      shader_program((path_str + "/shaders/shader.vert").c_str(),
                      (path_str + "/shaders/shader.frag").c_str()) {
 
-    // shader_program = new Shader((path_str + "/shaders/shader.vert").c_str(), (path_str + "/shaders/shader.frag").c_str());
-
-    origin_x = -1.f + pxls_to_float(cell_size, win_width) / 2;
-    origin_y = 1.f - pxls_to_float(cell_size, win_height) / 2;
+    float row_rem = win_height % cell_size;
+    float col_rem = win_width % cell_size;
+    this->origin_x = -1.f + pxls_to_float(this->cell_size + col_rem, win_width) / 2;
+    this->origin_y = 1.f - pxls_to_float(this->cell_size + row_rem, win_height) / 2;
 
     std::cout << "automaton constructor" << std::endl;
+    std::cout << win_width << " w|h " << win_height << std::endl;
+
     prepare_shaders();
 }
 
-void Automaton::update_dimensions(int win_width, int win_height) {
-    this->win_width = win_width;
-    this->win_height = win_height;
-
+void Automaton::update_grid() {
     rows = win_height / cell_size;
     cols = win_width / cell_size;
+
+    int row_rem = win_height % cell_size;
+    int col_rem = win_width % cell_size;
 
     int new_cell_count = (win_width / cell_size) * (win_height / cell_size);
     std::vector<int> new_cells(new_cell_count, 0);
@@ -39,10 +43,35 @@ void Automaton::update_dimensions(int win_width, int win_height) {
     cell_count = new_cell_count;
     update_cells = std::vector<int>(cell_count, 0);
 
-    origin_x = -1.f + pxls_to_float(cell_size, win_width) / 2;
-    origin_y = 1.f - pxls_to_float(cell_size, win_height) / 2;
+    origin_x = -1.f + pxls_to_float(cell_size + col_rem, win_width) / 2;
+    origin_y = 1.f - pxls_to_float(cell_size + row_rem, win_height) / 2;
 
     prepare_shaders();
+
+}
+
+void Automaton::update_dimensions(int win_width, int win_height) {
+    this->win_width = win_width;
+    this->win_height = win_height;
+
+    update_grid();
+}
+
+void Automaton::update_cell_size(int val) {
+    bool update = false;
+
+    if (val > 0) {
+        square_size += val;
+        update = true;
+    } else if (square_size > 1) {
+        square_size = std::max(1, square_size + val);
+        update = true;
+    }
+
+    if (update) {
+        cell_size = square_size + GAP;
+        update_grid();
+    }
 }
 
 void Automaton::prepare_shaders() {
@@ -70,8 +99,8 @@ void Automaton::prepare_shaders() {
                  GL_STREAM_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    float x_vert = pxls_to_float(SQUARE_SIZE, win_width) / 2;
-    float y_vert = pxls_to_float(SQUARE_SIZE, win_height) / 2;
+    float x_vert = pxls_to_float(square_size, win_width) / 2;
+    float y_vert = pxls_to_float(square_size, win_height) / 2;
     float quadVertices[12] = {
         -x_vert, y_vert,  // top right
         x_vert,  -y_vert, // bot right
@@ -96,18 +125,23 @@ void Automaton::prepare_shaders() {
 
     // also set instance data
     glEnableVertexAttribArray(1);
-    glBindBuffer( GL_ARRAY_BUFFER, instanceVBOs[0]); // this attribute comes from a different vertex buffer
+    glBindBuffer(
+        GL_ARRAY_BUFFER,
+        instanceVBOs[0]); // this attribute comes from a different vertex buffer
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
                           (void *)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glVertexAttribDivisor( 1, 1); // tell OpenGL this is an instanced vertex attribute.
+    glVertexAttribDivisor(
+        1, 1); // tell OpenGL this is an instanced vertex attribute.
 
     glEnableVertexAttribArray(2);
-    glBindBuffer( GL_ARRAY_BUFFER, instanceVBOs[1]); // this attribute comes from a different vertex buffer
+    glBindBuffer(
+        GL_ARRAY_BUFFER,
+        instanceVBOs[1]); // this attribute comes from a different vertex buffer
     glVertexAttribPointer(2, 1, GL_INT, GL_FALSE, 1 * sizeof(int), (void *)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glVertexAttribDivisor( 2, 1); // tell OpenGL this is an instanced vertex attribute.
-    
+    glVertexAttribDivisor(
+        2, 1); // tell OpenGL this is an instanced vertex attribute.
 }
 
 void Automaton::update_states() {
@@ -154,6 +188,7 @@ void Automaton::clear() {
 
 void Automaton::toggle_plague() { plague = !plague; }
 int Automaton::get_cell_count() { return cell_count; }
+int Automaton::get_squqare_size() { return square_size; }
 
 float Automaton::pxls_to_float(int pixels, int total_pixels) {
     return 2 * (float(pixels) / total_pixels);

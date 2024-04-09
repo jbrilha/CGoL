@@ -1,6 +1,6 @@
 #include "rule90.hpp"
-Rule90::Rule90(std::string path_str, int win_width, int win_height)
-    : Automaton(path_str, win_width, win_height) {
+Rule90::Rule90(std::string path_str, int win_width, int win_height, int square_size)
+    : Automaton(path_str, win_width, win_height, square_size) {
 
     set_cell_colors();
 };

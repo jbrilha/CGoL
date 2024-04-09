@@ -5,7 +5,7 @@
 
 class Disease : public Automaton {
   public:
-    Disease(std::string path_str, int win_width, int win_height);
+    Disease(std::string path_str, int win_width, int win_height, int square_size);
     ~Disease() {};
     void update() override;
     std::string get_type() override;

@@ -8,15 +8,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 
-static const int SQUARE_SIZE = 9;
+// static const int SQUARE_SIZE = 9;
 static const int GAP = 1;
 
 class Automaton {
   private:
-    float win_height;
-    float win_width;
+    int win_height;
+    int win_width;
 
+    int square_size;
     int cell_size;
+
+    void update_grid();
     void prepare_shaders();
     virtual void set_cell_colors() = 0;
 
@@ -31,12 +34,13 @@ class Automaton {
 
   public:
     Automaton();
-    Automaton(std::string path_str, int win_width, int win_height);
+    Automaton(std::string path_str, int win_width, int win_height, int square_size);
     virtual ~Automaton(){};
     virtual std::string get_type() = 0;
 
     virtual void update() = 0;
     void update_dimensions(int win_width, int win_height);
+    void update_cell_size(int val);
 
     void clear();
     void draw();
@@ -44,6 +48,7 @@ class Automaton {
     void set_value(double x_pos, double y_pos, int val);
     void toggle_plague();
     int get_cell_count();
+    int get_squqare_size();
 
     void fill_random();
 
