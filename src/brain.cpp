@@ -6,6 +6,10 @@ Brain::Brain(std::string path_str, int win_width, int win_height, int square_siz
     set_cell_colors();
 };
 
+Brain::~Brain() {
+    glDeleteProgram(shader_program.program_ID);
+}
+
 void Brain::update() {
     int state = 0;
 

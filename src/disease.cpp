@@ -1,9 +1,15 @@
 #include "disease.hpp"
+
 Disease::Disease(std::string path_str, int win_width, int win_height, int square_size)
         : Automaton(path_str, win_width, win_height, square_size) {
 
     set_cell_colors();
 };
+
+
+Disease::~Disease() {
+    glDeleteProgram(shader_program.program_ID);
+}
 
 void Disease::update() {
     int state = 0;

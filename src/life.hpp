@@ -6,7 +6,7 @@
 class Life : public Automaton {
   public:
     Life(std::string path_str, int win_width, int win_height, int square_size);
-    ~Life() {};
+    ~Life();
     void update() override;
     std::string get_type() override;
 
