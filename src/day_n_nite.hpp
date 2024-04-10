@@ -6,7 +6,7 @@
 class DayNNite : public Automaton {
   public:
     DayNNite(std::string path_str, int win_width, int win_height, int square_size);
-    ~DayNNite() {};
+    ~DayNNite();
     void update() override;
     std::string get_type() override;
 
