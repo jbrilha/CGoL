@@ -6,8 +6,8 @@ Automaton::Automaton(std::string path_str, int win_width, int win_height, int sq
       cell_count((win_width / cell_size) * (win_height / cell_size)),
       rows(win_height / cell_size), cols(win_width / cell_size), plague(false),
       cells(cell_count, 0), update_cells(cells),
-      shader_program((path_str + "/shaders/shader.vert").c_str(),
-                     (path_str + "/shaders/shader.frag").c_str()) {
+      shader_program((path_str + "/../shaders/shader.vert").c_str(),
+                     (path_str + "/../shaders/shader.frag").c_str()) {
 
     float row_rem = win_height % cell_size;
     float col_rem = win_width % cell_size;

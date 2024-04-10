@@ -1,17 +1,10 @@
 #ifndef SIMULATION_HPP
 #define SIMULATION_HPP
 
-#include <libproc.h>
-#include <mach-o/dyld.h>
+// #include <mach-o/dyld.h> // MacOS only!!
+#include <unistd.h>
 
 #include "automaton.hpp"
-#include "brain.hpp"
-#include "day_n_nite.hpp"
-#include "disease.hpp"
-#include "lfod.hpp"
-#include "life.hpp"
-#include "rule90.hpp"
-#include "seeds.hpp"
 
 #define GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
@@ -25,7 +18,7 @@ const int WIN_HEIGHT = 800;
 
 class Simulation {
   public:
-    Simulation();
+    Simulation(char* argv0);
     ~Simulation();
 
     void set_automaton(Automaton *automaton);
@@ -35,7 +28,8 @@ class Simulation {
     void init();
 
   private:
-    std::string get_executable_path();
+    // std::string get_executable_path();
+    std::string get_path(char* arg);
     std::string path_str;
 
     int win_height;
@@ -71,7 +65,6 @@ class Simulation {
     bool update_size;
     bool plague;
     bool step;
-    bool immovable;
     bool manual;
 
     float delta_time;
