@@ -20,7 +20,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-const int WIN_WIDTH = 1500;
+const int WIN_WIDTH = 800;
 const int WIN_HEIGHT = 800;
 
 class Simulation {

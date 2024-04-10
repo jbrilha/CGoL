@@ -4,18 +4,17 @@ Automaton::Automaton(std::string path_str, int win_width, int win_height, int sq
     : win_height(win_height), win_width(win_width), square_size(square_size),
       cell_size(square_size + GAP),
       cell_count((win_width / cell_size) * (win_height / cell_size)),
-      plague(false), cells(cell_count, 0), update_cells(cells),
-      rows(win_height / cell_size), cols(win_width / cell_size),
+      rows(win_height / cell_size), cols(win_width / cell_size), plague(false),
+      cells(cell_count, 0), update_cells(cells),
       shader_program((path_str + "/shaders/shader.vert").c_str(),
                      (path_str + "/shaders/shader.frag").c_str()) {
 
     float row_rem = win_height % cell_size;
     float col_rem = win_width % cell_size;
-    this->origin_x = -1.f + pxls_to_float(this->cell_size + col_rem, win_width) / 2;
-    this->origin_y = 1.f - pxls_to_float(this->cell_size + row_rem, win_height) / 2;
-
-    std::cout << "automaton constructor" << std::endl;
-    std::cout << win_width << " w|h " << win_height << std::endl;
+    this->origin_x =
+        -1.f + pxls_to_float(this->cell_size + col_rem, win_width) / 2;
+    this->origin_y =
+        1.f - pxls_to_float(this->cell_size + row_rem, win_height) / 2;
 
     prepare_shaders();
 }
@@ -47,7 +46,6 @@ void Automaton::update_grid() {
     origin_y = 1.f - pxls_to_float(cell_size + row_rem, win_height) / 2;
 
     prepare_shaders();
-
 }
 
 void Automaton::update_dimensions(int win_width, int win_height) {
@@ -75,7 +73,6 @@ void Automaton::update_cell_size(int val) {
 }
 
 void Automaton::prepare_shaders() {
-    std::cout << "prep shaders" << std::endl;
     shader_program.use();
 
     glm::vec2 offsets[cell_count];
@@ -188,7 +185,7 @@ void Automaton::clear() {
 
 void Automaton::toggle_plague() { plague = !plague; }
 int Automaton::get_cell_count() { return cell_count; }
-int Automaton::get_squqare_size() { return square_size; }
+int Automaton::get_square_size() { return square_size; }
 
 float Automaton::pxls_to_float(int pixels, int total_pixels) {
     return 2 * (float(pixels) / total_pixels);

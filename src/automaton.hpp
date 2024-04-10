@@ -8,7 +8,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 
-// static const int SQUARE_SIZE = 9;
 static const int GAP = 1;
 
 class Automaton {
@@ -48,18 +47,21 @@ class Automaton {
     void set_value(double x_pos, double y_pos, int val);
     void toggle_plague();
     int get_cell_count();
-    int get_squqare_size();
+    int get_square_size();
 
     void fill_random();
 
   protected:
     int cell_count;
-    bool plague;
-    std::vector<int> cells;
-    std::vector<int> update_cells;
-    void update_states();
     int rows;
     int cols;
+
+    bool plague;
+
+    std::vector<int> cells;
+    std::vector<int> update_cells;
+
+    void update_states();
 
     Shader shader_program;
     glm::vec3 red = glm::vec3(1.f, 0.f, 0.f);
@@ -71,6 +73,5 @@ class Automaton {
     glm::vec3 brown = glm::vec3(0.4f, 0.2f, 0.f);
     glm::vec3 yellow = glm::vec3(1.f, 0.9f, 0.6f);
     glm::vec3 light_blue = glm::vec3(0.2f, 0.8f, 1.f);
-
 };
 #endif

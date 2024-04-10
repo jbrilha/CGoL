@@ -37,7 +37,7 @@ void Simulation::init() {
 }
 
 bool Simulation::run() {
-    std::cout << "run" << std::endl;
+    std::cout << "Simulation running!" << std::endl;
     while (!glfwWindowShouldClose(window)) {
         counter++;
         process_input();
@@ -57,7 +57,7 @@ bool Simulation::run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (update_size) {
-            automaton->update_dimensions(win_width / 2, win_height / 2);
+            automaton->update_dimensions(win_width, win_height);
             cell_count = automaton->get_cell_count();
             update_size = false;
         }
@@ -186,7 +186,7 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         ready = !ready;
     }
     if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-        delay = std::max(delay + 10, nb_frames / 10);
+        delay = std::min(delay + 10, 500);
         manual = true;
     }
     if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
@@ -226,43 +226,43 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
 
     if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
         set_automaton(new Brain(path_str, win_width, win_height,
-                                this->automaton->get_squqare_size()));
+                                this->automaton->get_square_size()));
         ready = false;
         plague = false;
     }
     if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
         set_automaton(new DayNNite(path_str, win_width, win_height,
-                                   this->automaton->get_squqare_size()));
+                                   this->automaton->get_square_size()));
         ready = false;
         plague = false;
     }
     if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
         set_automaton(new Disease(path_str, win_width, win_height,
-                                  this->automaton->get_squqare_size()));
+                                  this->automaton->get_square_size()));
         ready = false;
         plague = false;
     }
     if (key == GLFW_KEY_4 && action == GLFW_PRESS) {
         set_automaton(new LFoD(path_str, win_width, win_height,
-                               this->automaton->get_squqare_size()));
+                               this->automaton->get_square_size()));
         ready = false;
         plague = false;
     }
     if (key == GLFW_KEY_5 && action == GLFW_PRESS) {
         set_automaton(new Life(path_str, win_width, win_height,
-                               this->automaton->get_squqare_size()));
+                               this->automaton->get_square_size()));
         ready = false;
         plague = false;
     }
     if (key == GLFW_KEY_6 && action == GLFW_PRESS) {
         set_automaton(new Rule90(path_str, win_width, win_height,
-                                 this->automaton->get_squqare_size()));
+                                 this->automaton->get_square_size()));
         ready = false;
         plague = false;
     }
     if (key == GLFW_KEY_7 && action == GLFW_PRESS) {
         set_automaton(new Seeds(path_str, win_width, win_height,
-                                this->automaton->get_squqare_size()));
+                                this->automaton->get_square_size()));
         ready = false;
         plague = false;
     }
@@ -272,10 +272,8 @@ void Simulation::framebuffer_size_callback(GLFWwindow *window, int width,
                                            int height) {
     glViewport(0, 0, width, height);
 
-    std::cout << "b4: " << win_width << " w|h " << win_height << std::endl;
     win_width = width;
     win_height = height;
-    std::cout << "aft: " << win_width << " w|h " << win_height << std::endl;
 
     update_size = true;
 }
@@ -314,6 +312,7 @@ void Simulation::init_GLFW() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
 #endif
 
     window = glfwCreateWindow(win_width, win_height, GAME_VERSION_NAME.c_str(),
