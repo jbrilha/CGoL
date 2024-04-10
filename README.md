@@ -7,7 +7,7 @@ In C++ with raw OpenGL :D
 - ESC: Closes the application;
 - ENTER: Start/stop simulation;
 - M1 / LEFT MOUSE: Make cell "alive" at cursor location;
-- M2 / RIGHT MOUSE: "Kill" cell at cursor location;
+- M2 / RIGHT MOUSE or SHIFT + M1: "Kill" cell at cursor location;
 - R: Randomly fills the grid with "live" cells;
 - C: Clears the grid;
 - 1: [Brian's Brain](https://en.wikipedia.org/wiki/Brian's_Brain) Automaton;
@@ -19,6 +19,8 @@ In C++ with raw OpenGL :D
 - 6: [Rule 90](https://en.wikipedia.org/wiki/Rule_90) Automaton;
 - 7: [Seeds](https://en.wikipedia.org/wiki/Seeds_(cellular_automaton)) Automaton;
 - +: Step once through simulation*;
+- ARROW UP & DOWN: Increase/decrease tickrate (higher is slower)
+- ARROW RIGHT & LEFT: Increase/decrease cell size (SHIFT + KEY increases more per click)
 
 \* GLFW reads this as GLFW_KEY_EQUAL so it might change depending on your layout
 
