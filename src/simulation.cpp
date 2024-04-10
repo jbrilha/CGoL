@@ -293,7 +293,7 @@ void Simulation::update_title_bar() {
       GAME_VERSION_NAME + " - " + FPS +
       " FPS | tickrate: " + std::to_string(delay) + " | " +
       std::to_string(cell_count) + " cells" + " | " + automaton->get_type() +
-      " | cell_size: " + std::to_string(automaton->get_square_size());
+      " | Cell Size: " + std::to_string(automaton->get_square_size());
 
   glfwSetWindowTitle(window, NAME_FPS.c_str());
 }
