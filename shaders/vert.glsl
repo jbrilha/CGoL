@@ -16,7 +16,7 @@ void main()
     gl_Position = vec4(aPos + aOffset, 0.f, 1.0);
 
     if(aState == 0) { color = color0; }
-    else if(aState == 1) { color = color1; }
+    else if(aState == 1 || aState == 3) { color = color1; }
     else if(aState == 2) { color = color2; }
-    else if(aState == 3) { color = color3; }
+    // else if(aState == 3) { color = color3; }
 }
