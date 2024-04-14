@@ -55,7 +55,7 @@ int Seeds::apply_rules(int offset) {
 }
 
 void Seeds::set_cell_colors() {
-    shader_program.set_vec3("color0", grey);
+    shader_program.set_vec3("color0", black);
     shader_program.set_vec3("color1", red);
 }
 
@@ -63,5 +63,5 @@ std::string Seeds::get_type() {
     std::string type_name = typeid(*this).name();
     std::string clean_name(type_name.begin() + 1, type_name.end());
 
-    return "7: " + clean_name;
+    return "0: " + clean_name;
 }

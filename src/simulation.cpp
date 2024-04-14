@@ -1,9 +1,12 @@
 #include "simulation.hpp"
+#include "sand.hpp"
 #include "brain.hpp"
 #include "day_n_nite.hpp"
 #include "disease.hpp"
 #include "lfod.hpp"
 #include "life.hpp"
+#include "rule0.hpp"
+#include "rule180.hpp"
 #include "rule90.hpp"
 #include "seeds.hpp"
 
@@ -12,8 +15,7 @@ Simulation::Simulation(char *argv0)
     : path_str(get_path(argv0)), win_height(WIN_HEIGHT), win_width(WIN_WIDTH),
       automaton(nullptr), nb_frames(0), last_time(0), FPS(""), cell_count(0),
       seeding(true), ready(false), update_size(false), plague(false),
-      manual(false), delta_time(0.f), last_frame(0.f),
-      counter(0), delay(10) {
+      manual(false), delta_time(0.f), last_frame(0.f), counter(0), delay(10) {
 
     if (path_str.empty()) {
         std::cerr << "Error: Failed to retrieve executable path" << std::endl;
@@ -38,7 +40,7 @@ void Simulation::set_automaton(Automaton *automaton) {
 }
 
 void Simulation::init() {
-    automaton = new Life(path_str, win_width, win_height, 9);
+    automaton = new Sand(path_str, win_width, win_height, 1);
     cell_count = automaton->get_cell_count();
 }
 
@@ -59,7 +61,7 @@ bool Simulation::run() {
 
         update_title_bar();
 
-        glClearColor(0.4f, 0.4f, 0.4f, 1.f);
+        glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (update_size) {
@@ -133,25 +135,20 @@ void Simulation::process_input() {
         glfwSetWindowShouldClose(window, true);
     }
 
-    double x_pos, y_pos;
-    glfwGetCursorPos(window, &x_pos, &y_pos);
-    int m1_state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
-    int shift_state = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
-    if (m1_state == GLFW_PRESS) {
-        if (shift_state == GLFW_PRESS) {
-            automaton->set_value(x_pos, y_pos, 0);
-
-        } else {
-            automaton->set_value(x_pos, y_pos, 1);
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        int val = automaton->get_type().find("Sand") == std::string::npos ? 1 : 3 ;
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+            val = 0;
         }
-        seeding = true;
-    }
-    int m2_state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
-    if (m2_state == GLFW_PRESS) {
-        automaton->set_value(x_pos, y_pos, 0);
-        seeding = true;
-    }
-    if (m2_state == GLFW_RELEASE && m1_state == GLFW_RELEASE) {
+        if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+            val = 2;
+        }
+
+        double x_pos, y_pos;
+        glfwGetCursorPos(window, &x_pos, &y_pos);
+        automaton->set_value(x_pos, y_pos, val);
+        // seeding = true;
+    } else {
         seeding = false;
     }
 }
@@ -208,11 +205,19 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         ready = !ready;
     }
     if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-        delay = std::min(delay - 10, 500);
+        int val = 10;
+        if (mods == GLFW_MOD_SHIFT) {
+            val = 100;
+        }
+        delay = std::min(delay - val, 500);
         manual = true;
     }
     if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-        delay = std::max(delay + 10, 0);
+        int val = 10;
+        if (mods == GLFW_MOD_SHIFT) {
+            val = 100;
+        }
+        delay = std::max(delay + val, 0);
         manual = true;
     }
     if (key == GLFW_KEY_P && action == GLFW_PRESS) {
@@ -277,12 +282,30 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         plague = false;
     }
     if (key == GLFW_KEY_6 && action == GLFW_PRESS) {
-        set_automaton(new Rule90(path_str, win_width, win_height,
+        set_automaton(new Rule0(path_str, win_width, win_height,
                                  this->automaton->get_square_size()));
         ready = false;
         plague = false;
     }
     if (key == GLFW_KEY_7 && action == GLFW_PRESS) {
+        set_automaton(new Rule180(path_str, win_width, win_height,
+                                 this->automaton->get_square_size()));
+        ready = false;
+        plague = false;
+    }
+    if (key == GLFW_KEY_8 && action == GLFW_PRESS) {
+        set_automaton(new Rule90(path_str, win_width, win_height,
+                                 this->automaton->get_square_size()));
+        ready = false;
+        plague = false;
+    }
+    if (key == GLFW_KEY_9 && action == GLFW_PRESS) {
+        set_automaton(new Sand(path_str, win_width, win_height,
+                                this->automaton->get_square_size()));
+        ready = false;
+        plague = false;
+    }
+    if (key == GLFW_KEY_0 && action == GLFW_PRESS) {
         set_automaton(new Seeds(path_str, win_width, win_height,
                                 this->automaton->get_square_size()));
         ready = false;
@@ -305,8 +328,8 @@ void Simulation::error_callback(int error, const char *description) {
 }
 
 void Simulation::update_FPS(double current_time) {
-    if (!manual)
-        delay = std::max(delay, nb_frames / 10);
+    // if (!manual)
+    //     delay = std::max(delay, nb_frames / 10);
 
     FPS = std::to_string(nb_frames);
 

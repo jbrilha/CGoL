@@ -2,6 +2,7 @@
 #define AUTOMATON_HPP
 
 #include "shaders.hpp"
+#include "util/glm_colors.hpp"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -9,6 +10,8 @@
 #include <vector>
 
 static const int GAP = 1;
+
+using namespace glm_colors;
 
 class Automaton {
   private:
@@ -64,14 +67,5 @@ class Automaton {
     void update_states();
 
     Shader shader_program;
-    glm::vec3 red = glm::vec3(1.f, 0.f, 0.f);
-    glm::vec3 green = glm::vec3(0.f, 1.f, 0.f);
-    glm::vec3 grey = glm::vec3(0.2f, 0.2f, 0.2f);
-    glm::vec3 white = glm::vec3(1.f, 1.f, 1.f);
-    glm::vec3 pink = glm::vec3(1.f, 0.5f, 0.5f);
-    glm::vec3 purple = glm::vec3(0.5f, 0.f, 0.7f);
-    glm::vec3 brown = glm::vec3(0.4f, 0.2f, 0.f);
-    glm::vec3 yellow = glm::vec3(1.f, 0.9f, 0.6f);
-    glm::vec3 light_blue = glm::vec3(0.2f, 0.8f, 1.f);
 };
 #endif

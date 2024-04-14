@@ -92,11 +92,11 @@ class Shader {
                      &value[0]);
     }
 
-    void set_vec3(const std::string &name, float x, float y, float z) const {
-        glUniform3f(glGetUniformLocation(program_ID, name.c_str()), x, y, z);
-    }
+    // void set_vec3(const std::string &name, float x, float y, float z) const {
+    //     glUniform3f(glGetUniformLocation(program_ID, name.c_str()), x, y, z);
+    // }
 
-    void set_vec3(const std::string &name, glm::vec3 &value) const {
+    void set_vec3(const std::string &name, const glm::vec3 &value) const {
         glUniform3fv(glGetUniformLocation(program_ID, name.c_str()), 1,
                      &value[0]);
     }

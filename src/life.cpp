@@ -65,7 +65,7 @@ int Life::apply_rules(int offset) {
 }
 
 void Life::set_cell_colors() {
-    shader_program.set_vec3("color0", grey);
+    shader_program.set_vec3("color0", black);
     shader_program.set_vec3("color1", green);
 }
 

@@ -12,7 +12,7 @@ DayNNite::~DayNNite() {
 
 void DayNNite::update() {
     int state = 0;
-    update_cells = cells;
+    // update_cells = cells;
 
     for (int offset = 0; offset < cell_count; offset++) {
         state = cells[offset];
@@ -58,7 +58,7 @@ int DayNNite::apply_rules(int offset) {
 }
 
 void DayNNite::set_cell_colors() {
-    shader_program.set_vec3("color0", grey);
+    shader_program.set_vec3("color0", black);
     shader_program.set_vec3("color1", green);
 }
 

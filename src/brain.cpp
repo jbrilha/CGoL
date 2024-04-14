@@ -55,7 +55,7 @@ int Brain::apply_rules(int offset) {
 }
 
 void Brain::set_cell_colors() {
-    shader_program.set_vec3("color0", grey);
+    shader_program.set_vec3("color0", black);
     shader_program.set_vec3("color1", purple);
     shader_program.set_vec3("color2", pink);
 }

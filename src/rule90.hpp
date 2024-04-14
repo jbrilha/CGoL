@@ -3,6 +3,8 @@
 
 #include "automaton.hpp"
 
+using namespace glm_colors;
+
 class Rule90 : public Automaton {
   public:
     Rule90(std::string path_str, int win_width, int win_height, int square_size);

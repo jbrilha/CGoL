@@ -20,17 +20,18 @@ void Rule90::update() {
 }
 
 int Rule90::apply_rules(int offset) {
+    if(!((offset) % cols)) return 0;
     return cells[offset - 1] != cells[offset + 1];
 }
 
 void Rule90::set_cell_colors() {
-    shader_program.set_vec3("color0", grey);
-    shader_program.set_vec3("color1", red);
+    shader_program.set_vec3("color0", black);
+    shader_program.set_vec3("color1",red);
 }
 
 std::string Rule90::get_type() {
     std::string type_name = typeid(*this).name();
     std::string clean_name(type_name.begin() + 1, type_name.end());
 
-    return "6: " + clean_name;
+    return "8: " + clean_name;
 }
