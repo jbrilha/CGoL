@@ -16,8 +16,11 @@ In C++ with raw OpenGL :D
 - 4: [Live Free or Die](https://conwaylife.com/wiki/OCA:Live_Free_or_Die) Automaton;
 - 5: [Life](https://en.wikipedia.org/wiki/Conway's_Game_of_Life) Automaton;
     - P: Toggles plague mode (Only available when Life is active);
-- 6: [Rule 90](https://en.wikipedia.org/wiki/Rule_90) Automaton;
-- 7: [Seeds](https://en.wikipedia.org/wiki/Seeds_(cellular_automaton)) Automaton;
+- 6: Rule 0 Automaton - Kinda Snowflake-y;
+- 7: Rule 180 Automaton - Vertical Rule90;
+- 8: [Rule 90](https://en.wikipedia.org/wiki/Rule_90) Automaton;
+- 9: [Seeds](https://en.wikipedia.org/wiki/Seeds_(cellular_automaton)) Automaton;
+- 0: Sand Simulation;
 - +: Step once through simulation*;
 - ARROW UP & DOWN: Increase/decrease tickrate (higher is slower)
 - ARROW RIGHT & LEFT: Increase/decrease cell size (SHIFT + KEY increases more per click)
