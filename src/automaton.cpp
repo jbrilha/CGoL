@@ -2,15 +2,13 @@
 
 Automaton::Automaton(std::string path_str, int win_width, int win_height, int square_size)
     : win_height(win_height), win_width(win_width), square_size(square_size),
-      cell_size(square_size + GAP),
+      cell_size(square_size + GAP), row_rem(win_height % cell_size), col_rem(win_width % cell_size),
       cell_count((win_width / cell_size) * (win_height / cell_size)),
       rows(win_height / cell_size), cols(win_width / cell_size), plague(false),
       cells(cell_count, 0), update_cells(cells),
       shader_program((path_str + "/../shaders/vert.glsl").c_str(),
                      (path_str + "/../shaders/frag.glsl").c_str()) {
 
-    float row_rem = win_height % cell_size;
-    float col_rem = win_width % cell_size;
     this->origin_x =
         -1.f + pxls_to_float(this->cell_size + col_rem, win_width) / 2;
     this->origin_y =
@@ -23,8 +21,8 @@ void Automaton::update_grid() {
     rows = win_height / cell_size;
     cols = win_width / cell_size;
 
-    int row_rem = win_height % cell_size;
-    int col_rem = win_width % cell_size;
+    row_rem = win_height % cell_size;
+    col_rem = win_width % cell_size;
 
     int new_cell_count = (win_width / cell_size) * (win_height / cell_size);
     std::vector<int> new_cells(new_cell_count, 0);

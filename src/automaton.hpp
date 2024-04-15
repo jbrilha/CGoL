@@ -21,6 +21,9 @@ class Automaton {
     int square_size;
     int cell_size;
 
+    int row_rem;
+    int col_rem;
+
     void update_grid();
     void prepare_shaders();
     virtual void set_cell_colors() = 0;

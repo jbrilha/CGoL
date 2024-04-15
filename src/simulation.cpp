@@ -40,7 +40,7 @@ void Simulation::set_automaton(Automaton *automaton) {
 }
 
 void Simulation::init() {
-    automaton = new Sand(path_str, win_width, win_height, 1);
+    automaton = new Sand(path_str, win_width, win_height, 99);
     cell_count = automaton->get_cell_count();
 }
 
@@ -61,7 +61,7 @@ bool Simulation::run() {
 
         update_title_bar();
 
-        glClearColor(0.f, 0.f, 0.f, 1.f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (update_size) {
