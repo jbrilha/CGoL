@@ -84,23 +84,21 @@ void Automaton::prepare_shaders() {
         }
     }
 
-    glGenBuffers(2, instanceVBOs);
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBOs[0]);
+    glGenBuffers(2, instance_VBOs);
+    glBindBuffer(GL_ARRAY_BUFFER, instance_VBOs[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * (cell_count), &offsets[0],
                  GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBOs[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, instance_VBOs[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(int) * (cell_count), &cells[0],
                  GL_STREAM_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     float x_vert = pxls_to_float(square_size, win_width) / 2;
     float y_vert = pxls_to_float(square_size, win_height) / 2;
-    glm::vec2 quadVertices[4] = {
-        glm::vec2(x_vert, y_vert),
-        glm::vec2(x_vert, -y_vert),
-        glm::vec2(-x_vert, -y_vert),
-        glm::vec2(-x_vert, y_vert),
+    glm::vec2 quad_vertices[4] = {
+        glm::vec2(x_vert, y_vert), glm::vec2(x_vert, -y_vert),
+        glm::vec2(-x_vert, -y_vert), glm::vec2(-x_vert, y_vert),
         // x_vert, y_vert,  // top right
         // x_vert,  -y_vert, // bot right
         // -x_vert, -y_vert, // bot left
@@ -109,57 +107,86 @@ void Automaton::prepare_shaders() {
         // x_vert,  -y_vert, x_vert, y_vert,
     };
 
-    unsigned int quadVBO;
+    unsigned int quad_VBO;
     glGenVertexArrays(1, &quadVAO);
-    glGenBuffers(1, &quadVBO);
+    glGenBuffers(1, &quad_VBO);
     glBindVertexArray(quadVAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, quad_VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices,
+                 GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
+                          (void *)0);
 
     // also set instance data
     glEnableVertexAttribArray(1);
-    glBindBuffer( GL_ARRAY_BUFFER, instanceVBOs[0]); // this attribute comes from a different vertex buffer
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+    glBindBuffer(GL_ARRAY_BUFFER,
+                 instance_VBOs[0]); // this attribute comes from a different
+                                    // vertex buffer
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
+                          (void *)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glVertexAttribDivisor( 1, 1); // tell OpenGL this is an instanced vertex attribute.
+    glVertexAttribDivisor(
+        1, 1); // tell OpenGL this is an instanced vertex attribute.
 
     glEnableVertexAttribArray(2);
-    glBindBuffer( GL_ARRAY_BUFFER, instanceVBOs[1]); // this attribute comes from a different vertex buffer
+    glBindBuffer(GL_ARRAY_BUFFER,
+                 instance_VBOs[1]); // this attribute comes from a different
+                                    // vertex buffer
     glVertexAttribPointer(2, 1, GL_INT, GL_FALSE, 1 * sizeof(int), (void *)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glVertexAttribDivisor( 2, 1); // tell OpenGL this is an instanced vertex attribute.
+    glVertexAttribDivisor(
+        2, 1); // tell OpenGL this is an instanced vertex attribute.
 }
 
 void Automaton::update_states() {
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBOs[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(int) * (cell_count), &cells[0], GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, instance_VBOs[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(int) * (cell_count), &cells[0],
+                 GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Automaton::set_value(double x_pos, double y_pos, int val) {
-    int col = floor(((int)x_pos - GAP) % (int)(win_width)) / cell_size;
-    int row = floor(((int)y_pos - 2 * GAP) % (int)(win_height)) / cell_size;
-    int offset = row * cols + col;
-    // int above_offset = offset - cols;
-    // int left_right_offset = offset - cols - 1;
-    // int right_right_offset = offset - cols + 1;
-    //
-    // int under_offset = offset + cols;
-    // int left_under_offset = offset + cols - 1;
-    // int right_under_offset = offset + cols + 1;
-    //
-    // int left_offset = offset - 1;
-    // int right_offset = offset + 1;
+void Automaton::set_value(double x_pos, double y_pos, int val, int radius) {
+    int row = 0, col = 0;
+    bool update = false;
 
-    if (offset >= 0 && offset < cell_count) {
-        cells[offset] = val;
-        update_cells[offset] = val;
-        update_states();
+    // if (allow_oob) {
+        col = floor(((int)x_pos - GAP) % (int)(win_width)) / cell_size;
+        row = floor(((int)y_pos - 2 * GAP) % (int)(win_height)) / cell_size;
+        std::cout << "?" << std::endl;
+    //
+    // } else {
+    //     col = floor(((int)x_pos - GAP)) / cell_size;
+    //     row = floor(((int)y_pos - 2 * GAP)) / cell_size;
+    // }
+
+    int offset = row * cols + col;
+    std::cout << row << " | " << col << std::endl;
+
+    if (radius == 0) {
+        // if (allow_oob || (row >= 0 && row < cols && col < rows && col >= 0)) {
+            cells[offset] = val;
+            update_cells[offset] = val;
+            update = true;
+        // }
+    } else {
+        for (int i = row - radius; i < row + radius + 1; i++) {
+            for (int j = col - radius; j < col + radius + 1; j++) {
+                offset = i * cols + j;
+
+                if (allow_oob || (i >= 0 && i < rows && j < cols && j >= 0)) {
+                    cells[offset] = val;
+                    update_cells[offset] = val;
+                    update = true;
+                }
+            }
+        }
     }
+
+    if (update)
+        update_states();
 }
 
 void Automaton::fill_random() {

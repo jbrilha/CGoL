@@ -12,7 +12,7 @@
 
 Simulation::Simulation(char *argv0)
     // : path_str(get_executable_path()), win_height(WIN_HEIGHT),
-    : path_str(get_path(argv0)), win_height(WIN_HEIGHT), win_width(WIN_WIDTH),
+    : path_str(get_path(argv0)), win_height(WIN_HEIGHT), win_width(WIN_WIDTH), radius(0),
       automaton(nullptr), nb_frames(0), last_time(0), FPS(""), cell_count(0),
       seeding(true), ready(false), update_size(false), plague(false),
       manual(false), delta_time(0.f), last_frame(0.f), counter(0), delay(10) {
@@ -146,7 +146,7 @@ void Simulation::process_input() {
 
         double x_pos, y_pos;
         glfwGetCursorPos(window, &x_pos, &y_pos);
-        automaton->set_value(x_pos, y_pos, val);
+        automaton->set_value(x_pos, y_pos, val, radius);
         // seeding = true;
     } else {
         seeding = false;
@@ -198,11 +198,27 @@ void Simulation::drop_callback(GLFWwindow *window, int count,
 
 void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
                               int action, int mods) {
+    // std::cout << key << std::endl;
 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+
     if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
         ready = !ready;
+    }
+    if (key == GLFW_KEY_PERIOD && action == GLFW_PRESS) {
+        int val = 1;
+        if (mods == GLFW_MOD_SHIFT) {
+            val = 10;
+        }
+        radius += val;
+    }
+    if (key == GLFW_KEY_COMMA && action == GLFW_PRESS) {
+        int val = 1;
+        if (mods == GLFW_MOD_SHIFT) {
+            val = 10;
+        }
+        radius = std::max(0, radius - val);
     }
     if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
         int val = 10;

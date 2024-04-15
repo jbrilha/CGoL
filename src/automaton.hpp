@@ -17,6 +17,7 @@ class Automaton {
   private:
     int win_height;
     int win_width;
+    bool allow_oob; // out of bounds
 
     int square_size;
     int cell_size;
@@ -35,7 +36,7 @@ class Automaton {
     float origin_y;
 
     unsigned int quadVAO;
-    unsigned int instanceVBOs[2];
+    unsigned int instance_VBOs[2];
 
   public:
     Automaton();
@@ -50,7 +51,7 @@ class Automaton {
     void clear();
     void draw();
 
-    void set_value(double x_pos, double y_pos, int val);
+    void set_value(double x_pos, double y_pos, int val, int radius);
     void toggle_plague();
     int get_cell_count();
     int get_square_size();
