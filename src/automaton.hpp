@@ -15,15 +15,15 @@ using namespace glm_colors;
 
 class Automaton {
   private:
-    int win_height;
-    int win_width;
-    bool allow_oob; // out of bounds
-
     int square_size;
     int cell_size;
 
-    int row_rem;
-    int col_rem;
+    int win_height;
+    int win_width;
+    int hei_margin;
+    int wid_margin;
+
+    bool allow_oob; // out of bounds
 
     void update_grid();
     void prepare_shaders();
