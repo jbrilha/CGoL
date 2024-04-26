@@ -65,6 +65,7 @@ bool Simulation::run() {
 
         if (update_size) {
             automaton->update_dimensions(win_width, win_height);
+            cursor->update_dimensions(win_width, win_height);
             cell_count = automaton->get_cell_count();
             update_size = false;
         }

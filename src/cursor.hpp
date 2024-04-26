@@ -41,6 +41,7 @@ class Cursor {
     void draw();
     void update_position(double x_pos, double y_pos);
     void update_radius(int radius);
+    void update_dimensions(int win_width, int win_height);
     void update_square_size(int val);
 
     int get_radius();

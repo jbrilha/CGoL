@@ -46,6 +46,13 @@ void Cursor::update_square_size(int val) {
     prepare_shaders();
 }
 
+void Cursor::update_dimensions(int win_width, int win_height) {
+    this->win_width = win_width;
+    this->win_height = win_height;
+
+    prepare_shaders();
+}
+
 void Cursor::update_radius(int radius) {
     this->radius = radius;
 
