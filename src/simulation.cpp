@@ -39,6 +39,8 @@ void Simulation::set_automaton(Automaton *automaton) {
 void Simulation::init() {
     automaton = new Sand(path_str, win_width, win_height, SQUARE_SIZE);
     cell_count = automaton->get_cell_count();
+
+    cursor = new Cursor(path_str, win_width, win_height, SQUARE_SIZE);
 }
 
 bool Simulation::run() {
@@ -78,7 +80,9 @@ bool Simulation::run() {
             }
             counter = 0;
         }
+
         automaton->draw();
+        cursor->draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -184,7 +188,25 @@ void Simulation::set_callbacks() {
             if (instance)
                 instance->drop_callback(window, count, paths);
         });
+    glfwSetCursorPosCallback(
+        window, [](GLFWwindow *window, double x_pos_in, double y_pos_in) {
+            Simulation *instance =
+                static_cast<Simulation *>(glfwGetWindowUserPointer(window));
+            if (instance)
+                instance->mouse_pos_callback(window, x_pos_in, y_pos_in);
+        });
+
 }
+void Simulation::mouse_pos_callback(GLFWwindow *window, double x_pos_in, double y_pos_in) {
+    float x_pos = static_cast<float>(x_pos_in);
+    float y_pos = static_cast<float>(y_pos_in);
+
+    if(x_pos > 0 && x_pos < win_width
+       && y_pos > 0 && y_pos < win_height) {
+        cursor->update_position(x_pos, y_pos);
+    }
+}
+
 void Simulation::drop_callback(GLFWwindow *window, int count,
                                const char **paths) {
     for (int i = 0; i < count; i++) {
@@ -208,6 +230,7 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
             val = 10;
         }
         radius += val;
+        cursor->update_radius(radius);
     }
     if (key == GLFW_KEY_COMMA && action == GLFW_PRESS) {
         int val = 1;
@@ -215,6 +238,8 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
             val = 10;
         }
         radius = std::max(0, radius - val);
+        // if(radius != cursor->get_radius())
+            cursor->update_radius(radius);
     }
     if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
         int val = 10;
@@ -249,6 +274,7 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
             val = 10;
         }
         automaton->update_cell_size(val);
+        cursor->update_square_size(val);
         cell_count = automaton->get_cell_count();
     }
     if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
@@ -257,6 +283,7 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
             val = -10;
         }
         automaton->update_cell_size(val);
+        cursor->update_square_size(val);
         cell_count = automaton->get_cell_count();
     }
     if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {
@@ -391,6 +418,4 @@ void Simulation::init_GLFW() {
         std::cout << "Failed to initialize GLAD" << std::endl;
         exit(EXIT_FAILURE);
     }
-
-    glEnable(GL_DEPTH_TEST);
 }

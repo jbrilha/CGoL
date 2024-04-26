@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include "automaton.hpp"
+#include "cursor.hpp"
 
 #define GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
@@ -38,6 +39,7 @@ class Simulation {
     int radius;
 
     Automaton *automaton;
+    Cursor *cursor;
 
     GLFWwindow *window;
     void init_GLFW();
@@ -48,6 +50,7 @@ class Simulation {
     void key_callback(GLFWwindow *window, int key, int scancode, int action,
                       int mods);
     void drop_callback(GLFWwindow *window, int count, const char **paths);
+    void mouse_pos_callback(GLFWwindow *window, double x_pos_in, double y_pos_in);
     void update_FPS(double current_time);
     void update_title_bar();
     void process_input();
