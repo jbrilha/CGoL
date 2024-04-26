@@ -97,9 +97,9 @@ void Automaton::prepare_shaders() {
     };
 
     unsigned int quad_VBO;
-    glGenVertexArrays(1, &quadVAO);
+    glGenVertexArrays(1, &quad_VAO);
     glGenBuffers(1, &quad_VBO);
-    glBindVertexArray(quadVAO);
+    glBindVertexArray(quad_VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, quad_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices,
@@ -189,7 +189,7 @@ void Automaton::fill_random() {
 void Automaton::draw() {
     shader_program.use();
 
-    glBindVertexArray(quadVAO);
+    glBindVertexArray(quad_VAO);
     glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, cell_count);
     glBindVertexArray(0);
 }
@@ -204,9 +204,7 @@ void Automaton::clear() {
 }
 
 void Automaton::set_cell_colors() {
-    std::cout << "set cols" << std::endl; 
     for(int i = 0; i < colors.size(); i++) {
-        std::cout << colors[i].x << colors[i].y << colors[i].z << std::endl;
         shader_program.set_vec3(("colors[" + std::to_string(i) + "]"), colors[i]);
     }
 }

@@ -33,7 +33,7 @@ class Automaton {
     float origin_x;
     float origin_y;
 
-    unsigned int quadVAO;
+    unsigned int quad_VAO;
     unsigned int instance_VBOs[2];
 
   public:
