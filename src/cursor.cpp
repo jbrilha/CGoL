@@ -12,9 +12,12 @@ Cursor::Cursor(std::string path_str, int win_width, int win_height, int square_s
 void Cursor::prepare_shaders() {
     shader_program.use();
 
-    int diameter = radius * 2;
-    float x_vert = pxls_to_float(radius ? (square_size + GAP) * (diameter + 1) : square_size + GAP, win_width) / 2;
-    float y_vert = pxls_to_float(radius ? (square_size + GAP) * (diameter + 1) : square_size + GAP, win_height) / 2;
+    int dimensions = radius
+                ? (square_size + GAP) * (radius * 2 + 1)
+                : square_size + GAP;
+
+    float x_vert = pxls_to_float(dimensions, win_width) / 2;
+    float y_vert = pxls_to_float(dimensions, win_height) / 2;
     glm::vec2 quad_vertices[4] = {
         glm::vec2(x_vert, y_vert),
         glm::vec2(x_vert, -y_vert),
