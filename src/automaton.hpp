@@ -10,6 +10,7 @@
 #include <vector>
 
 static const int GAP = 1;
+static const int SQUARE_SIZE = 9;
 
 using namespace glm_colors;
 
@@ -23,11 +24,8 @@ class Automaton {
     int hei_margin;
     int wid_margin;
 
-    bool allow_oob; // out of bounds
-
     void update_grid();
     void prepare_shaders();
-    virtual void set_cell_colors() = 0;
 
     virtual int apply_rules(int offset) = 0;
     float pxls_to_float(int pixels, int total_pixels);
@@ -59,6 +57,8 @@ class Automaton {
     void fill_random();
 
   protected:
+    std::vector<glm::vec3> colors;
+
     int cell_count;
     int rows;
     int cols;
@@ -69,6 +69,7 @@ class Automaton {
     std::vector<int> update_cells;
 
     void update_states();
+    void set_cell_colors();
 
     Shader shader_program;
 };

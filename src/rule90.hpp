@@ -14,7 +14,6 @@ class Rule90 : public Automaton {
 
   private:
     int apply_rules(int offset) override;
-    void set_cell_colors() override;
 
 };
 #endif

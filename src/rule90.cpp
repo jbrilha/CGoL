@@ -3,6 +3,7 @@
 Rule90::Rule90(std::string path_str, int win_width, int win_height, int square_size)
     : Automaton(path_str, win_width, win_height, square_size) {
 
+    colors.push_back(red);
     set_cell_colors();
 };
 
@@ -22,11 +23,6 @@ void Rule90::update() {
 int Rule90::apply_rules(int offset) {
     if(!((offset) % cols)) return 0;
     return cells[offset - 1] != cells[offset + 1];
-}
-
-void Rule90::set_cell_colors() {
-    shader_program.set_vec3("color0", black);
-    shader_program.set_vec3("color1",red);
 }
 
 std::string Rule90::get_type() {

@@ -3,6 +3,7 @@
 Disease::Disease(std::string path_str, int win_width, int win_height, int square_size)
         : Automaton(path_str, win_width, win_height, square_size) {
 
+    colors.push_back(light_blue);
     set_cell_colors();
 };
 
@@ -53,11 +54,6 @@ int Disease::apply_rules(int offset) {
     }
 
     return neighbors;
-}
-
-void Disease::set_cell_colors() {
-    shader_program.set_vec3("color0", black);
-    shader_program.set_vec3("color1", light_blue);
 }
 
 std::string Disease::get_type() {

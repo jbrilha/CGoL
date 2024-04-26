@@ -3,6 +3,7 @@
 DayNNite::DayNNite(std::string path_str, int win_width, int win_height, int square_size)
     : Automaton(path_str, win_width, win_height, square_size) {
 
+    colors.push_back(green);
     set_cell_colors();
 };
 
@@ -12,7 +13,6 @@ DayNNite::~DayNNite() {
 
 void DayNNite::update() {
     int state = 0;
-    // update_cells = cells;
 
     for (int offset = 0; offset < cell_count; offset++) {
         state = cells[offset];
@@ -55,11 +55,6 @@ int DayNNite::apply_rules(int offset) {
     }
 
     return neighbors;
-}
-
-void DayNNite::set_cell_colors() {
-    shader_program.set_vec3("color0", black);
-    shader_program.set_vec3("color1", green);
 }
 
 std::string DayNNite::get_type() {

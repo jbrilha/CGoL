@@ -11,7 +11,6 @@
 #include "seeds.hpp"
 
 Simulation::Simulation(char *argv0)
-    // : path_str(get_executable_path()), win_height(WIN_HEIGHT),
     : path_str(get_path(argv0)), win_height(WIN_HEIGHT), win_width(WIN_WIDTH), radius(0),
       automaton(nullptr), nb_frames(0), last_time(0), FPS(""), cell_count(0),
       seeding(true), ready(false), update_size(false), plague(false),
@@ -21,8 +20,6 @@ Simulation::Simulation(char *argv0)
         std::cerr << "Error: Failed to retrieve executable path" << std::endl;
         exit(EXIT_FAILURE);
     }
-    //
-    // get_executable_path();
 
     init_GLFW();
 }
@@ -40,7 +37,7 @@ void Simulation::set_automaton(Automaton *automaton) {
 }
 
 void Simulation::init() {
-    automaton = new Sand(path_str, win_width, win_height, 99);
+    automaton = new Sand(path_str, win_width, win_height, SQUARE_SIZE);
     cell_count = automaton->get_cell_count();
 }
 
@@ -87,7 +84,6 @@ bool Simulation::run() {
         glfwPollEvents();
     }
 
-    // glDeleteProgram(shader_program.program_ID); done in automata destructor
     glfwDestroyWindow(window);
 
     glfwTerminate();
@@ -136,7 +132,7 @@ void Simulation::process_input() {
     }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        int val = automaton->get_type().find("Sand") == std::string::npos ? 1 : 3 ;
+        int val = 1;
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
             val = 0;
         }
@@ -344,9 +340,6 @@ void Simulation::error_callback(int error, const char *description) {
 }
 
 void Simulation::update_FPS(double current_time) {
-    // if (!manual)
-    //     delay = std::max(delay, nb_frames / 10);
-
     FPS = std::to_string(nb_frames);
 
     nb_frames = 0;

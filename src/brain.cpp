@@ -3,6 +3,8 @@
 Brain::Brain(std::string path_str, int win_width, int win_height, int square_size)
     : Automaton(path_str, win_width, win_height, square_size) {
 
+    colors.push_back(purple);
+    colors.push_back(pink);
     set_cell_colors();
 };
 
@@ -52,12 +54,6 @@ int Brain::apply_rules(int offset) {
     }
 
     return neighbors;
-}
-
-void Brain::set_cell_colors() {
-    shader_program.set_vec3("color0", black);
-    shader_program.set_vec3("color1", purple);
-    shader_program.set_vec3("color2", pink);
 }
 
 std::string Brain::get_type() {
