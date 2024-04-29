@@ -12,6 +12,5 @@ class Seeds : public Automaton {
 
   private:
     int apply_rules(int offset) override;
-
 };
 #endif

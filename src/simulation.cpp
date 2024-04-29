@@ -1,5 +1,4 @@
 #include "simulation.hpp"
-#include "sand.hpp"
 #include "brain.hpp"
 #include "day_n_nite.hpp"
 #include "disease.hpp"
@@ -8,13 +7,15 @@
 #include "rule0.hpp"
 #include "rule180.hpp"
 #include "rule90.hpp"
+#include "sand.hpp"
 #include "seeds.hpp"
 
 Simulation::Simulation(char *argv0)
-    : path_str(get_path(argv0)), win_height(WIN_HEIGHT), win_width(WIN_WIDTH), radius(0),
-      automaton(nullptr), nb_frames(0), last_time(0), FPS(""), cell_count(0),
-      seeding(true), ready(false), update_size(false), plague(false),
-      manual(false), delta_time(0.f), last_frame(0.f), counter(0), delay(10) {
+    : path_str(get_path(argv0)), win_height(WIN_HEIGHT), win_width(WIN_WIDTH),
+      radius(0), automaton(nullptr), nb_frames(0), last_time(0), FPS(""),
+      cell_count(0), seeding(true), ready(false), update_size(false),
+      plague(false), manual(false), delta_time(0.f), last_frame(0.f),
+      counter(0), delay(10) {
 
     if (path_str.empty()) {
         std::cerr << "Error: Failed to retrieve executable path" << std::endl;
@@ -27,12 +28,17 @@ Simulation::Simulation(char *argv0)
 Simulation::~Simulation() {
     delete automaton;
     automaton = nullptr;
+
+    delete cursor;
+    cursor = nullptr;
 }
 
 void Simulation::set_automaton(Automaton *automaton) {
     if (this->automaton != nullptr) {
         delete this->automaton;
     }
+    ready = false;
+    plague = false;
     this->automaton = automaton;
 }
 
@@ -43,7 +49,7 @@ void Simulation::init() {
     cursor = new Cursor(path_str, win_width, win_height, SQUARE_SIZE);
 }
 
-bool Simulation::run() {
+void Simulation::run() {
     std::cout << "Simulation running!" << std::endl;
     while (!glfwWindowShouldClose(window)) {
         counter++;
@@ -70,14 +76,10 @@ bool Simulation::run() {
             update_size = false;
         }
 
-        if (step) {
-            automaton->update();
-            step = false;
-        }
-
         if (counter > delay) {
-            if (!seeding && ready) {
+            if ((!seeding && ready) || step) {
                 automaton->update();
+                step = false;
             }
             counter = 0;
         }
@@ -92,7 +94,6 @@ bool Simulation::run() {
     glfwDestroyWindow(window);
 
     glfwTerminate();
-    return false;
 }
 
 std::string Simulation::get_path(char *argv0) {
@@ -103,16 +104,16 @@ std::string Simulation::get_path(char *argv0) {
 
         char resolved_path[PATH_MAX];
         if (realpath(path.c_str(), resolved_path) != NULL) {
-            std::cout << "resolved bin path: " << resolved_path << std::endl;
+            std::cout << "Resolved bin path: " << resolved_path << std::endl;
             std::string path_str = std::string(resolved_path);
             return std::string(path_str.c_str(),
                                path_str.c_str() + path_str.rfind("/"));
         } else {
-            std::cerr << "realpath error: " << strerror(errno) << std::endl;
+            std::cerr << "Realpath error: " << strerror(errno) << std::endl;
             return "";
         }
     } else {
-        std::cerr << "error getting path: " << strerror(errno) << std::endl;
+        std::cerr << "Error getting path: " << strerror(errno) << std::endl;
         return "";
     }
 }
@@ -135,6 +136,11 @@ void Simulation::process_input() {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
+    if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS &&
+        (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS ||
+         glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)) {
+        step = true;
+    }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         int val = 1;
@@ -148,7 +154,6 @@ void Simulation::process_input() {
         double x_pos, y_pos;
         glfwGetCursorPos(window, &x_pos, &y_pos);
         automaton->set_value(x_pos, y_pos, val, radius);
-        // seeding = true;
     } else {
         seeding = false;
     }
@@ -196,14 +201,13 @@ void Simulation::set_callbacks() {
             if (instance)
                 instance->mouse_pos_callback(window, x_pos_in, y_pos_in);
         });
-
 }
-void Simulation::mouse_pos_callback(GLFWwindow *window, double x_pos_in, double y_pos_in) {
+void Simulation::mouse_pos_callback(GLFWwindow *window, double x_pos_in,
+                                    double y_pos_in) {
     float x_pos = static_cast<float>(x_pos_in);
     float y_pos = static_cast<float>(y_pos_in);
 
-    if(x_pos > 0 && x_pos < win_width
-       && y_pos > 0 && y_pos < win_height) {
+    if (x_pos > 0 && x_pos < win_width && y_pos > 0 && y_pos < win_height) {
         cursor->update_position(x_pos, y_pos);
     }
 }
@@ -239,7 +243,7 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
             val = 10;
         }
         radius = std::max(0, radius - val);
-        // if(radius != cursor->get_radius())
+        if (radius != cursor->get_radius())
             cursor->update_radius(radius);
     }
     if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
@@ -247,7 +251,7 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         if (mods == GLFW_MOD_SHIFT) {
             val = 100;
         }
-        delay = std::min(delay - val, 500);
+        delay = std::max(delay - val, 0);
         manual = true;
     }
     if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
@@ -255,7 +259,7 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         if (mods == GLFW_MOD_SHIFT) {
             val = 100;
         }
-        delay = std::max(delay + val, 0);
+        delay = std::min(delay + val, 1000);
         manual = true;
     }
     if (key == GLFW_KEY_P && action == GLFW_PRESS) {
@@ -294,62 +298,42 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
     if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
         set_automaton(new Brain(path_str, win_width, win_height,
                                 this->automaton->get_square_size()));
-        ready = false;
-        plague = false;
     }
     if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
         set_automaton(new DayNNite(path_str, win_width, win_height,
                                    this->automaton->get_square_size()));
-        ready = false;
-        plague = false;
     }
     if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
         set_automaton(new Disease(path_str, win_width, win_height,
                                   this->automaton->get_square_size()));
-        ready = false;
-        plague = false;
     }
     if (key == GLFW_KEY_4 && action == GLFW_PRESS) {
         set_automaton(new LFoD(path_str, win_width, win_height,
                                this->automaton->get_square_size()));
-        ready = false;
-        plague = false;
     }
     if (key == GLFW_KEY_5 && action == GLFW_PRESS) {
         set_automaton(new Life(path_str, win_width, win_height,
                                this->automaton->get_square_size()));
-        ready = false;
-        plague = false;
     }
     if (key == GLFW_KEY_6 && action == GLFW_PRESS) {
         set_automaton(new Rule0(path_str, win_width, win_height,
-                                 this->automaton->get_square_size()));
-        ready = false;
-        plague = false;
+                                this->automaton->get_square_size()));
     }
     if (key == GLFW_KEY_7 && action == GLFW_PRESS) {
         set_automaton(new Rule180(path_str, win_width, win_height,
-                                 this->automaton->get_square_size()));
-        ready = false;
-        plague = false;
+                                  this->automaton->get_square_size()));
     }
     if (key == GLFW_KEY_8 && action == GLFW_PRESS) {
         set_automaton(new Rule90(path_str, win_width, win_height,
                                  this->automaton->get_square_size()));
-        ready = false;
-        plague = false;
     }
     if (key == GLFW_KEY_9 && action == GLFW_PRESS) {
         set_automaton(new Seeds(path_str, win_width, win_height,
                                 this->automaton->get_square_size()));
-        ready = false;
-        plague = false;
     }
     if (key == GLFW_KEY_0 && action == GLFW_PRESS) {
         set_automaton(new Sand(path_str, win_width, win_height,
-                                this->automaton->get_square_size()));
-        ready = false;
-        plague = false;
+                               this->automaton->get_square_size()));
     }
 }
 
@@ -407,7 +391,7 @@ void Simulation::init_GLFW() {
 
     set_callbacks();
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     // glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
     glfwMakeContextCurrent(window);

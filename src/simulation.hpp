@@ -14,23 +14,23 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-const int WIN_WIDTH = 850;
-const int WIN_HEIGHT = 850;
+const int WIN_WIDTH = 800;
+const int WIN_HEIGHT = 800;
 
 class Simulation {
   public:
-    Simulation(char* argv0);
+    Simulation(char *argv0);
     ~Simulation();
 
     void set_automaton(Automaton *automaton);
 
-    bool run();
+    void run();
 
     void init();
 
   private:
     // std::string get_executable_path();
-    std::string get_path(char* arg);
+    std::string get_path(char *arg);
     std::string path_str;
 
     int win_height;
@@ -50,7 +50,8 @@ class Simulation {
     void key_callback(GLFWwindow *window, int key, int scancode, int action,
                       int mods);
     void drop_callback(GLFWwindow *window, int count, const char **paths);
-    void mouse_pos_callback(GLFWwindow *window, double x_pos_in, double y_pos_in);
+    void mouse_pos_callback(GLFWwindow *window, double x_pos_in,
+                            double y_pos_in);
     void update_FPS(double current_time);
     void update_title_bar();
     void process_input();

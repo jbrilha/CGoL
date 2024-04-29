@@ -5,7 +5,7 @@ int main(int argc, char *argv[]) {
 
     simulation.init();
 
-    while(simulation.run());
+    simulation.run();
 
     return EXIT_SUCCESS;
 }

@@ -1,16 +1,14 @@
 #include "seeds.hpp"
 
-Seeds::Seeds(std::string path_str, int win_width, int win_height, int square_size)
-        : Automaton(path_str, win_width, win_height, square_size) {
+Seeds::Seeds(std::string path_str, int win_width, int win_height,
+             int square_size)
+    : Automaton(path_str, win_width, win_height, square_size) {
 
-    // colors.push_back(black);
     colors.push_back(orange);
     set_cell_colors();
 };
 
-Seeds::~Seeds() {
-    glDeleteProgram(shader_program.program_ID);
-}
+Seeds::~Seeds() { glDeleteProgram(shader_program.program_ID); }
 
 void Seeds::update() {
     int state = 0;
@@ -20,13 +18,12 @@ void Seeds::update() {
 
         int neighbors = apply_rules(offset);
 
-        if(!state && neighbors == 2) {
+        if (!state && neighbors == 2) {
             update_cells[offset] = 1;
             continue;
         }
 
         update_cells[offset] = 0;
-
     }
     cells = update_cells;
 

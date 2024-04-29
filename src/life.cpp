@@ -1,15 +1,13 @@
 #include "life.hpp"
 
 Life::Life(std::string path_str, int win_width, int win_height, int square_size)
-        : Automaton(path_str, win_width, win_height, square_size) {
+    : Automaton(path_str, win_width, win_height, square_size) {
 
     colors.push_back(green);
     set_cell_colors();
 };
 
-Life::~Life() {
-    glDeleteProgram(shader_program.program_ID);
-}
+Life::~Life() { glDeleteProgram(shader_program.program_ID); }
 
 void Life::update() {
     int state = 0;

@@ -1,15 +1,14 @@
 #include "rule0.hpp"
 
-Rule0::Rule0(std::string path_str, int win_width, int win_height, int square_size)
+Rule0::Rule0(std::string path_str, int win_width, int win_height,
+             int square_size)
     : Automaton(path_str, win_width, win_height, square_size) {
 
     colors.push_back(blue);
     set_cell_colors();
 };
 
-Rule0::~Rule0() {
-    glDeleteProgram(shader_program.program_ID);
-}
+Rule0::~Rule0() { glDeleteProgram(shader_program.program_ID); }
 
 void Rule0::update() {
     for (int offset = 0; offset < cell_count; offset++) {
@@ -21,7 +20,9 @@ void Rule0::update() {
 }
 
 int Rule0::apply_rules(int offset) {
-    if(!((offset) % cols)) return 0;
+    if (!((offset) % cols))
+        return 0;
+
     return cells[offset - cols] != cells[offset + cols];
 }
 

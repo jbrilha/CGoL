@@ -4,11 +4,11 @@
 #include "shaders.hpp"
 #include "automaton.hpp"
 #include "util/glm_colors.hpp"
+#include "util/pxls.hpp"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <vector>
 
 using namespace glm_colors;
 
@@ -28,7 +28,7 @@ class Cursor {
 
     void prepare_shaders();
 
-    float pxls_to_float(int pixels, int total_pixels);
+    // float pxls_to_float(int pixels, int total_pixels);
 
     unsigned int quad_VAO;
     unsigned int cursor_VBO;
@@ -36,7 +36,7 @@ class Cursor {
   public:
     Cursor();
     Cursor(std::string path_str, int win_width, int win_height, int square_size);
-    ~Cursor(){};
+    ~Cursor();
 
     void draw();
     void update_position(double x_pos, double y_pos);

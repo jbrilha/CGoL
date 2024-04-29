@@ -1,15 +1,14 @@
 #include "day_n_nite.hpp"
 
-DayNNite::DayNNite(std::string path_str, int win_width, int win_height, int square_size)
+DayNNite::DayNNite(std::string path_str, int win_width, int win_height,
+                   int square_size)
     : Automaton(path_str, win_width, win_height, square_size) {
 
     colors.push_back(green);
     set_cell_colors();
 };
 
-DayNNite::~DayNNite() {
-    glDeleteProgram(shader_program.program_ID);
-}
+DayNNite::~DayNNite() { glDeleteProgram(shader_program.program_ID); }
 
 void DayNNite::update() {
     int state = 0;
@@ -23,10 +22,9 @@ void DayNNite::update() {
                       neighbors == 7 || neighbors == 8)) {
             update_cells[offset] = 1;
         } else if (!state && (neighbors == 3 || neighbors == 6 ||
-                      neighbors == 7 || neighbors == 8)) {
+                              neighbors == 7 || neighbors == 8)) {
             update_cells[offset] = 1;
-        }
-        else {
+        } else {
             update_cells[offset] = 0;
         }
     }
@@ -42,7 +40,8 @@ int DayNNite::apply_rules(int offset) {
 
     for (int i = -1; i < 2; i++) {
         for (int j = -1; j < 2; j++) {
-            if (i == 0 && j == 0) continue;
+            if (i == 0 && j == 0)
+                continue;
 
             int neigh_row = (row + i + rows) % rows;
             int neigh_col = (col + j + cols) % cols;

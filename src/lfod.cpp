@@ -7,9 +7,7 @@ LFoD::LFoD(std::string path_str, int win_width, int win_height, int square_size)
     set_cell_colors();
 };
 
-LFoD::~LFoD() {
-    glDeleteProgram(shader_program.program_ID);
-}
+LFoD::~LFoD() { glDeleteProgram(shader_program.program_ID); }
 
 void LFoD::update() {
     int state = 0;

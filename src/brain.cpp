@@ -1,6 +1,7 @@
 #include "brain.hpp"
 
-Brain::Brain(std::string path_str, int win_width, int win_height, int square_size)
+Brain::Brain(std::string path_str, int win_width, int win_height,
+             int square_size)
     : Automaton(path_str, win_width, win_height, square_size) {
 
     colors.push_back(purple);
@@ -8,9 +9,7 @@ Brain::Brain(std::string path_str, int win_width, int win_height, int square_siz
     set_cell_colors();
 };
 
-Brain::~Brain() {
-    glDeleteProgram(shader_program.program_ID);
-}
+Brain::~Brain() { glDeleteProgram(shader_program.program_ID); }
 
 void Brain::update() {
     int state = 0;

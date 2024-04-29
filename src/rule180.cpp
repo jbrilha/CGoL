@@ -1,15 +1,14 @@
 #include "rule180.hpp"
 
-Rule180::Rule180(std::string path_str, int win_width, int win_height, int square_size)
+Rule180::Rule180(std::string path_str, int win_width, int win_height,
+                 int square_size)
     : Automaton(path_str, win_width, win_height, square_size) {
 
     colors.push_back(purple);
     set_cell_colors();
 };
 
-Rule180::~Rule180() {
-    glDeleteProgram(shader_program.program_ID);
-}
+Rule180::~Rule180() { glDeleteProgram(shader_program.program_ID); }
 
 void Rule180::update() {
     for (int offset = 0; offset < cell_count; offset++) {
@@ -21,8 +20,11 @@ void Rule180::update() {
 }
 
 int Rule180::apply_rules(int offset) {
-    // if(!((offset) % cols)) return 0;
-    return (cells[offset - (cols)] != cells[offset + (cols)]) != (cells[offset - 1] != cells[offset + 1]);
+    if (!((offset) % cols))
+        return 0;
+
+    return (cells[offset - (cols)] != cells[offset + (cols)]) !=
+           (cells[offset - 1] != cells[offset + 1]);
 }
 
 std::string Rule180::get_type() {

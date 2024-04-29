@@ -1,16 +1,14 @@
 #include "disease.hpp"
 
-Disease::Disease(std::string path_str, int win_width, int win_height, int square_size)
-        : Automaton(path_str, win_width, win_height, square_size) {
+Disease::Disease(std::string path_str, int win_width, int win_height,
+                 int square_size)
+    : Automaton(path_str, win_width, win_height, square_size) {
 
     colors.push_back(light_blue);
     set_cell_colors();
 };
 
-
-Disease::~Disease() {
-    glDeleteProgram(shader_program.program_ID);
-}
+Disease::~Disease() { glDeleteProgram(shader_program.program_ID); }
 
 void Disease::update() {
     int state = 0;
@@ -28,6 +26,7 @@ void Disease::update() {
             update_cells[offset] = 0;
         }
     }
+
     cells = update_cells;
 
     update_states();

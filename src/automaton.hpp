@@ -3,6 +3,7 @@
 
 #include "shaders.hpp"
 #include "util/glm_colors.hpp"
+#include "util/pxls.hpp"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -28,7 +29,7 @@ class Automaton {
     void prepare_shaders();
 
     virtual int apply_rules(int offset) = 0;
-    float pxls_to_float(int pixels, int total_pixels);
+    // float pxls_to_float(int pixels, int total_pixels);
 
     float origin_x;
     float origin_y;
@@ -38,7 +39,8 @@ class Automaton {
 
   public:
     Automaton();
-    Automaton(std::string path_str, int win_width, int win_height, int square_size);
+    Automaton(std::string path_str, int win_width, int win_height,
+              int square_size);
     virtual ~Automaton(){};
     virtual std::string get_type() = 0;
 

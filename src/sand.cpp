@@ -5,7 +5,6 @@
 Sand::Sand(std::string path_str, int win_width, int win_height, int square_size)
     : Automaton(path_str, win_width, win_height, square_size) {
 
-    // colors.push_back(black);
     colors.push_back(yellow);
     colors.push_back(white);
     colors.push_back(brown);
@@ -44,7 +43,8 @@ int Sand::apply_rules(int offset) {
         return 0;
     }
     if (cells[under_offset] == 1 || cells[under_offset] == 2) {
-        if((double) rand() / RAND_MAX >= 0.5 ) goto check_right;
+        if ((double)rand() / RAND_MAX >= 0.5)
+            goto check_right;
 
         if (!cells[left_offset] && !cells[left_under_offset]) {
             update_cells[offset] = 0;
@@ -88,8 +88,8 @@ int Sand::apply_rules(int offset) {
 //     int above_offset = offset - cols;
 //
 //     int under_offset = offset + cols;
-//     int left_above_offset = offset + cols - 1; // these are actually still under
-//     int right_above_offset = offset + cols + 1;
+//     int left_above_offset = offset + cols - 1; // these are actually still
+//     under int right_above_offset = offset + cols + 1;
 //
 //     int left_offset = offset - 1;
 //     int right_offset = offset + 1;

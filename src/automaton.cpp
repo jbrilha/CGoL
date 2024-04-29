@@ -1,10 +1,10 @@
 #include "automaton.hpp"
-#include <iomanip>
-#include <string>
 
-Automaton::Automaton(std::string path_str, int win_width, int win_height, int square_size)
-    : square_size(square_size), cell_size(square_size + GAP), win_height(win_height),
-      win_width(win_width), hei_margin(win_height % cell_size), wid_margin(win_width % cell_size),
+Automaton::Automaton(std::string path_str, int win_width, int win_height,
+                     int square_size)
+    : square_size(square_size), cell_size(square_size + GAP),
+      win_height(win_height), win_width(win_width),
+      hei_margin(win_height % cell_size), wid_margin(win_width % cell_size),
       cell_count((win_width / cell_size) * (win_height / cell_size)),
       rows(win_height / cell_size), cols(win_width / cell_size), plague(false),
       cells(cell_count, 0), update_cells(cells),
@@ -12,9 +12,9 @@ Automaton::Automaton(std::string path_str, int win_width, int win_height, int sq
                      (path_str + "/../shaders/frag.glsl").c_str()) {
 
     this->origin_x =
-        -1.f + pxls_to_float(this->cell_size + wid_margin, win_width) / 2;
+        -1.f + pxls::to_float(this->cell_size + wid_margin, win_width);
     this->origin_y =
-        1.f - pxls_to_float(this->cell_size + hei_margin, win_height) / 2;
+        1.f - pxls::to_float(this->cell_size + hei_margin, win_height);
 
     colors.push_back(black);
     prepare_shaders();
@@ -43,8 +43,8 @@ void Automaton::update_grid() {
     cell_count = new_cell_count;
     update_cells = std::vector<int>(cell_count, 0);
 
-    origin_x = -1.f + pxls_to_float(cell_size + wid_margin, win_width) / 2;
-    origin_y = 1.f - pxls_to_float(cell_size + hei_margin, win_height) / 2;
+    origin_x = -1.f + pxls::to_float(cell_size + wid_margin, win_width);
+    origin_y = 1.f - pxls::to_float(cell_size + hei_margin, win_height);
 
     prepare_shaders();
 }
@@ -72,8 +72,8 @@ void Automaton::prepare_shaders() {
     for (int row = 0; row < rows; row++) {
         for (int col = 0; col < cols; col++) {
             offsets[i++] = {
-                origin_x + pxls_to_float(cell_size, win_width) * col,
-                origin_y - pxls_to_float(cell_size, win_height) * row};
+                origin_x + (2 * pxls::to_float(cell_size, win_width)) * col,
+                origin_y - (2 * pxls::to_float(cell_size, win_height)) * row};
         }
     }
 
@@ -87,8 +87,8 @@ void Automaton::prepare_shaders() {
                  GL_STREAM_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    float x_vert = pxls_to_float(square_size, win_width) / 2;
-    float y_vert = pxls_to_float(square_size, win_height) / 2;
+    float x_vert = pxls::to_float(square_size, win_width);
+    float y_vert = pxls::to_float(square_size, win_height);
     glm::vec2 quad_vertices[4] = {
         glm::vec2(x_vert, y_vert),
         glm::vec2(x_vert, -y_vert),
@@ -142,19 +142,24 @@ void Automaton::set_value(double x_pos, double y_pos, int val, int radius) {
     // if(x_pos < (double) win_width / 2) x_pos -= 2.625;
     // if(y_pos < (double) win_height / 2) y_pos -= 3.234;
 
-    if (x_pos < (double) wid_margin / 2 || x_pos > win_width - (double) wid_margin / 2 ||
-        y_pos < (double) hei_margin / 2 || y_pos > win_height - (double)hei_margin / 2) {
-        
+    if (x_pos < (double)wid_margin / 2 ||
+        x_pos > win_width - (double)wid_margin / 2 ||
+        y_pos < (double)hei_margin / 2 ||
+        y_pos > win_height - (double)hei_margin / 2) {
+
         return;
     }
-        // std::cout << "\r"
-        // <<  "{" << x_pos << ", " << y_pos << "}" << std::setprecision(10) << std::fixed << "\n"
-        // <<  wid_margin << "|" << hei_margin
-        // << "[" << col << ":" << row << "]"
-        // << std::flush;
+    // std::cout << "\r"
+    // <<  "{" << x_pos << ", " << y_pos << "}" << std::setprecision(10) <<
+    // std::fixed << "\n"
+    // <<  wid_margin << "|" << hei_margin
+    // << "[" << col << ":" << row << "]"
+    // << std::flush;
 
-    int col = (floor(((int)x_pos - GAP - wid_margin / 2) % (int)(win_width) )) / cell_size;
-    int row = (floor(((int)y_pos - GAP - hei_margin / 2) % (int)(win_height))) / cell_size;
+    int col = (floor(((int)x_pos - GAP - wid_margin / 2) % (int)(win_width))) /
+              cell_size;
+    int row = (floor(((int)y_pos - GAP - hei_margin / 2) % (int)(win_height))) /
+              cell_size;
     int offset = row * cols + col;
 
     if (radius == 0) {
@@ -204,8 +209,9 @@ void Automaton::clear() {
 }
 
 void Automaton::set_cell_colors() {
-    for(int i = 0; i < colors.size(); i++) {
-        shader_program.set_vec3(("colors[" + std::to_string(i) + "]"), colors[i]);
+    for (int i = 0; i < colors.size(); i++) {
+        shader_program.set_vec3(("colors[" + std::to_string(i) + "]"),
+                                colors[i]);
     }
 }
 
@@ -213,6 +219,6 @@ void Automaton::toggle_plague() { plague = !plague; }
 int Automaton::get_cell_count() { return cell_count; }
 int Automaton::get_square_size() { return square_size; }
 
-float Automaton::pxls_to_float(int pixels, int total_pixels) {
-    return 2 * (float(pixels) / total_pixels);
-}
+// float Automaton::pxls_to_float(int pixels, int total_pixels) {
+//     return (float) pixels / total_pixels;
+// }
