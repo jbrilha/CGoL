@@ -35,7 +35,7 @@ class Cursor {
 
   public:
     Cursor();
-    Cursor(std::string path_str, int win_width, int win_height, int square_size);
+    Cursor(std::string path_str, int win_width, int win_height, int square_size, int radius);
     ~Cursor();
 
     void draw();

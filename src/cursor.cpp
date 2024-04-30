@@ -1,8 +1,8 @@
 #include "cursor.hpp"
 
-Cursor::Cursor(std::string path_str, int win_width, int win_height, int square_size)
+Cursor::Cursor(std::string path_str, int win_width, int win_height, int square_size, int radius)
     : square_size(square_size), win_height(win_height), win_width(win_width),
-      radius(0), cursor_x(0), cursor_y(0), cursor_pos(0),
+      radius(radius), cursor_x(0), cursor_y(0), cursor_pos(0),
       shader_program((path_str + "/../shaders/cursor_vert.glsl").c_str(),
                      (path_str + "/../shaders/cursor_frag.glsl").c_str()) {
 
@@ -44,8 +44,8 @@ void Cursor::update_position(double x_pos, double y_pos) {
     shader_program.set_vec2("cursor_pos", cursor_pos);
 }
 
-void Cursor::update_square_size(int val) {
-    square_size = std::max(1, square_size + val);
+void Cursor::update_square_size(int square_size) {
+    this->square_size = square_size;
 
     prepare_shaders();
 }
@@ -72,7 +72,3 @@ void Cursor::draw() {
 }
 
 int Cursor::get_radius() { return radius; }
-
-// float Cursor::pxls_to_float(int pixels, int total_pixels) {
-//     return (float) pixels / total_pixels;
-// }

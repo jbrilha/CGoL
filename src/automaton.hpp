@@ -11,7 +11,7 @@
 #include <vector>
 
 static const int GAP = 1;
-static const int SQUARE_SIZE = 9;
+static const int SQUARE_SIZE = 1;
 
 using namespace glm_colors;
 
@@ -46,7 +46,7 @@ class Automaton {
 
     virtual void update() = 0;
     void update_dimensions(int win_width, int win_height);
-    void update_cell_size(int val);
+    void update_square_size(int val);
 
     void clear();
     void draw();
@@ -55,6 +55,7 @@ class Automaton {
     void toggle_plague();
     int get_cell_count();
     int get_square_size();
+    int get_cell_size();
 
     void fill_random();
 

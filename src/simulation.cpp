@@ -12,7 +12,7 @@
 
 Simulation::Simulation(char *argv0)
     : path_str(get_path(argv0)), win_height(WIN_HEIGHT), win_width(WIN_WIDTH),
-      radius(0), automaton(nullptr), nb_frames(0), last_time(0), FPS(""),
+      radius(10), automaton(nullptr), nb_frames(0), last_time(0), FPS(""),
       cell_count(0), seeding(true), ready(false), update_size(false),
       plague(false), manual(false), delta_time(0.f), last_frame(0.f),
       counter(0), delay(10) {
@@ -46,7 +46,7 @@ void Simulation::init() {
     automaton = new Sand(path_str, win_width, win_height, SQUARE_SIZE);
     cell_count = automaton->get_cell_count();
 
-    cursor = new Cursor(path_str, win_width, win_height, SQUARE_SIZE);
+    cursor = new Cursor(path_str, win_width, win_height, SQUARE_SIZE, radius);
 }
 
 void Simulation::run() {
@@ -278,18 +278,26 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         if (mods == GLFW_MOD_SHIFT) {
             val = 10;
         }
-        automaton->update_cell_size(val);
-        cursor->update_square_size(val);
+
+        int square_size = automaton->get_square_size() + val;
+
+        automaton->update_square_size(square_size);
+        cursor->update_square_size(square_size);
         cell_count = automaton->get_cell_count();
     }
     if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-        int val = -1;
+        int val = 1;
         if (mods == GLFW_MOD_SHIFT) {
-            val = -10;
+            val = 10;
         }
-        automaton->update_cell_size(val);
-        cursor->update_square_size(val);
-        cell_count = automaton->get_cell_count();
+        int square_size = std::max(1, automaton->get_square_size() - val);
+
+        if (square_size != automaton->get_square_size()) {
+            automaton->update_square_size(square_size);
+            cursor->update_square_size(square_size);
+            cell_count = automaton->get_cell_count();
+        }
+
     }
     if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {
         step = true;

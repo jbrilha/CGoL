@@ -1,12 +1,11 @@
 #include "sand.hpp"
-#include "util/glm_colors.hpp"
-#include <cstdlib>
 
 Sand::Sand(std::string path_str, int win_width, int win_height, int square_size)
     : Automaton(path_str, win_width, win_height, square_size) {
 
     colors.push_back(yellow);
     colors.push_back(white);
+    // colors.push_back(yellow);
     colors.push_back(brown);
     set_cell_colors();
 };
@@ -14,8 +13,14 @@ Sand::Sand(std::string path_str, int win_width, int win_height, int square_size)
 Sand::~Sand() { glDeleteProgram(shader_program.program_ID); }
 
 void Sand::update() {
+    // update_cells = cells;
     for (int offset = cell_count - 1; offset >= 0; offset--) {
+    // for (int offset = 0; offset < cell_count; offset++) {
         apply_rules(offset);
+        // int a = apply_rules(offset);
+        // if(a == 5) {
+        //     std::cout << a << std::endl;
+        // }
     }
     cells = update_cells;
 
@@ -34,55 +39,58 @@ int Sand::apply_rules(int offset) {
 
     int state = cells[offset];
 
-    if (state == 0 || state == 2) {
+    if (state == 2 || state == 0) {
         return 0;
     }
 
     if (under_offset >= cell_count) {
         update_cells[offset] = 1;
-        return 0;
+        return 1;
     }
-    if (cells[under_offset] == 1 || cells[under_offset] == 2) {
-        if ((double)rand() / RAND_MAX >= 0.5)
-            goto check_right;
+    if (cells[under_offset]){
+        bool go_left = false, go_right = false;
 
-        if (!cells[left_offset] && !cells[left_under_offset]) {
-            update_cells[offset] = 0;
-            update_cells[left_under_offset] = 1;
-        } else if (!cells[right_offset] && !cells[right_under_offset]) {
-            update_cells[offset] = 0;
-            update_cells[right_under_offset] = 1;
-        } else {
-            update_cells[offset] = 1;
+        if ((!cells[left_offset] || cells[left_offset] == 3) &&
+            (!cells[left_under_offset] || cells[left_under_offset] == 3)
+            && ((left_under_offset + 1) % cols)) {
+          go_left = true;
         }
-        return 0;
-    check_right:
-        if (!cells[right_offset] && !cells[right_under_offset]) {
-            update_cells[offset] = 0;
-            update_cells[right_under_offset] = 1;
-        } else if (!cells[left_offset] && !cells[left_under_offset]) {
-            update_cells[offset] = 0;
-            update_cells[left_under_offset] = 1;
-        } else {
-            update_cells[offset] = 1;
+        if ((!cells[right_offset] || cells[right_offset] == 3) &&
+            (!cells[right_under_offset] || cells[right_under_offset] == 3)
+            && (right_under_offset % cols)) {
+          go_right = true;
         }
-        return 0;
+        if(!go_left && !go_right){
+            update_cells[offset] = 1;
+            return 2;
+        }
+
+        if (go_right && go_left) {
+            (double)rand() / RAND_MAX >= 0.5
+                ? update_cells[left_under_offset] = 1
+                : update_cells[right_under_offset] = 1;
+        } else if (go_left) {
+            update_cells[left_under_offset] = 1;
+
+        } else if (go_right) {
+            update_cells[right_under_offset] = 1;
+        }
+
+        update_cells[offset] = 0;
+        return 3;
     } else {
-        if (cells[above_offset] == 3 && cells[under_offset] == 0) {
-            update_cells[offset] = 3;
-            update_cells[above_offset] = 0;
-            update_cells[under_offset] = cells[offset];
-            return 0;
-        } else if (cells[above_offset] == 0 || cells[above_offset] == 2) {
-            update_cells[offset] = 0;
-            update_cells[under_offset] = cells[offset];
-            return 0;
+        if (!cells[under_offset] || cells[under_offset] == 3) {
+        update_cells[offset] = 0;
+        update_cells[under_offset] = 3;
         } else {
-            update_cells[offset] = 3;
+        update_cells[offset] = 0;
+        update_cells[under_offset] = 1;
+        
         }
     }
 
-    return -1;
+
+    return 5;
 }
 // int Sand::apply_rules(int offset) {
 //     int above_offset = offset - cols;

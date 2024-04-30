@@ -56,8 +56,8 @@ void Automaton::update_dimensions(int win_width, int win_height) {
     update_grid();
 }
 
-void Automaton::update_cell_size(int val) {
-    square_size = std::max(1, square_size + val);
+void Automaton::update_square_size(int square_size) {
+    this->square_size = square_size;
     cell_size = square_size + GAP;
 
     update_grid();
@@ -139,8 +139,6 @@ void Automaton::update_states() {
 
 void Automaton::set_value(double x_pos, double y_pos, int val, int radius) {
     bool update = false;
-    // if(x_pos < (double) win_width / 2) x_pos -= 2.625;
-    // if(y_pos < (double) win_height / 2) y_pos -= 3.234;
 
     if (x_pos < (double)wid_margin / 2 ||
         x_pos > win_width - (double)wid_margin / 2 ||
@@ -149,12 +147,6 @@ void Automaton::set_value(double x_pos, double y_pos, int val, int radius) {
 
         return;
     }
-    // std::cout << "\r"
-    // <<  "{" << x_pos << ", " << y_pos << "}" << std::setprecision(10) <<
-    // std::fixed << "\n"
-    // <<  wid_margin << "|" << hei_margin
-    // << "[" << col << ":" << row << "]"
-    // << std::flush;
 
     int col = (floor(((int)x_pos - GAP - wid_margin / 2) % (int)(win_width))) /
               cell_size;
@@ -218,7 +210,4 @@ void Automaton::set_cell_colors() {
 void Automaton::toggle_plague() { plague = !plague; }
 int Automaton::get_cell_count() { return cell_count; }
 int Automaton::get_square_size() { return square_size; }
-
-// float Automaton::pxls_to_float(int pixels, int total_pixels) {
-//     return (float) pixels / total_pixels;
-// }
+int Automaton::get_cell_size() { return cell_size; }
