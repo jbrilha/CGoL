@@ -29,7 +29,6 @@ class Automaton {
     void prepare_shaders();
 
     virtual int apply_rules(int offset) = 0;
-    // float pxls_to_float(int pixels, int total_pixels);
 
     float origin_x;
     float origin_y;
@@ -46,7 +45,7 @@ class Automaton {
 
     virtual void update() = 0;
     void update_dimensions(int win_width, int win_height);
-    void update_square_size(int val);
+    void update_square_size(int square_size);
 
     void clear();
     void draw();

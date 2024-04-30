@@ -28,8 +28,6 @@ class Cursor {
 
     void prepare_shaders();
 
-    // float pxls_to_float(int pixels, int total_pixels);
-
     unsigned int quad_VAO;
     unsigned int cursor_VBO;
 
@@ -42,7 +40,7 @@ class Cursor {
     void update_position(double x_pos, double y_pos);
     void update_radius(int radius);
     void update_dimensions(int win_width, int win_height);
-    void update_square_size(int val);
+    void update_square_size(int square_size);
 
     int get_radius();
 
