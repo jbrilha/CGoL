@@ -116,7 +116,6 @@ water:
         if(!go_left && !go_right
             && !go_b_left && !go_b_right
         ){
-            std::cout << "w" << std::endl;
             update_cells[offset] = WATER;
             return 1;
         }

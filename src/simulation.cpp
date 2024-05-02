@@ -9,7 +9,6 @@
 #include "rule90.hpp"
 #include "sand.hpp"
 #include "seeds.hpp"
-#include "src/automaton.hpp"
 
 Simulation::Simulation(char *argv0)
     : path_str(get_path(argv0)), win_height(WIN_HEIGHT), win_width(WIN_WIDTH),
@@ -146,13 +145,15 @@ void Simulation::process_input() {
     }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        bool sw = water && automaton->get_type().find("Sand") != std::string::npos;
+        bool s = automaton->get_type().find("Sand") != std::string::npos;
+        bool sw = s & water;
+
         int val = sw ? WATER : 1;
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
             val = 0;
         }
         if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-            val = sw ? 5 : 1;
+            val = s ? 5 : 1;
         }
 
         double x_pos, y_pos;
