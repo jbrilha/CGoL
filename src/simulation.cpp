@@ -9,12 +9,13 @@
 #include "rule90.hpp"
 #include "sand.hpp"
 #include "seeds.hpp"
+#include "src/automaton.hpp"
 
 Simulation::Simulation(char *argv0)
     : path_str(get_path(argv0)), win_height(WIN_HEIGHT), win_width(WIN_WIDTH),
-      radius(10), automaton(nullptr), nb_frames(0), last_time(0), FPS(""),
+      radius(RADIUS), automaton(nullptr), nb_frames(0), last_time(0), FPS(""),
       cell_count(0), seeding(true), ready(false), update_size(false),
-      plague(false), manual(false), delta_time(0.f), last_frame(0.f),
+      plague(false), water(false), delta_time(0.f), last_frame(0.f),
       counter(0), delay(10) {
 
     if (path_str.empty()) {
@@ -47,6 +48,7 @@ void Simulation::init() {
     cell_count = automaton->get_cell_count();
 
     cursor = new Cursor(path_str, win_width, win_height, SQUARE_SIZE, radius);
+    automaton->load();
 }
 
 void Simulation::run() {
@@ -106,6 +108,7 @@ std::string Simulation::get_path(char *argv0) {
         if (realpath(path.c_str(), resolved_path) != NULL) {
             std::cout << "Resolved bin path: " << resolved_path << std::endl;
             std::string path_str = std::string(resolved_path);
+
             return std::string(path_str.c_str(),
                                path_str.c_str() + path_str.rfind("/"));
         } else {
@@ -118,7 +121,7 @@ std::string Simulation::get_path(char *argv0) {
     }
 }
 
-// std::string Simulation::get_executable_path() { // MacOS only
+// std::string Simulation::get_path() { // MacOS only
 //     char path[1024];
 //     uint32_t size = sizeof(path);
 //     if (_NSGetExecutablePath(path, &size) == 0)
@@ -143,12 +146,13 @@ void Simulation::process_input() {
     }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        int val = 1;
+        bool sw = water && automaton->get_type().find("Sand") != std::string::npos;
+        int val = sw ? WATER : 1;
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
             val = 0;
         }
         if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-            val = 2;
+            val = sw ? 5 : 1;
         }
 
         double x_pos, y_pos;
@@ -207,7 +211,10 @@ void Simulation::mouse_pos_callback(GLFWwindow *window, double x_pos_in,
     float x_pos = static_cast<float>(x_pos_in);
     float y_pos = static_cast<float>(y_pos_in);
 
-    if (x_pos > 0 && x_pos < win_width && y_pos > 0 && y_pos < win_height) {
+    if (x_pos > 0 - SQUARE_SIZE * (radius + 1) &&
+        x_pos < win_width + SQUARE_SIZE * (radius + 1) &&
+        y_pos > 0 - SQUARE_SIZE * (radius + 1) &&
+        y_pos < win_height + SQUARE_SIZE * (radius + 1)) {
         cursor->update_position(x_pos, y_pos);
     }
 }
@@ -252,7 +259,6 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
             val = 100;
         }
         delay = std::max(delay - val, 0);
-        manual = true;
     }
     if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
         int val = 10;
@@ -260,14 +266,21 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
             val = 100;
         }
         delay = std::min(delay + val, 1000);
-        manual = true;
+    }
+    if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+        // std::cout << "water" << std::endl;
+        water = !water;
     }
     if (key == GLFW_KEY_P && action == GLFW_PRESS) {
         plague = !plague;
         automaton->toggle_plague();
     }
     if (key == GLFW_KEY_C && action == GLFW_PRESS) {
-        automaton->clear();
+        bool all = false;
+        if (mods == GLFW_MOD_SHIFT) {
+            all = true;
+        }
+        automaton->clear(all);
         ready = false;
     }
     if (key == GLFW_KEY_X && action == GLFW_PRESS) {
@@ -277,6 +290,13 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
     if (key == GLFW_KEY_R && action == GLFW_PRESS) {
         automaton->fill_random();
     }
+    if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+        automaton->save();
+    }
+    if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+        automaton->load();
+    }
+
     if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
         int val = 1;
         if (mods == GLFW_MOD_SHIFT) {
@@ -372,9 +392,9 @@ void Simulation::update_FPS(double current_time) {
 void Simulation::update_title_bar() {
     std::string NAME_FPS =
         GAME_VERSION_NAME + " - " + FPS +
-        " FPS | tickrate: " + std::to_string(delay) + " | " +
+        " FPS | tickrate: " + std::to_string(delay) + " | " + 
         std::to_string(cell_count) + " cells" + " | " + automaton->get_type() +
-        " | Cell Size: " + std::to_string(automaton->get_square_size());
+        " | cell size: " + std::to_string(automaton->get_square_size());
 
     glfwSetWindowTitle(window, NAME_FPS.c_str());
 }

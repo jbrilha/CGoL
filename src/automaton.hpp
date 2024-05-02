@@ -49,11 +49,13 @@ class Automaton {
     virtual void update() = 0;
     void update_dimensions(int win_width, int win_height);
     void update_square_size(int square_size);
-    void clear();
+    void clear(bool all);
     void draw();
     void set_value(double x_pos, double y_pos, int val, int radius);
     void toggle_plague();
     void change_cursor_shape();
+    void save();
+    void load();
 
     int get_cell_count();
     int get_square_size();

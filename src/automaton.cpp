@@ -1,4 +1,5 @@
 #include "automaton.hpp"
+#include <string>
 
 Automaton::Automaton(std::string path_str, int win_width, int win_height,
                      int square_size)
@@ -200,9 +201,16 @@ void Automaton::draw() {
     glBindVertexArray(0);
 }
 
-void Automaton::clear() {
-    cells = std::vector<int>(cell_count, 0);
-    update_cells = std::vector<int>(cell_count, 0);
+void Automaton::clear(bool all) {
+    if(all) {
+        cells = std::vector<int>(cell_count, 0);
+        // update_cells = std::vector<int>(cell_count, 0);
+    } else {
+        for(int &cell : cells) {
+            if(cell == 1 || cell == 3) cell = 0;
+        }
+    }
+    update_cells = cells;
 
     update_states();
 }
@@ -212,6 +220,44 @@ void Automaton::set_cell_colors() {
         shader_program.set_vec3(("colors[" + std::to_string(i) + "]"),
                                 colors[i]);
     }
+}
+
+void Automaton::save() {
+    std::ofstream output("save.txt");
+
+    if (!output.is_open()) {
+        std::cout << "FAILED TO CREATE SAVE FILE" << std::endl;
+    }
+
+    // output.write((std::to_string(win_width) + "\n").c_str(), sizeof(win_width));
+    // output.write((std::to_string(win_height) + "\n").c_str(), sizeof(win_width));
+    for(int cell : cells) {
+        std::string cell_str = std::to_string(cell);
+        output.write(cell_str.c_str(), cell_str.size());
+    }
+
+    output.close();
+}
+
+void Automaton::load() {
+    std::ifstream input("save.txt");
+
+    if (!input.is_open()) {
+        std::cout << "FAILED TO CREATE SAVE FILE" << std::endl;
+    }
+
+    // input.write((std::to_string(win_width) + "\n").c_str(), sizeof(win_width));
+    // input.write((std::to_string(win_height) + "\n").c_str(), sizeof(win_width));
+    std::string cells_str;
+    getline(input, cells_str);
+    for(int i = 0; i < cells_str.length() && i < cell_count; i++) {
+        cells[i] = cells_str[i] - 0x30;
+    }
+    update_cells = cells;
+
+    input.close();
+
+    update_states();
 }
 
 void Automaton::change_cursor_shape() { circular_cursor = !circular_cursor; }

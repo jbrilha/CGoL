@@ -16,6 +16,7 @@
 
 const int WIN_WIDTH = 800;
 const int WIN_HEIGHT = 800;
+const int RADIUS = 1;
 
 class Simulation {
   public:
@@ -23,13 +24,10 @@ class Simulation {
     ~Simulation();
 
     void set_automaton(Automaton *automaton);
-
     void run();
-
     void init();
 
   private:
-    // std::string get_executable_path();
     std::string get_path(char *arg);
     std::string path_str;
 
@@ -71,7 +69,7 @@ class Simulation {
     bool update_size;
     bool plague;
     bool step;
-    bool manual;
+    bool water;
 
     float delta_time;
     float last_frame;
