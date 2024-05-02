@@ -270,6 +270,10 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         automaton->clear();
         ready = false;
     }
+    if (key == GLFW_KEY_X && action == GLFW_PRESS) {
+        automaton->change_cursor_shape();
+        cursor->change_shape();
+    }
     if (key == GLFW_KEY_R && action == GLFW_PRESS) {
         automaton->fill_random();
     }
@@ -297,7 +301,6 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
             cursor->update_square_size(square_size);
             cell_count = automaton->get_cell_count();
         }
-
     }
     if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {
         step = true;

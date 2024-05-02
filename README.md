@@ -6,10 +6,11 @@ In C++ with raw OpenGL :D
 ## Currently available controls:
 - ESC: Closes the application;
 - ENTER: Start/stop simulation;
-- M1 / LEFT MOUSE: Make cell "alive" at cursor location;
-- M2 / RIGHT MOUSE or SHIFT + M1: "Kill" cell at cursor location;
+- M1 / LEFT MOUSE: Make cell "alive" at cursor;
+- SHIFT + M1: "Kill" cell at cursor;
 - R: Randomly fills the grid with "live" cells;
 - C: Clears the grid;
+- X: Toggle cursor shape;
 - 1: [Brian's Brain](https://en.wikipedia.org/wiki/Brian's_Brain) Automaton;
 - 2: [Day & Night](https://en.wikipedia.org/wiki/Day_and_Night_(cellular_automaton)) Automaton;
 - 3: Disease Automaton (a variation on Life);
@@ -21,11 +22,13 @@ In C++ with raw OpenGL :D
 - 8: [Rule 90](https://en.wikipedia.org/wiki/Rule_90) Automaton;
 - 9: [Seeds](https://en.wikipedia.org/wiki/Seeds_(cellular_automaton)) Automaton;
 - 0: Sand Simulation;
-- +: Step once through simulation*;
-- ARROW UP & DOWN: Increase/decrease tickrate (higher is slower)
-- ARROW RIGHT & LEFT: Increase/decrease cell size (SHIFT + KEY increases more per click)
+- "+": Step once through simulation*;
+- SHIFT + "+": Continuously step through simulation*;
+- ARROW UP & DOWN: Increase/decrease tickrate (higher is slower);
+- ARROW RIGHT & LEFT: Increase/decrease cell size (SHIFT + KEY increases more per click);
+- "." & ",": Increase/decrease cursor radius;
 
-\* GLFW reads this as GLFW_KEY_EQUAL so it might change depending on your layout
+\* GLFW reads this as GLFW_KEY_EQUAL on MacOs so it might not be the same key depending on your layout.
 
 ## Build instructions -- REQUIRES CMAKE AND g++ COMPILER
 Copy into your terminal while on the parent directory:

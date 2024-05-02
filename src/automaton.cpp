@@ -7,7 +7,7 @@ Automaton::Automaton(std::string path_str, int win_width, int win_height,
       hei_margin(win_height % cell_size), wid_margin(win_width % cell_size),
       cell_count((win_width / cell_size) * (win_height / cell_size)),
       rows(win_height / cell_size), cols(win_width / cell_size), plague(false),
-      cells(cell_count, 0), update_cells(cells),
+      circular_cursor(false), cells(cell_count, 0), update_cells(cells),
       shader_program((path_str + "/../shaders/vert.glsl").c_str(),
                      (path_str + "/../shaders/frag.glsl").c_str()) {
 
@@ -17,7 +17,7 @@ Automaton::Automaton(std::string path_str, int win_width, int win_height,
         1.f - pxls::to_float(this->cell_size + hei_margin, win_height);
 
     colors.push_back(black);
-    prepare_shaders();
+    set_shaders();
 }
 
 void Automaton::update_grid() {
@@ -46,7 +46,7 @@ void Automaton::update_grid() {
     origin_x = -1.f + pxls::to_float(cell_size + wid_margin, win_width);
     origin_y = 1.f - pxls::to_float(cell_size + hei_margin, win_height);
 
-    prepare_shaders();
+    set_shaders();
 }
 
 void Automaton::update_dimensions(int win_width, int win_height) {
@@ -63,7 +63,7 @@ void Automaton::update_square_size(int square_size) {
     update_grid();
 }
 
-void Automaton::prepare_shaders() {
+void Automaton::set_shaders() {
     shader_program.use();
 
     glm::vec2 offsets[cell_count];
@@ -87,14 +87,7 @@ void Automaton::prepare_shaders() {
                  GL_STREAM_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    float x_vert = pxls::to_float(square_size, win_width);
-    float y_vert = pxls::to_float(square_size, win_height);
-    glm::vec2 quad_vertices[4] = {
-        glm::vec2(x_vert, y_vert),
-        glm::vec2(x_vert, -y_vert),
-        glm::vec2(-x_vert, -y_vert),
-        glm::vec2(-x_vert, y_vert),
-    };
+    set_square_vertices();
 
     unsigned int quad_VBO;
     glGenVertexArrays(1, &quad_VAO);
@@ -102,8 +95,8 @@ void Automaton::prepare_shaders() {
     glBindVertexArray(quad_VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, quad_VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices,
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, quad_vertices.size() * sizeof(glm::vec2),
+                 quad_vertices.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
@@ -130,6 +123,18 @@ void Automaton::prepare_shaders() {
         2, 1); // tell OpenGL this is an instanced vertex attribute.
 }
 
+void Automaton::set_square_vertices() {
+    float x_vert = pxls::to_float(square_size, win_width);
+    float y_vert = pxls::to_float(square_size, win_height);
+
+    quad_vertices = {
+        glm::vec2(x_vert, y_vert),
+        glm::vec2(x_vert, -y_vert),
+        glm::vec2(-x_vert, -y_vert),
+        glm::vec2(-x_vert, y_vert),
+    };
+}
+
 void Automaton::update_states() {
     glBindBuffer(GL_ARRAY_BUFFER, instance_VBOs[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(int) * (cell_count), &cells[0],
@@ -138,8 +143,6 @@ void Automaton::update_states() {
 }
 
 void Automaton::set_value(double x_pos, double y_pos, int val, int radius) {
-    bool update = false;
-
     if (x_pos < (double)wid_margin / 2 ||
         x_pos > win_width - (double)wid_margin / 2 ||
         y_pos < (double)hei_margin / 2 ||
@@ -147,6 +150,8 @@ void Automaton::set_value(double x_pos, double y_pos, int val, int radius) {
 
         return;
     }
+
+    bool update = false;
 
     int col = (floor(((int)x_pos - GAP - wid_margin / 2) % (int)(win_width))) /
               cell_size;
@@ -159,11 +164,14 @@ void Automaton::set_value(double x_pos, double y_pos, int val, int radius) {
         update_cells[offset] = val;
         update = true;
     } else {
-        for (int i = row - radius; i < row + radius + 1; i++) {
-            for (int j = col - radius; j < col + radius + 1; j++) {
-                offset = i * cols + j;
+        for (int r = row - radius; r < row + radius + 1; r++) {
+            for (int c = col - radius; c < col + radius + 1; c++) {
+                offset = r * cols + c;
 
-                if (i >= 0 && i < rows && j < cols && j >= 0) {
+                if (r >= 0 && r < rows && c < cols && c >= 0 &&
+                    (!circular_cursor ||  // cursor check for short circuiting. micro optimizations babyyyy
+                     sqrt(pow(abs(r - row), 2) + pow(abs(c - col), 2)) <= radius + 0.1)) {
+
                     cells[offset] = val;
                     update_cells[offset] = val;
                     update = true;
@@ -180,6 +188,7 @@ void Automaton::fill_random() {
     for (int &cell : cells) {
         cell = (rand() % 100) < 20 ? 1 : 0;
     }
+
     update_states();
 }
 
@@ -187,13 +196,11 @@ void Automaton::draw() {
     shader_program.use();
 
     glBindVertexArray(quad_VAO);
-    glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, cell_count);
+    glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, quad_vertices.size(), cell_count);
     glBindVertexArray(0);
 }
 
 void Automaton::clear() {
-    cells.clear();
-    update_cells.clear();
     cells = std::vector<int>(cell_count, 0);
     update_cells = std::vector<int>(cell_count, 0);
 
@@ -207,6 +214,7 @@ void Automaton::set_cell_colors() {
     }
 }
 
+void Automaton::change_cursor_shape() { circular_cursor = !circular_cursor; }
 void Automaton::toggle_plague() { plague = !plague; }
 int Automaton::get_cell_count() { return cell_count; }
 int Automaton::get_square_size() { return square_size; }

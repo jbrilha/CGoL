@@ -25,8 +25,11 @@ class Automaton {
     int hei_margin;
     int wid_margin;
 
+    std::vector<glm::vec2> quad_vertices;
+
     void update_grid();
-    void prepare_shaders();
+    void set_shaders();
+    void set_square_vertices();
 
     virtual int apply_rules(int offset) = 0;
 
@@ -46,12 +49,12 @@ class Automaton {
     virtual void update() = 0;
     void update_dimensions(int win_width, int win_height);
     void update_square_size(int square_size);
-
     void clear();
     void draw();
-
     void set_value(double x_pos, double y_pos, int val, int radius);
     void toggle_plague();
+    void change_cursor_shape();
+
     int get_cell_count();
     int get_square_size();
     int get_cell_size();
@@ -66,6 +69,7 @@ class Automaton {
     int cols;
 
     bool plague;
+    bool circular_cursor;
 
     std::vector<int> cells;
     std::vector<int> update_cells;

@@ -21,12 +21,18 @@ class Cursor {
     int win_width;
 
     int radius;
+    
+    bool circular;
 
     double cursor_x;
     double cursor_y;
     glm::vec2 cursor_pos;
 
-    void prepare_shaders();
+    std::vector<glm::vec2> quad_vertices;
+
+    void set_shaders();
+    void set_square_vertices();
+    void set_circle_vertices();
 
     unsigned int quad_VAO;
     unsigned int cursor_VBO;
@@ -41,6 +47,7 @@ class Cursor {
     void update_radius(int radius);
     void update_dimensions(int win_width, int win_height);
     void update_square_size(int square_size);
+    void change_shape();
 
     int get_radius();
 
