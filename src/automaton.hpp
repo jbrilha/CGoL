@@ -2,6 +2,7 @@
 #define AUTOMATON_HPP
 
 #include "shaders.hpp"
+#include "constants.hpp"
 #include "util/glm_colors.hpp"
 #include "util/pxls.hpp"
 
@@ -9,9 +10,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
-
-static const int GAP = 1;
-static const int SQUARE_SIZE = 1;
 
 using namespace glm_colors;
 

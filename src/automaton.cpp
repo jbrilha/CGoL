@@ -1,5 +1,4 @@
 #include "automaton.hpp"
-#include <string>
 
 Automaton::Automaton(std::string path_str, int win_width, int win_height,
                      int square_size)
@@ -160,17 +159,20 @@ void Automaton::set_value(double x_pos, double y_pos, int val, int radius) {
               cell_size;
     int offset = row * cols + col;
 
+
     if (radius == 0) {
-        cells[offset] = val;
-        update_cells[offset] = val;
-        update = true;
+        if (cells[offset] == 5) return;
+
+      cells[offset] = val;
+      update_cells[offset] = val;
+      update = true;
     } else {
         for (int r = row - radius; r < row + radius + 1; r++) {
             for (int c = col - radius; c < col + radius + 1; c++) {
                 offset = r * cols + c;
 
-                if (r >= 0 && r < rows && c < cols && c >= 0 &&
-                    (!circular_cursor ||  // cursor check for short circuiting. micro optimizations babyyyy
+                if (r >= 0 && r < rows && c < cols && c >= 0 && (val == 0 || cells[offset] != 5)
+                    && (!circular_cursor ||  // cursor check for short circuiting. micro optimizations babyyyy
                      sqrt(pow(abs(r - row), 2) + pow(abs(c - col), 2)) <= radius + 0.1)) {
 
                     cells[offset] = val;

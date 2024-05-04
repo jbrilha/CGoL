@@ -6,6 +6,7 @@
 
 #include "automaton.hpp"
 #include "cursor.hpp"
+#include "constants.hpp"
 
 #define GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
@@ -13,10 +14,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-const int WIN_WIDTH = 800;
-const int WIN_HEIGHT = 800;
-const int RADIUS = 1;
 
 class Simulation {
   public:
