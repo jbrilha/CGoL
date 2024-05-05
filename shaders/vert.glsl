@@ -8,9 +8,12 @@ uniform vec3[10] colors;
 
 out vec3 color;
 
-void main()
-{
+float rand(vec2 co) {
+    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+void main() {
     gl_Position = vec4(aPos + aOffset, 0.f, 1.0);
 
-    color = colors[aState];
+    color = colors[aState] + vec3(rand(aOffset), rand(aOffset), rand(aOffset)) * 0.1f;
 }

@@ -1,14 +1,15 @@
 #include "sand.hpp"
+#include "src/automaton.hpp"
 
 Sand::Sand(std::string path_str, int win_width, int win_height, int square_size)
     : Automaton(path_str, win_width, win_height, square_size) {
 
-    colors.push_back(yellow);
+    colors.push_back(sand_yellow);
     // colors.push_back(brown);
-    colors.push_back(yellow);
-    colors.push_back(blue);
-    colors.push_back(purple);
-    // colors.push_back(blue);
+    colors.push_back(sand_yellow);
+    colors.push_back(ocean_blue);
+    // colors.push_back(purple);
+    colors.push_back(ocean_blue);
     colors.push_back(white);
     set_cell_colors();
 };
@@ -20,7 +21,7 @@ void Sand::update() {
     for (int offset = cell_count - 1; offset >= 0; offset--) {
         // for (int offset = 0; offset < cell_count; offset++) {
         int state = cells[offset];
-        if(state && state != 5) {
+        if(state && state != SOLID) {
             apply_rules(offset);
 
         }
@@ -52,9 +53,15 @@ int Sand::apply_rules(int offset) {
     int BR = B + 1; // (B)ot (R)ight
     
     bool go_b_left = false, go_b_right = false;
+    bool swap = false;
     if(STATE == WATER) goto water;
 
     if (cells[B]) {
+        if(cells[B] == WATER) {
+            update_cells[offset] = WATER;
+            update_cells[B] = SAND;
+            return 0;
+        }
         if (!cells[L]
             && (!cells[BL]
             || cells[BL] == FALLING_SAND
@@ -63,6 +70,7 @@ int Sand::apply_rules(int offset) {
             && (BL + 1) % cols
             && BL < cell_count
         ) {
+            // if(cells[BL] == WATER) swap = true;
             go_b_left = true;
         }
 
@@ -74,6 +82,7 @@ int Sand::apply_rules(int offset) {
             && BR % cols
             && BR < cell_count
         ) {
+            // if(cells[BR] == WATER) swap = true;
             go_b_right = true;
         }
 
