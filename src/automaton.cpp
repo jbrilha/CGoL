@@ -206,10 +206,9 @@ void Automaton::draw() {
 void Automaton::clear(bool all) {
     if(all) {
         cells = std::vector<int>(cell_count, 0);
-        // update_cells = std::vector<int>(cell_count, 0);
     } else {
         for(int &cell : cells) {
-            if(cell == 1 || cell == 3) cell = 0;
+            if(cell && cell != SOLID) cell = 0;
         }
     }
     update_cells = cells;
@@ -245,7 +244,7 @@ void Automaton::load() {
     std::ifstream input("save.txt");
 
     if (!input.is_open()) {
-        std::cout << "FAILED TO CREATE SAVE FILE" << std::endl;
+        std::cout << "FAILED TO READ SAVE FILE" << std::endl;
     }
 
     // input.write((std::to_string(win_width) + "\n").c_str(), sizeof(win_width));

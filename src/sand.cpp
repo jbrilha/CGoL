@@ -7,9 +7,9 @@ Sand::Sand(std::string path_str, int win_width, int win_height, int square_size)
     colors.push_back(sand_yellow);
     // colors.push_back(brown);
     colors.push_back(sand_yellow);
-    colors.push_back(ocean_blue);
+    colors.push_back(river_blue);
     // colors.push_back(purple);
-    colors.push_back(ocean_blue);
+    colors.push_back(river_blue);
     colors.push_back(white);
     set_cell_colors();
 };
@@ -19,16 +19,16 @@ Sand::~Sand() { glDeleteProgram(shader_program.program_ID); }
 void Sand::update() {
     // update_cells = cells;
     for (int offset = cell_count - 1; offset >= 0; offset--) {
-        // for (int offset = 0; offset < cell_count; offset++) {
+    // for (int offset = 0; offset < cell_count; offset++) {
+    // for (int offset = cell_count - cols; offset != cols; offset++) {
+        // if(!((offset + 1) % cols)) {
+        //     offset -= (cols + cols);
+        // }
         int state = cells[offset];
         if(state && state != SOLID) {
             apply_rules(offset);
 
         }
-        // int a = apply_rules(offset);
-        // if(a) {
-        //     std::cout << "oof" << a << std::endl;
-        // }
     }
 
     cells = update_cells;
@@ -70,7 +70,7 @@ int Sand::apply_rules(int offset) {
             && (BL + 1) % cols
             && BL < cell_count
         ) {
-            // if(cells[BL] == WATER) swap = true;
+            if(cells[BL] == WATER) swap = true;
             go_b_left = true;
         }
 
@@ -82,7 +82,7 @@ int Sand::apply_rules(int offset) {
             && BR % cols
             && BR < cell_count
         ) {
-            // if(cells[BR] == WATER) swap = true;
+            if(cells[BR] == WATER) swap = true;
             go_b_right = true;
         }
 
@@ -100,7 +100,7 @@ int Sand::apply_rules(int offset) {
         }
 
         update_cells[idx] = SAND;
-        update_cells[offset] = 0;
+        update_cells[offset] = swap ? cells[idx] : 0;
         return 2;
     } else {
         update_cells[offset] = 0;
@@ -110,13 +110,12 @@ int Sand::apply_rules(int offset) {
 
 water:
     bool go_left = false, go_right = false;
+    bool p_left = false, p_right = false;
     // if (!(cells[B] % 2)) { // shower kinda
     // if (cells[B] && !(cells[B] % 2)) {
     if (cells[B]) {
         if (!cells[L]
-            && (!cells[BL]
-            || cells[BL] == FALLING_WATER
-        )
+            && (!cells[BL] || cells[BL] == FALLING_WATER)
             && update_cells[BL] != WATER
             && (BL + 1) % cols
             && BL > 0
@@ -125,9 +124,7 @@ water:
         }
 
         if (!cells[R]
-            && (!cells[BR]
-            || cells[BR] == FALLING_WATER
-        )
+            && (!cells[BR] || cells[BR] == FALLING_WATER)
             && update_cells[BR] != WATER
             && BR % cols
             && BR < cell_count
@@ -135,21 +132,44 @@ water:
             go_b_right = true;
         }
 
+        int N = 5;
+        int gr = 0, gl = 0;
         if (!go_b_left
-            && !cells[L]
-            && update_cells[L] != WATER
-            && (L + 1) % cols
-            && L > 0
+            // && !cells[L]
+            // && update_cells[L] != WATER
+            // && (L + 1) % cols
+            // && L > 0
         ) {
-            go_left = true;
+            for(int i = 0; i < N; i++) {
+                if(!cells[L - i]
+                    && update_cells[L - i] != WATER
+                    && (L - i + 1) % cols
+                    && (L - i + 1) > 0) {
+                    gl = i;
+                    go_left = true;
+                } else {
+                    break;
+                }
+            }
         }
         if (!go_b_right
-            && !cells[R]
-            && update_cells[R] != WATER
-            && R % cols
-            && R < cell_count
+            // && !cells[R]
+            // && update_cells[R] != WATER
+            // && R % cols
+            // && R < cell_count
         ) {
-            go_right = true;
+            for(int i = 0; i < N; i++) {
+                if(!cells[R + i]
+                    && update_cells[R + i] != WATER
+                    && (R+i) % cols
+                    && (R+i) < cell_count) {
+                    gr = i;
+                    go_right = true;
+                } else {
+                    break;
+                }
+            }
+
         }
 
         if (!(go_b_left || go_b_right
@@ -159,13 +179,19 @@ water:
             return 1;
         }
 
+        // std::cout << gr << " | " << gl << std::endl;
+
         int idx = 0;
         if (go_b_right && go_b_left) {
             idx = (double)rand() / RAND_MAX < 0.5 ? BL : BR;
         } else if (go_b_right || go_b_left) {
             idx = go_b_left ? BL : BR;
         } else if (go_right && go_left) {
-            idx = (double)rand() / RAND_MAX < 0.5 ? L : R;
+            if (gl == gr) {
+                idx = (double)rand() / RAND_MAX < 0.5 ? L - gl: R + gr;
+            } else {
+                idx = gl > gr ? L - gl : R + gr;
+            }
         } else {
             idx = go_left ? L : R;
         }

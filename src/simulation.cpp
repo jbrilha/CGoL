@@ -47,7 +47,7 @@ void Simulation::init() {
     cell_count = automaton->get_cell_count();
 
     cursor = new Cursor(path_str, win_width, win_height, SQUARE_SIZE, radius);
-    automaton->load();
+    // automaton->load();
 }
 
 void Simulation::run() {
@@ -62,12 +62,17 @@ void Simulation::run() {
 
         double current_time = glfwGetTime();
         nb_frames++;
-        if (current_time - last_time >= 1.0)
-            update_FPS(current_time);
+        if (current_time - last_time >= 1.0) {
+            FPS = std::to_string(nb_frames);
+
+            nb_frames = 0;
+            last_time = current_time;
+        }
 
         update_title_bar();
 
-        glClearColor(0.1f, 0.1f, 0.1f, 1.f);
+        // glClearColor(0.1f, 0.1f, 0.1f, 1.f);
+        glClearColor(0.3f, 0.3f, 0.3f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (update_size) {
@@ -269,7 +274,6 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         delay = std::min(delay + val, 1000);
     }
     if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-        // std::cout << "water" << std::endl;
         water = !water;
     }
     if (key == GLFW_KEY_P && action == GLFW_PRESS) {
@@ -383,21 +387,14 @@ void Simulation::error_callback(int error, const char *description) {
     fprintf(stderr, "Error: %s\n", description);
 }
 
-void Simulation::update_FPS(double current_time) {
-    FPS = std::to_string(nb_frames);
-
-    nb_frames = 0;
-    last_time = current_time;
-}
-
 void Simulation::update_title_bar() {
-    std::string NAME_FPS =
+    std::string TITLE_BAR =
         GAME_VERSION_NAME + " - " + FPS +
         " FPS | tickrate: " + std::to_string(delay) + " | " + 
         std::to_string(cell_count) + " cells" + " | " + automaton->get_type() +
         " | cell size: " + std::to_string(automaton->get_square_size());
 
-    glfwSetWindowTitle(window, NAME_FPS.c_str());
+    glfwSetWindowTitle(window, TITLE_BAR.c_str());
 }
 
 void Simulation::init_GLFW() {

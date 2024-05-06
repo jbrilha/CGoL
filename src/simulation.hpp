@@ -47,7 +47,6 @@ class Simulation {
     void drop_callback(GLFWwindow *window, int count, const char **paths);
     void mouse_pos_callback(GLFWwindow *window, double x_pos_in,
                             double y_pos_in);
-    void update_FPS(double current_time);
     void update_title_bar();
     void process_input();
 

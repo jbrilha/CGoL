@@ -21,6 +21,7 @@ namespace glm_colors {
 
     const glm::vec3 blue = glm::vec3(0.f, 0.f, 1.f);
     const glm::vec3 ocean_blue = glm::vec3(0.f, 0.1f, 0.2f);
+    const glm::vec3 river_blue = glm::vec3(0.f, 0.4f, 0.8f);
     const glm::vec3 light_blue = glm::vec3(0.2f, 0.8f, 1.f);
     const glm::vec3 purple = glm::vec3(0.5f, 0.f, 0.7f);
 
