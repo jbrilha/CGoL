@@ -7,7 +7,7 @@ Automaton::Automaton(std::string path_str, int win_width, int win_height,
       hei_margin(win_height % cell_size), wid_margin(win_width % cell_size),
       cell_count((win_width / cell_size) * (win_height / cell_size)),
       rows(win_height / cell_size), cols(win_width / cell_size), plague(false),
-      circular_cursor(false), cells(cell_count, 0), update_cells(cells),
+      circular_cursor(CIRCULAR), cells(cell_count, 0), update_cells(cells),
       shader_program((path_str + "/../shaders/vert.glsl").c_str(),
                      (path_str + "/../shaders/frag.glsl").c_str()) {
 
@@ -161,11 +161,11 @@ void Automaton::set_value(double x_pos, double y_pos, int val, int radius) {
 
 
     if (radius == 0) {
-        if (cells[offset] == 5) return;
+        if (cells[offset] == 5 && val) return;
 
-      cells[offset] = val;
-      update_cells[offset] = val;
-      update = true;
+        cells[offset] = val;
+        update_cells[offset] = val;
+        update = true;
     } else {
         for (int r = row - radius; r < row + radius + 1; r++) {
             for (int c = col - radius; c < col + radius + 1; c++) {
@@ -264,5 +264,7 @@ void Automaton::load() {
 void Automaton::change_cursor_shape() { circular_cursor = !circular_cursor; }
 void Automaton::toggle_plague() { plague = !plague; }
 int Automaton::get_cell_count() { return cell_count; }
+int Automaton::get_rows() { return rows; }
+int Automaton::get_cols() { return cols; }
 int Automaton::get_square_size() { return square_size; }
 int Automaton::get_cell_size() { return cell_size; }

@@ -12,5 +12,6 @@ class Sand : public Automaton {
 
   private:
     int apply_rules(int offset) override;
+    bool look_ahead(int offset, int state);
 };
 #endif

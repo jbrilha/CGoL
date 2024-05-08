@@ -56,6 +56,8 @@ class Automaton {
     void load();
 
     int get_cell_count();
+    int get_rows();
+    int get_cols();
     int get_square_size();
     int get_cell_size();
 

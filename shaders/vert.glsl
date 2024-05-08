@@ -15,5 +15,10 @@ float rand(vec2 co) {
 void main() {
     gl_Position = vec4(aPos + aOffset, 0.f, 1.0);
 
-    color = colors[aState] + vec3(rand(aOffset), rand(aOffset), rand(aOffset)) * 0.1f;
+    // if(aState == 0) {
+        color = colors[aState] + vec3(rand(aOffset), rand(aOffset), rand(aOffset)) * 0.1f;
+    // }
+    // else {
+    //     color = vec3(aOffset, aOffset.x / aOffset.y);
+    // }
 }

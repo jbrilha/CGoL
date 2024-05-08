@@ -2,10 +2,11 @@
 #define CURSOR_HPP
 
 #include "shaders.hpp"
-#include "automaton.hpp"
 #include "util/glm_colors.hpp"
 #include "util/pxls.hpp"
+#include "constants.hpp"
 
+#include <vector>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

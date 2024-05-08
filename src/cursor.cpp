@@ -3,7 +3,7 @@
 Cursor::Cursor(std::string path_str, int win_width, int win_height,
                int square_size, int radius)
     : square_size(square_size), win_height(win_height), win_width(win_width),
-      radius(radius), circular(false), cursor_x(0), cursor_y(0), cursor_pos(0),
+      radius(radius), circular(CIRCULAR), cursor_x(0), cursor_y(0), cursor_pos(0),
       shader_program((path_str + "/../shaders/cursor_vert.glsl").c_str(),
                      (path_str + "/../shaders/cursor_frag.glsl").c_str()) {
 

@@ -57,5 +57,5 @@ std::string Seeds::get_type() {
     std::string type_name = typeid(*this).name();
     std::string clean_name(type_name.begin() + 1, type_name.end());
 
-    return "0: " + clean_name;
+    return "9: " + clean_name;
 }

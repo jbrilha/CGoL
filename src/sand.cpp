@@ -1,5 +1,6 @@
 #include "sand.hpp"
 #include "src/automaton.hpp"
+#include "src/constants.hpp"
 
 Sand::Sand(std::string path_str, int win_width, int win_height, int square_size)
     : Automaton(path_str, win_width, win_height, square_size) {
@@ -8,8 +9,8 @@ Sand::Sand(std::string path_str, int win_width, int win_height, int square_size)
     // colors.push_back(brown);
     colors.push_back(sand_yellow);
     colors.push_back(river_blue);
-    // colors.push_back(purple);
-    colors.push_back(river_blue);
+    colors.push_back(purple);
+    // colors.push_back(river_blue);
     colors.push_back(white);
     set_cell_colors();
 };
@@ -17,17 +18,10 @@ Sand::Sand(std::string path_str, int win_width, int win_height, int square_size)
 Sand::~Sand() { glDeleteProgram(shader_program.program_ID); }
 
 void Sand::update() {
-    // update_cells = cells;
     for (int offset = cell_count - 1; offset >= 0; offset--) {
-    // for (int offset = 0; offset < cell_count; offset++) {
-    // for (int offset = cell_count - cols; offset != cols; offset++) {
-        // if(!((offset + 1) % cols)) {
-        //     offset -= (cols + cols);
-        // }
         int state = cells[offset];
         if(state && state != SOLID) {
             apply_rules(offset);
-
         }
     }
 
@@ -36,13 +30,21 @@ void Sand::update() {
     update_states();
 }
 
+bool Sand::look_ahead(int look_ahead_offset, int state) {
+    if(cells[look_ahead_offset] == state && (double)rand() / RAND_MAX < 0.5) {
+        return false;
+    }
+    
+    return true;
+}
+
 int Sand::apply_rules(int offset) {
-    int STATE = cells[offset] < 3 ? SAND : WATER;
+    int state = cells[offset] < 3 ? SAND : WATER;
 
     int B = offset + cols; // (B)ot
 
     if (B >= cell_count) {
-        update_cells[offset] = STATE;
+        cells[offset] = state;
         return 10;
     }
 
@@ -53,161 +55,114 @@ int Sand::apply_rules(int offset) {
     int BR = B + 1; // (B)ot (R)ight
     
     bool go_b_left = false, go_b_right = false;
-    bool swap = false;
-    if(STATE == WATER) goto water;
 
-    if (cells[B]) {
-        if(cells[B] == WATER) {
-            update_cells[offset] = WATER;
-            update_cells[B] = SAND;
-            return 0;
-        }
-        if (!cells[L]
-            && (!cells[BL]
-            || cells[BL] == FALLING_SAND
-        )
-            && update_cells[BL] != SAND
+    if(state == WATER) goto water;
+
+    if(!cells[B]) {
+        update_cells[offset] = 0;
+        update_cells[B] = FALLING_SAND;
+        return 0;
+    } else {
+        if(!cells[L]
+            && (!cells[BL] || cells[BL] == FALLING_SAND)
+            && !update_cells[BL]
+            && look_ahead(L - 1, SAND)
             && (BL + 1) % cols
-            && BL < cell_count
+            // && L > 0
         ) {
-            if(cells[BL] == WATER) swap = true;
             go_b_left = true;
         }
-
-        if (!cells[R]
-            && (!cells[BR]
-            || cells[BR] == FALLING_SAND
-        )
-            && update_cells[BR] != SAND
+        if(!cells[R]
+            && (!cells[BR] || cells[BR] == FALLING_SAND)
+            && !update_cells[BR]
             && BR % cols
-            && BR < cell_count
-        ) {
-            if(cells[BR] == WATER) swap = true;
+            // && BR < cell_count
+            ) {
             go_b_right = true;
         }
 
-        if (!(go_b_left || go_b_right)
-        ) {
+        if(!(go_b_left || go_b_right)) {
             update_cells[offset] = SAND;
             return 1;
         }
 
         int idx = 0;
-        if (go_b_right && go_b_left) {
-            idx = (double)rand() / RAND_MAX < 0.5 ? BL : BR;
+        if(go_b_left && go_b_right) {
+            idx = (double)rand() / RAND_MAX < 0.5 ? BL: BR;
         } else {
-            idx = go_b_left ? BL : BR;
+            idx = go_b_left ? BL: BR;
         }
 
         update_cells[idx] = SAND;
-        update_cells[offset] = swap ? cells[idx] : 0;
-        return 2;
-    } else {
         update_cells[offset] = 0;
-        update_cells[B] = FALLING_SAND;
-        return 3;
+        return 1;
     }
 
 water:
     bool go_left = false, go_right = false;
-    bool p_left = false, p_right = false;
     // if (!(cells[B] % 2)) { // shower kinda
     // if (cells[B] && !(cells[B] % 2)) {
-    if (cells[B]) {
-        if (!cells[L]
-            && (!cells[BL] || cells[BL] == FALLING_WATER)
-            && update_cells[BL] != WATER
-            && (BL + 1) % cols
-            && BL > 0
+    if(!cells[B] && !update_cells[B]) {
+        update_cells[offset] = 0;
+        update_cells[B] = FALLING_WATER;
+        return 0;
+    } else {
+        if(!cells[L]
+            && !update_cells[L]
+            // && look_ahead(offset - 1, WATER)
+            && look_ahead(L - 1, WATER)
+            && (L + 1) % cols
         ) {
-            go_b_left = true;
-        }
-
-        if (!cells[R]
-            && (!cells[BR] || cells[BR] == FALLING_WATER)
-            && update_cells[BR] != WATER
-            && BR % cols
-            && BR < cell_count
-        ) {
-            go_b_right = true;
-        }
-
-        int N = 5;
-        int gr = 0, gl = 0;
-        if (!go_b_left
-            // && !cells[L]
-            // && update_cells[L] != WATER
-            // && (L + 1) % cols
-            // && L > 0
-        ) {
-            for(int i = 0; i < N; i++) {
-                if(!cells[L - i]
-                    && update_cells[L - i] != WATER
-                    && (L - i + 1) % cols
-                    && (L - i + 1) > 0) {
-                    gl = i;
-                    go_left = true;
-                } else {
-                    break;
-                }
+            if(
+                (!cells[BL] || cells[BL] == FALLING_WATER)
+                && !update_cells[BL]
+                && look_ahead(L - 1, WATER)
+                && (BL + 1) % cols
+                // && L > 0
+            ) {
+                go_b_left = true;
+            } else {
+                go_left = true;
             }
         }
-        if (!go_b_right
-            // && !cells[R]
-            // && update_cells[R] != WATER
-            // && R % cols
-            // && R < cell_count
+        if(!cells[R]
+            && !update_cells[R]
+            // && look_ahead(L - 1, WATER)
+            && R % cols
+            && R < cell_count
         ) {
-            for(int i = 0; i < N; i++) {
-                if(!cells[R + i]
-                    && update_cells[R + i] != WATER
-                    && (R+i) % cols
-                    && (R+i) < cell_count) {
-                    gr = i;
-                    go_right = true;
-                } else {
-                    break;
-                }
+            if(
+                (!cells[BR] || cells[BR] == FALLING_WATER)
+                && !update_cells[BR]
+                && BR % cols
+                // && BR < cell_count
+            ) {
+                go_b_right = true;
             }
-
+            else {
+                go_right = true;
+            }
         }
 
-        if (!(go_b_left || go_b_right
-            || go_left || go_right
-        )) {
+        if(!(go_b_left || go_b_right || go_left || go_right)) {
             update_cells[offset] = WATER;
             return 1;
         }
 
-        // std::cout << gr << " | " << gl << std::endl;
-
         int idx = 0;
-        if (go_b_right && go_b_left) {
-            idx = (double)rand() / RAND_MAX < 0.5 ? BL : BR;
-        } else if (go_b_right || go_b_left) {
-            idx = go_b_left ? BL : BR;
+        if(go_b_left && go_b_right) {
+            idx = (double)rand() / RAND_MAX < 0.5 ? BL: BR;
+        } else if (go_b_left || go_b_right) {
+            idx = go_b_left ? BL: BR;
         } else if (go_right && go_left) {
-            if (gl == gr) {
-                idx = (double)rand() / RAND_MAX < 0.5 ? L - gl: R + gr;
-            } else {
-                idx = gl > gr ? L - gl : R + gr;
-            }
+            idx = (double)rand() / RAND_MAX < 0.5 ? L: R;
         } else {
-            idx = go_left ? L : R;
+            idx = go_left ? L: R;
         }
 
         update_cells[idx] = WATER;
         update_cells[offset] = 0;
-        return 2;
-    } else {
-        if((update_cells[B] % 2)) {
-            update_cells[offset] = WATER;
-            return 0;
-        }
-
-        update_cells[offset] = 0;
-        update_cells[B] = FALLING_WATER;
-        return 3;
+        return 1;
     }
 
 }
@@ -216,5 +171,5 @@ std::string Sand::get_type() {
     std::string type_name = typeid(*this).name();
     std::string clean_name(type_name.begin() + 1, type_name.end());
 
-    return "9: " + clean_name;
+    return "0: " + clean_name;
 }

@@ -12,10 +12,11 @@
 
 Simulation::Simulation(char *argv0)
     : path_str(get_path(argv0)), win_height(WIN_HEIGHT), win_width(WIN_WIDTH),
-      radius(RADIUS), automaton(nullptr), nb_frames(0), last_time(0), FPS(""),
-      cell_count(0), seeding(true), ready(false), update_size(false),
-      plague(false), water(false), delta_time(0.f), last_frame(0.f),
-      counter(0), delay(10) {
+      radius(RADIUS), automaton(nullptr), cursor(nullptr), menu(nullptr),
+      dropdown(nullptr), nb_frames(0), last_time(0), FPS(""), cell_count(0),
+      seeding(true), ready(READY), update_size(false), plague(false),
+      water(true), delta_time(0.f), last_frame(0.f), counter(0),
+      tickrate(TICKRATE) {
 
     if (path_str.empty()) {
         std::cerr << "Error: Failed to retrieve executable path" << std::endl;
@@ -31,6 +32,12 @@ Simulation::~Simulation() {
 
     delete cursor;
     cursor = nullptr;
+
+    delete menu;
+    menu = nullptr;
+
+    delete dropdown;
+    dropdown = nullptr;
 }
 
 void Simulation::set_automaton(Automaton *automaton) {
@@ -47,7 +54,9 @@ void Simulation::init() {
     cell_count = automaton->get_cell_count();
 
     cursor = new Cursor(path_str, win_width, win_height, SQUARE_SIZE, radius);
-    // automaton->load();
+    automaton->load();
+
+    dropdown = new Dropdown(path_str, win_width, win_height, SQUARE_SIZE, radius);
 }
 
 void Simulation::run() {
@@ -78,11 +87,12 @@ void Simulation::run() {
         if (update_size) {
             automaton->update_dimensions(win_width, win_height);
             cursor->update_dimensions(win_width, win_height);
+            dropdown->update_dimensions(win_width, win_height);
             cell_count = automaton->get_cell_count();
             update_size = false;
         }
 
-        if (counter > delay) {
+        if (counter > tickrate) {
             if ((!seeding && ready) || step) {
                 automaton->update();
                 step = false;
@@ -91,6 +101,8 @@ void Simulation::run() {
         }
 
         automaton->draw();
+        dropdown->draw();
+
         cursor->draw();
 
         glfwSwapBuffers(window);
@@ -264,14 +276,14 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         if (mods == GLFW_MOD_SHIFT) {
             val = 100;
         }
-        delay = std::max(delay - val, 0);
+        tickrate = std::max(tickrate - val, 0);
     }
     if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
         int val = 10;
         if (mods == GLFW_MOD_SHIFT) {
             val = 100;
         }
-        delay = std::min(delay + val, 1000);
+        tickrate = std::min(tickrate + val, 1000);
     }
     if (key == GLFW_KEY_W && action == GLFW_PRESS) {
         water = !water;
@@ -311,6 +323,11 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         int square_size = automaton->get_square_size() + val;
 
         automaton->update_square_size(square_size);
+        int cols = automaton->get_cols();
+        if (radius * 2 > cols) {
+            radius = cols / 4;
+            cursor->update_radius(radius);
+        }
         cursor->update_square_size(square_size);
         cell_count = automaton->get_cell_count();
     }
@@ -323,9 +340,17 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
 
         if (square_size != automaton->get_square_size()) {
             automaton->update_square_size(square_size);
+            int cols = automaton->get_cols();
+            if (radius * 2 > cols) {
+                radius = cols / 4;
+                cursor->update_radius(radius);
+            }
             cursor->update_square_size(square_size);
             cell_count = automaton->get_cell_count();
         }
+    }
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+        dropdown->toggle();
     }
     if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {
         step = true;
@@ -375,6 +400,14 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
 
 void Simulation::framebuffer_size_callback(GLFWwindow *window, int width,
                                            int height) {
+    // int aspect_ratio;
+    // if(width > height) {
+    //     aspect_ratio = width/height;
+    // } else {
+    //     aspect_ratio = height/width;
+    //
+    // }
+    glViewport(0, 0, width, height);
     glViewport(0, 0, width, height);
 
     win_width = width;
@@ -390,7 +423,7 @@ void Simulation::error_callback(int error, const char *description) {
 void Simulation::update_title_bar() {
     std::string TITLE_BAR =
         GAME_VERSION_NAME + " - " + FPS +
-        " FPS | tickrate: " + std::to_string(delay) + " | " + 
+        " FPS | tickrate: " + std::to_string(tickrate) + " | " + 
         std::to_string(cell_count) + " cells" + " | " + automaton->get_type() +
         " | cell size: " + std::to_string(automaton->get_square_size());
 
@@ -426,7 +459,7 @@ void Simulation::init_GLFW() {
     glfwMakeContextCurrent(window);
     gladLoadGL();
     // limit frame_rate to display (kinda like V-Sync?)
-    glfwSwapInterval(0);
+    glfwSwapInterval(GLFW_FALSE);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
