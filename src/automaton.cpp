@@ -20,6 +20,32 @@ Automaton::Automaton(std::string path_str, int win_width, int win_height,
     set_shaders();
 }
 
+Automaton::Automaton(std::string path_str, GLFWwindow *window, int square_size)
+    : square_size(square_size), cell_size(square_size + GAP), window(window),
+    plague(false), circular_cursor(CIRCULAR),
+    shader_program((path_str + "/../shaders/vert.glsl").c_str(),
+                   (path_str + "/../shaders/frag.glsl").c_str()) {
+
+
+    glfwGetWindowSize(window, &win_width, &win_height);
+    hei_margin = (win_height % cell_size);
+    wid_margin = (win_width % cell_size);
+    cell_count = ((win_width / cell_size) * (win_height / cell_size));
+    rows = (win_height / cell_size);
+    cols = (win_width / cell_size);
+    cells = std::vector<int>(cell_count, 0);
+    update_cells = (cells);
+
+    std::cout << "made it: " << win_width << " | " << win_height << std::endl;
+    this->origin_x =
+        -1.f + pxls::to_float(this->cell_size + wid_margin, win_width);
+    this->origin_y =
+        1.f - pxls::to_float(this->cell_size + hei_margin, win_height);
+
+    colors.push_back(black);
+    set_shaders();
+}
+
 void Automaton::update_grid() {
     rows = win_height / cell_size;
     cols = win_width / cell_size;
@@ -162,6 +188,7 @@ void Automaton::set_value(double x_pos, double y_pos, int val, int radius) {
 
     if (radius == 0) {
         if (cells[offset] == 5 && val) return;
+        std::cout << row << " | " << col << std::endl;
 
         cells[offset] = val;
         update_cells[offset] = val;

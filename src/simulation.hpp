@@ -9,6 +9,7 @@
 #include "menu.hpp"
 #include "menu_item.hpp"
 #include "dropdown_mi.hpp"
+#include "button_mi.hpp"
 #include "constants.hpp"
 
 #define GLAD_GL_IMPLEMENTATION
@@ -39,8 +40,9 @@ class Simulation {
     Automaton *automaton;
     Cursor *cursor;
     Menu *menu;
-    MenuItem *menu_item;
-    Dropdown *dropdown;
+    // MenuItem *menu_item;
+    // Dropdown *dropdown;
+    // Button *button;
 
     GLFWwindow *window;
     void init_GLFW();

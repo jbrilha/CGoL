@@ -14,6 +14,18 @@ Sand::Sand(std::string path_str, int win_width, int win_height, int square_size)
     colors.push_back(white);
     set_cell_colors();
 };
+Sand::Sand(std::string path_str, GLFWwindow *window, int square_size)
+    : Automaton(path_str, window, square_size) {
+
+    colors.push_back(sand_yellow);
+    // colors.push_back(brown);
+    colors.push_back(sand_yellow);
+    colors.push_back(river_blue);
+    colors.push_back(purple);
+    // colors.push_back(river_blue);
+    colors.push_back(white);
+    set_cell_colors();
+};
 
 Sand::~Sand() { glDeleteProgram(shader_program.program_ID); }
 

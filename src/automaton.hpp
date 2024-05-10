@@ -6,7 +6,8 @@
 #include "util/glm_colors.hpp"
 #include "util/pxls.hpp"
 
-#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+// #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
@@ -41,6 +42,8 @@ class Automaton {
     Automaton();
     Automaton(std::string path_str, int win_width, int win_height,
               int square_size);
+    Automaton(std::string path_str, GLFWwindow *window,
+              int square_size);
     virtual ~Automaton(){};
     virtual std::string get_type() = 0;
 
@@ -64,6 +67,7 @@ class Automaton {
     void fill_random();
 
   protected:
+    GLFWwindow *window;
     std::vector<glm::vec3> colors;
 
     int cell_count;

@@ -9,11 +9,14 @@
 #include "rule90.hpp"
 #include "sand.hpp"
 #include "seeds.hpp"
+#include "src/automaton.hpp"
+#include "src/constants.hpp"
 
 Simulation::Simulation(char *argv0)
     : path_str(get_path(argv0)), win_height(WIN_HEIGHT), win_width(WIN_WIDTH),
-      radius(RADIUS), automaton(nullptr), cursor(nullptr), menu(nullptr),
-      dropdown(nullptr), nb_frames(0), last_time(0), FPS(""), cell_count(0),
+      radius(RADIUS), automaton(nullptr), cursor(nullptr),// menu_item(nullptr),
+      /* dropdown(nullptr),button(nullptr),  */ menu(nullptr), 
+    nb_frames(0), last_time(0), FPS(""), cell_count(0),
       seeding(true), ready(READY), update_size(false), plague(false),
       water(true), delta_time(0.f), last_frame(0.f), counter(0),
       tickrate(TICKRATE) {
@@ -35,9 +38,6 @@ Simulation::~Simulation() {
 
     delete menu;
     menu = nullptr;
-
-    delete dropdown;
-    dropdown = nullptr;
 }
 
 void Simulation::set_automaton(Automaton *automaton) {
@@ -50,13 +50,14 @@ void Simulation::set_automaton(Automaton *automaton) {
 }
 
 void Simulation::init() {
-    automaton = new Sand(path_str, win_width, win_height, SQUARE_SIZE);
+    automaton = new Sand(path_str, window, SQUARE_SIZE);
+    // automaton = new Sand(path_str, win_width, win_height, SQUARE_SIZE);
     cell_count = automaton->get_cell_count();
 
     cursor = new Cursor(path_str, win_width, win_height, SQUARE_SIZE, radius);
-    automaton->load();
+    // automaton->load();
 
-    dropdown = new Dropdown(path_str, win_width, win_height, SQUARE_SIZE, radius);
+    menu = new Menu(path_str, win_width, win_height, SQUARE_SIZE, radius);
 }
 
 void Simulation::run() {
@@ -87,7 +88,7 @@ void Simulation::run() {
         if (update_size) {
             automaton->update_dimensions(win_width, win_height);
             cursor->update_dimensions(win_width, win_height);
-            dropdown->update_dimensions(win_width, win_height);
+            // menu_item->update_dimensions(win_width, win_height);
             cell_count = automaton->get_cell_count();
             update_size = false;
         }
@@ -101,7 +102,7 @@ void Simulation::run() {
         }
 
         automaton->draw();
-        dropdown->draw();
+        menu->draw();
 
         cursor->draw();
 
@@ -350,7 +351,8 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         }
     }
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-        dropdown->toggle();
+        std::cout << "click" << std::endl;
+        // menu_item->click();
     }
     if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {
         step = true;
@@ -460,6 +462,7 @@ void Simulation::init_GLFW() {
     gladLoadGL();
     // limit frame_rate to display (kinda like V-Sync?)
     glfwSwapInterval(GLFW_FALSE);
+    // glfwSwapInterval(GLFW_TRUE);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
