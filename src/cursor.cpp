@@ -1,12 +1,13 @@
 #include "cursor.hpp"
 
-Cursor::Cursor(std::string path_str, int win_width, int win_height,
-               int square_size, int radius)
-    : square_size(square_size), win_height(win_height), win_width(win_width),
-      radius(radius), circular(CIRCULAR), cursor_x(0), cursor_y(0), cursor_pos(0),
+Cursor::Cursor(std::string path_str, GLFWwindow *window, int square_size,
+               int radius)
+    : square_size(square_size), radius(radius), circular(CIRCULAR), cursor_x(0),
+      cursor_y(0), cursor_pos(0),
       shader_program((path_str + "/../shaders/cursor_vert.glsl").c_str(),
                      (path_str + "/../shaders/cursor_frag.glsl").c_str()) {
 
+    glfwGetWindowSize(window, &win_width, &win_height);
     set_shaders();
 }
 
@@ -104,3 +105,4 @@ void Cursor::change_shape() {
 }
 
 int Cursor::get_radius() { return radius; }
+bool Cursor::is_circular() { return circular; }

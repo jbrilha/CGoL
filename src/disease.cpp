@@ -1,10 +1,9 @@
 #include "disease.hpp"
 
-Disease::Disease(std::string path_str, int win_width, int win_height,
+Disease::Disease(std::string path_str, GLFWwindow *window,
                  int square_size)
-    : Automaton(path_str, win_width, win_height, square_size) {
+    : Automaton(path_str, window, square_size, light_blue) {
 
-    colors.push_back(light_blue);
     set_cell_colors();
 };
 

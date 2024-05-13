@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -38,9 +39,12 @@ class Cursor {
     unsigned int quad_VAO;
     unsigned int cursor_VBO;
 
+    GLFWwindow *window;
+
   public:
     Cursor();
-    Cursor(std::string path_str, int win_width, int win_height, int square_size, int radius);
+    // Cursor(std::string path_str, int win_width, int win_height, int square_size, int radius);
+    Cursor(std::string path_str, GLFWwindow *window, int square_size, int radius);
     ~Cursor();
 
     void draw();
@@ -51,6 +55,7 @@ class Cursor {
     void change_shape();
 
     int get_radius();
+    bool is_circular();
 
   protected:
     Shader shader_program;

@@ -1,9 +1,11 @@
 #include "menu.hpp"
 
-Menu::Menu(std::string path_str, int win_width, int win_height,
-               int square_size, int radius) {
+Menu::Menu(std::string path_str, GLFWwindow *window) {
+    glfwGetWindowSize(window, &win_width, &win_height);
+    glm::vec3 offset = glm::vec3(pxls::to_float(win_width - OFFSET, win_width),
+                       pxls::to_float(win_height - OFFSET, win_height), 0);
+    items.push_back(new Dropdown(path_str, window, DROPDOWN_ARROW_SIZE, offset));
 
-    items.push_back(new Dropdown(path_str, win_width, win_height, SQUARE_SIZE, radius));
 }
 
 Menu::~Menu() {
@@ -15,6 +17,12 @@ Menu::~Menu() {
 void Menu::update_dimensions(int win_width, int win_height) {
 }
 
+void Menu::click() {
+    for(auto item : items) {
+        item->click();
+    }
+
+}
 
 void Menu::draw() {
     for(auto item : items) {

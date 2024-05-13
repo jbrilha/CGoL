@@ -1,48 +1,31 @@
 #include "automaton.hpp"
 
-Automaton::Automaton(std::string path_str, int win_width, int win_height,
-                     int square_size)
-    : square_size(square_size), cell_size(square_size + GAP),
-      win_height(win_height), win_width(win_width),
-      hei_margin(win_height % cell_size), wid_margin(win_width % cell_size),
-      cell_count((win_width / cell_size) * (win_height / cell_size)),
-      rows(win_height / cell_size), cols(win_width / cell_size), plague(false),
-      circular_cursor(CIRCULAR), cells(cell_count, 0), update_cells(cells),
+Automaton::Automaton(std::string path_str, GLFWwindow *window, int square_size,
+                     glm::vec3 color)
+    : square_size(square_size), cell_size(square_size + GAP), window(window),
+      plague(false), main_color(color), 
       shader_program((path_str + "/../shaders/vert.glsl").c_str(),
                      (path_str + "/../shaders/frag.glsl").c_str()) {
 
-    this->origin_x =
-        -1.f + pxls::to_float(this->cell_size + wid_margin, win_width);
-    this->origin_y =
-        1.f - pxls::to_float(this->cell_size + hei_margin, win_height);
-
-    colors.push_back(black);
-    set_shaders();
-}
-
-Automaton::Automaton(std::string path_str, GLFWwindow *window, int square_size)
-    : square_size(square_size), cell_size(square_size + GAP), window(window),
-    plague(false), circular_cursor(CIRCULAR),
-    shader_program((path_str + "/../shaders/vert.glsl").c_str(),
-                   (path_str + "/../shaders/frag.glsl").c_str()) {
-
-
     glfwGetWindowSize(window, &win_width, &win_height);
+
     hei_margin = (win_height % cell_size);
     wid_margin = (win_width % cell_size);
+
     cell_count = ((win_width / cell_size) * (win_height / cell_size));
+
     rows = (win_height / cell_size);
     cols = (win_width / cell_size);
-    cells = std::vector<int>(cell_count, 0);
-    update_cells = (cells);
 
-    std::cout << "made it: " << win_width << " | " << win_height << std::endl;
-    this->origin_x =
-        -1.f + pxls::to_float(this->cell_size + wid_margin, win_width);
-    this->origin_y =
-        1.f - pxls::to_float(this->cell_size + hei_margin, win_height);
+    cells = std::vector<int>(cell_count, 0);
+    update_cells = cells;
+
+    origin_x = -1.f + pxls::to_float(cell_size + wid_margin, win_width);
+    origin_y = 1.f - pxls::to_float(cell_size + hei_margin, win_height);
 
     colors.push_back(black);
+    colors.push_back(main_color);
+
     set_shaders();
 }
 
@@ -168,7 +151,7 @@ void Automaton::update_states() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Automaton::set_value(double x_pos, double y_pos, int val, int radius) {
+void Automaton::set_value(double x_pos, double y_pos, int val, int radius, bool circular) {
     if (x_pos < (double)wid_margin / 2 ||
         x_pos > win_width - (double)wid_margin / 2 ||
         y_pos < (double)hei_margin / 2 ||
@@ -185,10 +168,9 @@ void Automaton::set_value(double x_pos, double y_pos, int val, int radius) {
               cell_size;
     int offset = row * cols + col;
 
-
     if (radius == 0) {
-        if (cells[offset] == 5 && val) return;
-        std::cout << row << " | " << col << std::endl;
+        if (cells[offset] == 5 && val)
+            return;
 
         cells[offset] = val;
         update_cells[offset] = val;
@@ -198,9 +180,12 @@ void Automaton::set_value(double x_pos, double y_pos, int val, int radius) {
             for (int c = col - radius; c < col + radius + 1; c++) {
                 offset = r * cols + c;
 
-                if (r >= 0 && r < rows && c < cols && c >= 0 && (val == 0 || cells[offset] != 5)
-                    && (!circular_cursor ||  // cursor check for short circuiting. micro optimizations babyyyy
-                     sqrt(pow(abs(r - row), 2) + pow(abs(c - col), 2)) <= radius + 0.1)) {
+                if (r >= 0 && r < rows && c < cols && c >= 0 &&
+                    (val == 0 || cells[offset] != 5) &&
+                    (!circular ||   // cursor check for short circuiting.
+                                    // micro optimizations babyyyy
+                     sqrt(pow(abs(r - row), 2) + pow(abs(c - col), 2)) <=
+                         radius + 0.1)) {
 
                     cells[offset] = val;
                     update_cells[offset] = val;
@@ -231,11 +216,12 @@ void Automaton::draw() {
 }
 
 void Automaton::clear(bool all) {
-    if(all) {
+    if (all) {
         cells = std::vector<int>(cell_count, 0);
     } else {
-        for(int &cell : cells) {
-            if(cell && cell != SOLID) cell = 0;
+        for (int &cell : cells) {
+            if (cell && cell != SOLID)
+                cell = 0;
         }
     }
     update_cells = cells;
@@ -257,9 +243,7 @@ void Automaton::save() {
         std::cout << "FAILED TO CREATE SAVE FILE" << std::endl;
     }
 
-    // output.write((std::to_string(win_width) + "\n").c_str(), sizeof(win_width));
-    // output.write((std::to_string(win_height) + "\n").c_str(), sizeof(win_width));
-    for(int cell : cells) {
+    for (int cell : cells) {
         std::string cell_str = std::to_string(cell);
         output.write(cell_str.c_str(), cell_str.size());
     }
@@ -274,11 +258,9 @@ void Automaton::load() {
         std::cout << "FAILED TO READ SAVE FILE" << std::endl;
     }
 
-    // input.write((std::to_string(win_width) + "\n").c_str(), sizeof(win_width));
-    // input.write((std::to_string(win_height) + "\n").c_str(), sizeof(win_width));
     std::string cells_str;
     getline(input, cells_str);
-    for(int i = 0; i < cells_str.length() && i < cell_count; i++) {
+    for (int i = 0; i < cells_str.length() && i < cell_count; i++) {
         cells[i] = cells_str[i] - 0x30;
     }
     update_cells = cells;
@@ -288,7 +270,7 @@ void Automaton::load() {
     update_states();
 }
 
-void Automaton::change_cursor_shape() { circular_cursor = !circular_cursor; }
+// void Automaton::change_cursor_shape() { circular_cursor = !circular_cursor; }
 void Automaton::toggle_plague() { plague = !plague; }
 int Automaton::get_cell_count() { return cell_count; }
 int Automaton::get_rows() { return rows; }

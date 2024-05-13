@@ -1,10 +1,10 @@
 #include "brain.hpp"
 
-Brain::Brain(std::string path_str, int win_width, int win_height,
+Brain::Brain(std::string path_str, GLFWwindow *window,
              int square_size)
-    : Automaton(path_str, win_width, win_height, square_size) {
+    : Automaton(path_str, window, square_size, purple) {
 
-    colors.push_back(purple);
+    // colors.push_back(purple);
     colors.push_back(pink);
     set_cell_colors();
 };

@@ -14,12 +14,10 @@
 
 Simulation::Simulation(char *argv0)
     : path_str(get_path(argv0)), win_height(WIN_HEIGHT), win_width(WIN_WIDTH),
-      radius(RADIUS), automaton(nullptr), cursor(nullptr),// menu_item(nullptr),
-      /* dropdown(nullptr),button(nullptr),  */ menu(nullptr), 
-    nb_frames(0), last_time(0), FPS(""), cell_count(0),
-      seeding(true), ready(READY), update_size(false), plague(false),
-      water(true), delta_time(0.f), last_frame(0.f), counter(0),
-      tickrate(TICKRATE) {
+      radius(RADIUS), automaton(nullptr), cursor(nullptr), menu(nullptr), nb_frames(0),
+      last_time(0), FPS(""), cell_count(0), seeding(true), ready(READY),
+      update_size(false), plague(false), water(true), delta_time(0.f),
+      last_frame(0.f), counter(0), tickrate(TICKRATE) {
 
     if (path_str.empty()) {
         std::cerr << "Error: Failed to retrieve executable path" << std::endl;
@@ -51,13 +49,13 @@ void Simulation::set_automaton(Automaton *automaton) {
 
 void Simulation::init() {
     automaton = new Sand(path_str, window, SQUARE_SIZE);
-    // automaton = new Sand(path_str, win_width, win_height, SQUARE_SIZE);
     cell_count = automaton->get_cell_count();
 
-    cursor = new Cursor(path_str, win_width, win_height, SQUARE_SIZE, radius);
+    // cursor = new Cursor(path_str, win_width, win_height, SQUARE_SIZE,
+    // radius);
+    cursor = new Cursor(path_str, window, SQUARE_SIZE, radius);
     // automaton->load();
-
-    menu = new Menu(path_str, win_width, win_height, SQUARE_SIZE, radius);
+    menu = new Menu(path_str, window);
 }
 
 void Simulation::run() {
@@ -176,7 +174,7 @@ void Simulation::process_input() {
 
         double x_pos, y_pos;
         glfwGetCursorPos(window, &x_pos, &y_pos);
-        automaton->set_value(x_pos, y_pos, val, radius);
+        automaton->set_value(x_pos, y_pos, val, radius, cursor->is_circular());
     } else {
         seeding = false;
     }
@@ -302,7 +300,7 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         ready = false;
     }
     if (key == GLFW_KEY_X && action == GLFW_PRESS) {
-        automaton->change_cursor_shape();
+        // automaton->change_cursor_shape();
         cursor->change_shape();
     }
     if (key == GLFW_KEY_R && action == GLFW_PRESS) {
@@ -352,51 +350,51 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
     }
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
         std::cout << "click" << std::endl;
-        // menu_item->click();
+        menu->click();
     }
     if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {
         step = true;
     }
 
     if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-        set_automaton(new Brain(path_str, win_width, win_height,
-                                this->automaton->get_square_size()));
+        set_automaton(
+            new Brain(path_str, window, this->automaton->get_square_size()));
     }
     if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-        set_automaton(new DayNNite(path_str, win_width, win_height,
-                                   this->automaton->get_square_size()));
+        set_automaton(
+            new DayNNite(path_str, window, this->automaton->get_square_size()));
     }
     if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
-        set_automaton(new Disease(path_str, win_width, win_height,
-                                  this->automaton->get_square_size()));
+        set_automaton(
+            new Disease(path_str, window, this->automaton->get_square_size()));
     }
     if (key == GLFW_KEY_4 && action == GLFW_PRESS) {
-        set_automaton(new LFoD(path_str, win_width, win_height,
-                               this->automaton->get_square_size()));
+        set_automaton(
+            new LFoD(path_str, window, this->automaton->get_square_size()));
     }
     if (key == GLFW_KEY_5 && action == GLFW_PRESS) {
-        set_automaton(new Life(path_str, win_width, win_height,
-                               this->automaton->get_square_size()));
+        set_automaton(
+            new Life(path_str, window, this->automaton->get_square_size()));
     }
     if (key == GLFW_KEY_6 && action == GLFW_PRESS) {
-        set_automaton(new Rule0(path_str, win_width, win_height,
-                                this->automaton->get_square_size()));
+        set_automaton(
+            new Rule0(path_str, window, this->automaton->get_square_size()));
     }
     if (key == GLFW_KEY_7 && action == GLFW_PRESS) {
-        set_automaton(new Rule180(path_str, win_width, win_height,
-                                  this->automaton->get_square_size()));
+        set_automaton(
+            new Rule180(path_str, window, this->automaton->get_square_size()));
     }
     if (key == GLFW_KEY_8 && action == GLFW_PRESS) {
-        set_automaton(new Rule90(path_str, win_width, win_height,
-                                 this->automaton->get_square_size()));
+        set_automaton(
+            new Rule90(path_str, window, this->automaton->get_square_size()));
     }
     if (key == GLFW_KEY_9 && action == GLFW_PRESS) {
-        set_automaton(new Seeds(path_str, win_width, win_height,
-                                this->automaton->get_square_size()));
+        set_automaton(
+            new Seeds(path_str, window, this->automaton->get_square_size()));
     }
     if (key == GLFW_KEY_0 && action == GLFW_PRESS) {
-        set_automaton(new Sand(path_str, win_width, win_height,
-                               this->automaton->get_square_size()));
+        set_automaton(
+            new Sand(path_str, window, this->automaton->get_square_size()));
     }
 }
 
@@ -425,7 +423,7 @@ void Simulation::error_callback(int error, const char *description) {
 void Simulation::update_title_bar() {
     std::string TITLE_BAR =
         GAME_VERSION_NAME + " - " + FPS +
-        " FPS | tickrate: " + std::to_string(tickrate) + " | " + 
+        " FPS | tickrate: " + std::to_string(tickrate) + " | " +
         std::to_string(cell_count) + " cells" + " | " + automaton->get_type() +
         " | cell size: " + std::to_string(automaton->get_square_size());
 

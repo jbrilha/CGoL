@@ -4,6 +4,11 @@
 static const int GAP = 1;
 static const int SQUARE_SIZE = 24;
 
+static const int BUTTON_HEIGHT = 24;
+static const int BUTTON_WIDTH = BUTTON_HEIGHT * 3;
+
+static const int DROPDOWN_ARROW_SIZE = 30;
+
 static const int WIN_WIDTH = 800;
 static const int WIN_HEIGHT = 800;
 static const int RADIUS = 1;

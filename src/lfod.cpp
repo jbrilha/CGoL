@@ -1,9 +1,8 @@
 #include "lfod.hpp"
 
-LFoD::LFoD(std::string path_str, int win_width, int win_height, int square_size)
-    : Automaton(path_str, win_width, win_height, square_size) {
+LFoD::LFoD(std::string path_str, GLFWwindow *window, int square_size)
+    : Automaton(path_str, window, square_size, red) {
 
-    colors.push_back(red);
     set_cell_colors();
 };
 

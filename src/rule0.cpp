@@ -1,10 +1,8 @@
 #include "rule0.hpp"
 
-Rule0::Rule0(std::string path_str, int win_width, int win_height,
-             int square_size)
-    : Automaton(path_str, win_width, win_height, square_size) {
+Rule0::Rule0(std::string path_str, GLFWwindow *window, int square_size)
+    : Automaton(path_str, window, square_size, blue) {
 
-    colors.push_back(blue);
     set_cell_colors();
 };
 

@@ -1,10 +1,8 @@
 #include "rule180.hpp"
 
-Rule180::Rule180(std::string path_str, int win_width, int win_height,
-                 int square_size)
-    : Automaton(path_str, win_width, win_height, square_size) {
+Rule180::Rule180(std::string path_str, GLFWwindow *window, int square_size)
+    : Automaton(path_str, window, square_size, purple) {
 
-    colors.push_back(purple);
     set_cell_colors();
 };
 

@@ -7,7 +7,7 @@ using namespace glm_colors;
 
 class Rule0 : public Automaton {
   public:
-    Rule0(std::string path_str, int win_width, int win_height, int square_size);
+    Rule0(std::string path_str, GLFWwindow *window, int square_size);
     ~Rule0();
     void update() override;
     std::string get_type() override;

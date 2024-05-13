@@ -5,7 +5,6 @@
 
 class Sand : public Automaton {
   public:
-    Sand(std::string path_str, int win_width, int win_height, int square_size);
     Sand(std::string path_str, GLFWwindow *window, int square_size);
     ~Sand();
     void update() override;

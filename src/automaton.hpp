@@ -5,6 +5,7 @@
 #include "constants.hpp"
 #include "util/glm_colors.hpp"
 #include "util/pxls.hpp"
+#include "cursor.hpp"
 
 #include <GLFW/glfw3.h>
 // #include <glad/glad.h>
@@ -40,10 +41,8 @@ class Automaton {
 
   public:
     Automaton();
-    Automaton(std::string path_str, int win_width, int win_height,
-              int square_size);
     Automaton(std::string path_str, GLFWwindow *window,
-              int square_size);
+              int square_size, glm::vec3 color);
     virtual ~Automaton(){};
     virtual std::string get_type() = 0;
 
@@ -52,9 +51,9 @@ class Automaton {
     void update_square_size(int square_size);
     void clear(bool all);
     void draw();
-    void set_value(double x_pos, double y_pos, int val, int radius);
+    void set_value(double x_pos, double y_pos, int val, int radius, bool circular);
     void toggle_plague();
-    void change_cursor_shape();
+    // void change_cursor_shape();
     void save();
     void load();
 
@@ -63,6 +62,7 @@ class Automaton {
     int get_cols();
     int get_square_size();
     int get_cell_size();
+    glm::vec3 get_main_color();
 
     void fill_random();
 
@@ -75,7 +75,6 @@ class Automaton {
     int cols;
 
     bool plague;
-    bool circular_cursor;
 
     std::vector<int> cells;
     std::vector<int> update_cells;
@@ -83,6 +82,9 @@ class Automaton {
     void update_states();
     void set_cell_colors();
 
+    glm::vec3 main_color;
+
     Shader shader_program;
+
 };
 #endif

@@ -1,22 +1,63 @@
 #include "dropdown_mi.hpp"
-#include "glm/ext/matrix_transform.hpp"
-#include "src/button_mi.hpp"
-#include "src/menu_item.hpp"
+#include "src/constants.hpp"
+#include "util/glm_colors.hpp"
 #include "util/pxls.hpp"
 
-Dropdown::Dropdown(std::string path_str, int win_width, int win_height,
-                   int square_size, int radius)
-    : MenuItem(path_str, win_width, win_height, square_size, radius),
-       center(0.f), offset(0.f), /* items(1, nullptr), */ collapsed(true) {
+Dropdown::Dropdown(std::string path_str, GLFWwindow *window, int size,
+                   glm::vec3 position)
+    : MenuItem(path_str, window, position), center(0.f), collapsed(true),
+      size(size) {
 
-    items.push_back(new Button(path_str, win_width, win_height, SQUARE_SIZE, radius));
-    // items.push_back(Button(path_str, win_width, win_height, SQUARE_SIZE * 2, radius));
+    float nx = pxls::to_float(sin(glm::radians(30.f)) * size, win_width);
+    float ny = pxls::to_float(cos(glm::radians(30.f)) * size, win_height);
+    center = glm::vec3(nx, ny, 0.f);
+
+    float button_gap = pxls::to_float(BUTTON_HEIGHT * 3, win_height);
+    std::vector<glm::vec3> colors = {
+        purple, green, light_blue, red, green,
+        blue, purple, red, orange, sand_yellow
+    };
+
+    for (int i = 0; i < 10; i++) {
+        glm::vec3 button_pos = position - glm::vec3(-nx, button_gap * (i + 1), 0.f);
+
+        items.push_back(new Button( path_str, window, BUTTON_WIDTH, BUTTON_HEIGHT, button_pos, colors[i]));
+    }
+
     set_shaders();
 }
 
+Dropdown::Dropdown(std::string path_str, GLFWwindow *window, int size,
+                   glm::vec3 position, glm::vec3 color)
+    : MenuItem(path_str, window, position, color), center(0.f), collapsed(true),
+      size(size) {
+
+    float nx = pxls::to_float(sin(glm::radians(30.f)) * size, win_width);
+    float ny = pxls::to_float(cos(glm::radians(30.f)) * size, win_height);
+    center = glm::vec3(nx, ny, 0.f);
+
+    float button_gap = pxls::to_float(BUTTON_HEIGHT * 3, win_height);
+    std::vector<glm::vec3> colors = {
+        purple, green, light_blue, red, green,
+        blue, purple, red, orange, sand_yellow
+    };
+
+    for (int i = 0; i < 10; i++) {
+        glm::vec3 button_pos = position - glm::vec3(-nx, button_gap * (i + 1), 0.f);
+
+        items.push_back(new Button( path_str, window, BUTTON_WIDTH, BUTTON_HEIGHT, button_pos, colors[i]));
+    }
+
+    set_shaders();
+}
+
+void Dropdown::init(std::string path_str) {
+}
+
 Dropdown::~Dropdown() {
-    glDeleteProgram(shader_program.program_ID); 
-    for(auto item : items) {
+    glDeleteProgram(shader_program.program_ID);
+
+    for (auto item : items) {
         delete item;
     }
 }
@@ -24,20 +65,16 @@ Dropdown::~Dropdown() {
 void Dropdown::set_model() {
     std::cout << "dd sm" << std::endl;
     shader_program.use();
-    float nx = pxls::to_float(sin(glm::radians(30.f)) * square_size, win_width);
-    float ny = pxls::to_float(cos(glm::radians(30.f)) * square_size, win_height);
-    center = glm::vec3(nx, ny, 0.f);
-    offset = glm::vec3(pxls::to_float(win_width - OFFSET, win_width),
-                       pxls::to_float(win_height - OFFSET, win_height), 0);
 
-    model = glm::translate(model, center + 0.5f);
-    model = glm::rotate(model, glm::radians(90.f), glm::vec3(0.f, 0.f, 1.f));
+    model = glm::translate(model, center + position);
+    // model = glm::rotate(model, glm::radians(90.f), glm::vec3(0.f, 0.f, 1.f));
     shader_program.set_mat4("model", model);
 }
 
 void Dropdown::set_vertices() {
     std::cout << "dd sv" << std::endl;
-    float vert = pxls::to_float(32, std::max(win_height, win_width));
+    float vert =
+        pxls::to_float(DROPDOWN_ARROW_SIZE, std::max(win_height, win_width));
 
     quad_vertices = {
         glm::vec2(vert, -vert),
@@ -54,8 +91,9 @@ void Dropdown::collapse() {
 
 void Dropdown::click() {
     collapsed = !collapsed;
-    collapsed ? collapse() : expand();
+    // collapsed ? collapse() : expand();
 
+    model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.f, 0.f, 1.f));
     shader_program.use();
     shader_program.set_mat4("model", model);
 }
@@ -76,9 +114,11 @@ void Dropdown::expand() {
 //
 //     for (int i = 0; i < segments; i++) {
 //         float x_vert =
-//             pxls::to_float(dimensions * cos(angle_step * i) + GAP, win_width);
+//             pxls::to_float(dimensions * cos(angle_step * i) + GAP,
+//             win_width);
 //         float y_vert =
-//             pxls::to_float(dimensions * sin(angle_step * i) + GAP, win_height);
+//             pxls::to_float(dimensions * sin(angle_step * i) + GAP,
+//             win_height);
 //
 //         quad_vertices.push_back(glm::vec2(x_vert, y_vert));
 //     }
@@ -111,9 +151,9 @@ void Dropdown::expand() {
 // }
 
 void Dropdown::draw() {
-    if(!collapsed) {
-        if(!items.empty()) {
-            for(auto item : items) {
+    if (!collapsed) {
+        if (!items.empty()) {
+            for (auto item : items) {
                 item->draw();
             }
         }
