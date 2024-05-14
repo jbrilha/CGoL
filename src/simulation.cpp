@@ -160,7 +160,7 @@ void Simulation::process_input() {
         step = true;
     }
 
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !clicking) {
         bool s = automaton->get_type().find("Sand") != std::string::npos;
         bool sw = s & water;
 
@@ -236,7 +236,9 @@ void Simulation::mouse_button_callback(GLFWwindow *window, int button, int actio
         double x_pos, y_pos;
         glfwGetCursorPos(window, &x_pos, &y_pos);
         int action =  menu->handle_cursor(x_pos, y_pos, true);
+        if(action >= 0) clicking = true;
         switch (action) {
+            case 0: break;
             case 1:
                 set_automaton(
                     new Brain(path_str, window, this->automaton->get_square_size()));
@@ -278,6 +280,7 @@ void Simulation::mouse_button_callback(GLFWwindow *window, int button, int actio
                     new Sand(path_str, window, this->automaton->get_square_size()));
                 break;
             default:
+                clicking = false;
                 break;
         }
     }
@@ -414,7 +417,6 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         }
     }
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-        std::cout << "click" << std::endl;
         menu->click();
     }
     if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {

@@ -100,12 +100,15 @@ int Dropdown::handle_cursor(double x_pos, double y_pos, bool clicking) {
     float v1_x = win_width * ((vert1.x) + 1.f) / 2;
     float v2_y = win_height * (1.f - (vert2.y)) / 2;
 
+    int action = -1;
+
     if(x_pos <= v0_x && y_pos <= v0_y
         && x_pos >= v1_x
         && y_pos >= v2_y
 
     ) {
         if(clicking) {
+            action = 0;
             click();
         } else {
             hover();
@@ -115,12 +118,13 @@ int Dropdown::handle_cursor(double x_pos, double y_pos, bool clicking) {
     if(!collapsed) {
         for(const auto item : items) {
             int action = item->handle_cursor(x_pos, y_pos, clicking);
-            if(action >= 0)
+            if(action > 0) {
                 return action;
+            }
         }
     }
 
-    return -1;
+    return action;
 }
 
 void Dropdown::collapse() {

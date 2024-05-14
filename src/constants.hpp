@@ -1,8 +1,8 @@
 #ifndef CONSTANTS
 #define CONSTANTS
 
-static const int GAP = 1;
-static const int SQUARE_SIZE = 24;
+static const int GAP = 0;
+static const int SQUARE_SIZE = 2;
 
 static const int BUTTON_HEIGHT = 24;
 static const int BUTTON_WIDTH = BUTTON_HEIGHT * 3;

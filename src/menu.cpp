@@ -24,8 +24,9 @@ void Menu::update_dimensions(int win_width, int win_height) {
 int Menu::handle_cursor(double x_pos, double y_pos, bool clicking) {
     for(const auto item : items) {
         int action = item->handle_cursor(x_pos, y_pos, clicking);
-        if(action >= 0) {}
+        if(action >= 0) {
             return action;
+        }
     }
 
     return -1;
