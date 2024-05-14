@@ -17,7 +17,7 @@ Simulation::Simulation(char *argv0)
       radius(RADIUS), automaton(nullptr), cursor(nullptr), menu(nullptr), nb_frames(0),
       last_time(0), FPS(""), cell_count(0), seeding(true), ready(READY),
       update_size(false), plague(false), water(true), delta_time(0.f),
-      last_frame(0.f), counter(0), tickrate(TICKRATE) {
+      last_frame(0.f), counter(0), tickrate(TICKRATE), clicking(false) {
 
     if (path_str.empty()) {
         std::cerr << "Error: Failed to retrieve executable path" << std::endl;
@@ -86,7 +86,7 @@ void Simulation::run() {
         if (update_size) {
             automaton->update_dimensions(win_width, win_height);
             cursor->update_dimensions(win_width, win_height);
-            // menu_item->update_dimensions(win_width, win_height);
+            menu->update_dimensions(win_width, win_height);
             cell_count = automaton->get_cell_count();
             update_size = false;
         }
@@ -222,7 +222,68 @@ void Simulation::set_callbacks() {
             if (instance)
                 instance->mouse_pos_callback(window, x_pos_in, y_pos_in);
         });
+    glfwSetMouseButtonCallback(
+        window, [](GLFWwindow *window, int button, int action, int mods) {
+            Simulation *instance =
+                static_cast<Simulation *>(glfwGetWindowUserPointer(window));
+            if (instance)
+                instance->mouse_button_callback(window, button, action, mods);
+        });
 }
+
+void Simulation::mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
+    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        double x_pos, y_pos;
+        glfwGetCursorPos(window, &x_pos, &y_pos);
+        int action =  menu->handle_cursor(x_pos, y_pos, true);
+        switch (action) {
+            case 1:
+                set_automaton(
+                    new Brain(path_str, window, this->automaton->get_square_size()));
+                break;
+            case 2:
+                set_automaton(
+                    new DayNNite(path_str, window, this->automaton->get_square_size()));
+                break;
+            case 3:
+                set_automaton(
+                    new Disease(path_str, window, this->automaton->get_square_size()));
+                break;
+            case 4:
+                set_automaton(
+                    new LFoD(path_str, window, this->automaton->get_square_size()));
+                break;
+            case 5:
+                set_automaton(
+                    new Life(path_str, window, this->automaton->get_square_size()));
+                break;
+            case 6:
+                set_automaton(
+                    new Rule0(path_str, window, this->automaton->get_square_size()));
+                break;
+            case 7:
+                set_automaton(
+                    new Rule180(path_str, window, this->automaton->get_square_size()));
+                break;
+            case 8:
+                set_automaton(
+                    new Rule90(path_str, window, this->automaton->get_square_size()));
+                break;
+            case 9:
+                set_automaton(
+                    new Seeds(path_str, window, this->automaton->get_square_size()));
+                break;
+            case 10:
+                set_automaton(
+                    new Sand(path_str, window, this->automaton->get_square_size()));
+                break;
+            default:
+                break;
+        }
+    }
+
+}
+
 void Simulation::mouse_pos_callback(GLFWwindow *window, double x_pos_in,
                                     double y_pos_in) {
     float x_pos = static_cast<float>(x_pos_in);
@@ -234,6 +295,10 @@ void Simulation::mouse_pos_callback(GLFWwindow *window, double x_pos_in,
         y_pos < win_height + SQUARE_SIZE * (radius + 1)) {
         cursor->update_position(x_pos, y_pos);
     }
+
+    // if(x_pos > win_width - BUTTON_WIDTH && x_pos < win_width) {
+        menu->handle_cursor(x_pos, y_pos, false);
+    // }
 }
 
 void Simulation::drop_callback(GLFWwindow *window, int count,
@@ -453,7 +518,7 @@ void Simulation::init_GLFW() {
 
     set_callbacks();
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     // glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
     glfwMakeContextCurrent(window);

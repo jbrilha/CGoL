@@ -29,6 +29,8 @@ class Simulation {
     std::string get_path(char *arg);
     std::string path_str;
 
+    bool clicking;
+
     int win_height;
     int win_width;
 
@@ -49,6 +51,7 @@ class Simulation {
     void drop_callback(GLFWwindow *window, int count, const char **paths);
     void mouse_pos_callback(GLFWwindow *window, double x_pos_in,
                             double y_pos_in);
+    void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
     void update_title_bar();
     void process_input();
 

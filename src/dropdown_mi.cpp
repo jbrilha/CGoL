@@ -21,7 +21,7 @@ Dropdown::Dropdown(std::string path_str, GLFWwindow *window, int size,
     for (int i = 0; i < 10; i++) {
         glm::vec3 button_pos = position - glm::vec3(-nx, button_gap * (i + 1), 0.f);
 
-        items.push_back(new Button( path_str, window, BUTTON_WIDTH, BUTTON_HEIGHT, button_pos, colors[i]));
+        items.push_back(new Button( path_str, window, BUTTON_WIDTH, BUTTON_HEIGHT, button_pos, colors[i], i + 1));
     }
 
     set_shaders();
@@ -51,7 +51,15 @@ Dropdown::Dropdown(std::string path_str, GLFWwindow *window, int size,
     set_shaders();
 }
 
-void Dropdown::init(std::string path_str) {
+void Dropdown::update_dimensions(int win_width, int win_height) {
+    this->win_width = win_width;
+    this->win_height = win_height;
+
+    for (auto item : items) {
+        item->update_dimensions(win_width, win_height);
+    }
+
+    set_shaders();
 }
 
 Dropdown::~Dropdown() {
@@ -63,16 +71,15 @@ Dropdown::~Dropdown() {
 }
 
 void Dropdown::set_model() {
-    std::cout << "dd sm" << std::endl;
     shader_program.use();
 
     model = glm::translate(model, center + position);
-    // model = glm::rotate(model, glm::radians(90.f), glm::vec3(0.f, 0.f, 1.f));
+    if(!collapsed)
+        model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.f, 0.f, 1.f));
     shader_program.set_mat4("model", model);
 }
 
 void Dropdown::set_vertices() {
-    std::cout << "dd sv" << std::endl;
     float vert =
         pxls::to_float(DROPDOWN_ARROW_SIZE, std::max(win_height, win_width));
 
@@ -81,6 +88,39 @@ void Dropdown::set_vertices() {
         glm::vec2(-vert, -vert),
         glm::vec2(0, vert),
     };
+}
+
+int Dropdown::handle_cursor(double x_pos, double y_pos, bool clicking) {
+    glm::vec2 vert0 = quad_vertices[0] + glm::vec2(center.x + position.x, center.y + position.y); //bot right
+    glm::vec2 vert1 = quad_vertices[1] + glm::vec2(center.x + position.x, center.y + position.y); //bot left
+    glm::vec2 vert2 = quad_vertices[2] + glm::vec2(center.x + position.x, center.y + position.y); //top
+
+    float v0_x = win_width * ((vert0.x) + 1.f) / 2;
+    float v0_y = win_height * (1.f - (vert0.y)) / 2;
+    float v1_x = win_width * ((vert1.x) + 1.f) / 2;
+    float v2_y = win_height * (1.f - (vert2.y)) / 2;
+
+    if(x_pos <= v0_x && y_pos <= v0_y
+        && x_pos >= v1_x
+        && y_pos >= v2_y
+
+    ) {
+        if(clicking) {
+            click();
+        } else {
+            hover();
+        }
+    }
+
+    if(!collapsed) {
+        for(const auto item : items) {
+            int action = item->handle_cursor(x_pos, y_pos, clicking);
+            if(action >= 0)
+                return action;
+        }
+    }
+
+    return -1;
 }
 
 void Dropdown::collapse() {

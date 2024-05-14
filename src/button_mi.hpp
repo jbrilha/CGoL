@@ -24,9 +24,12 @@ class Button : public MenuItem {
     Button();
     Button(std::string path_str, GLFWwindow *window, int width, int height, glm::vec3 position);
     Button(std::string path_str, GLFWwindow *window, int width, int height, glm::vec3 position, glm::vec3 color);
+    Button(std::string path_str, GLFWwindow *window, int width, int height, glm::vec3 position, int idx);
+    Button(std::string path_str, GLFWwindow *window, int width, int height, glm::vec3 position, glm::vec3 color, int idx);
     ~Button();
 
     void click() override;
+    // void handle_cursor(double x_pos, double y_pos, bool clicking) override;
 
     bool clicked;
 };

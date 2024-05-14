@@ -23,20 +23,26 @@ class MenuItem {
     MenuItem();
     MenuItem(std::string path_str, GLFWwindow *window, glm::vec3 position);
     MenuItem(std::string path_str, GLFWwindow *window, glm::vec3 position, glm::vec3 color);
+    MenuItem(std::string path_str, GLFWwindow *window, glm::vec3 position, int idx);
+    MenuItem(std::string path_str, GLFWwindow *window, glm::vec3 position, glm::vec3 color, int idx);
     virtual ~MenuItem();
 
     virtual void draw();
     void update_position(double x_pos, double y_pos);
-    void update_dimensions(int win_width, int win_height);
+    virtual void update_dimensions(int win_width, int win_height);
     void change_shape();
+    virtual int handle_cursor(double x_pos, double y_pos, bool clicking);
 
     int get_radius();
+    int get_index();
     virtual void click() = 0;
 
   protected:
     unsigned int quad_VAO;
     int square_size;
     void set_shaders();
+    void hover();
+    
     Shader shader_program;
     glm::mat4 model;
     std::vector<glm::vec2> quad_vertices;
@@ -46,6 +52,8 @@ class MenuItem {
 
     int win_height;
     int win_width;
+
+    int idx;
 
     GLFWwindow *window;
 };

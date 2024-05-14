@@ -9,23 +9,37 @@ Menu::Menu(std::string path_str, GLFWwindow *window) {
 }
 
 Menu::~Menu() {
-    for(auto item : items) {
+    for(const auto item : items) {
         delete item;
     }
 }
 
 void Menu::update_dimensions(int win_width, int win_height) {
+    for(const auto item : items) {
+        item->update_dimensions(win_width, win_height);
+    }
+}
+
+
+int Menu::handle_cursor(double x_pos, double y_pos, bool clicking) {
+    for(const auto item : items) {
+        int action = item->handle_cursor(x_pos, y_pos, clicking);
+        if(action >= 0) {}
+            return action;
+    }
+
+    return -1;
 }
 
 void Menu::click() {
-    for(auto item : items) {
+    for(const auto item : items) {
         item->click();
     }
 
 }
 
 void Menu::draw() {
-    for(auto item : items) {
+    for(const auto item : items) {
         item->draw();
     }
 }

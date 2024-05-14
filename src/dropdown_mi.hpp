@@ -38,5 +38,7 @@ class Dropdown : public MenuItem {
 
     void draw() override;
     void click() override;
+    int handle_cursor(double x_pos, double y_pos, bool clicking) override;
+    void update_dimensions(int win_width, int win_height) override;
 };
 #endif
