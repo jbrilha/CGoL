@@ -75,7 +75,7 @@ void Automaton::update_square_size(int square_size) {
 void Automaton::set_shaders() {
     shader_program.use();
 
-    glm::vec2 offsets[cell_count];
+    std::vector<glm::vec2> offsets = std::vector<glm::vec2>(cell_count);
     int i = 0;
 
     for (int row = 0; row < rows; row++) {
@@ -145,6 +145,8 @@ void Automaton::set_square_vertices() {
 }
 
 void Automaton::update_states() {
+    // shader_program.use();
+
     glBindBuffer(GL_ARRAY_BUFFER, instance_VBOs[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(int) * (cell_count), &cells[0],
                  GL_DYNAMIC_DRAW);
@@ -169,7 +171,7 @@ void Automaton::set_value(double x_pos, double y_pos, int val, int radius, bool 
     int offset = row * cols + col;
 
     if (radius == 0) {
-        if (cells[offset] == 5 && val)
+        if (cells[offset] == SOLID && val)
             return;
 
         cells[offset] = val;
