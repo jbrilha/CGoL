@@ -6,7 +6,8 @@
 #include "util/glm_colors.hpp"
 #include "util/pxls.hpp"
 #include "src/menu_item.hpp"
-#include "src/dropdown_mi.hpp"
+#include "src/mi_dropdown.hpp"
+#include "src/mi_radial.hpp"
 
 #include <vector>
 #include <glad/glad.h>

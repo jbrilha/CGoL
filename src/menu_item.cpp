@@ -1,37 +1,13 @@
 #include "menu_item.hpp"
-#include "src/menu.hpp"
 
-MenuItem::MenuItem(std::string path_str, GLFWwindow *window, glm::vec3 position)
-    : shader_program((path_str + "/../shaders/menu_vert.glsl").c_str(),
-                     (path_str + "/../shaders/menu_frag.glsl").c_str()),
-      model(1.f), position(position), color(1.f), idx(-1) {
+MenuItem::MenuItem(std::string path_str, GLFWwindow *window,
+             glm::vec3 position, glm::vec3 color, int idx, float angle, bool circular)
+        : shader_program((path_str + "/../shaders/menu_vert.glsl").c_str(),
+                         (path_str + "/../shaders/menu_frag.glsl").c_str()),
+          model(1.f), position(position), color(color), idx(idx), angle(angle), circular(circular) {
 
-    glfwGetWindowSize(window, &win_width, &win_height);
-}
-
-MenuItem::MenuItem(std::string path_str, GLFWwindow *window, glm::vec3 position, glm::vec3 color)
-    : shader_program((path_str + "/../shaders/menu_vert.glsl").c_str(),
-                     (path_str + "/../shaders/menu_frag.glsl").c_str()),
-      model(1.f), position(position), color(color), idx(-1) {
-
-    glfwGetWindowSize(window, &win_width, &win_height);
-}
-
-MenuItem::MenuItem(std::string path_str, GLFWwindow *window, glm::vec3 position, glm::vec3 color, int idx)
-    : shader_program((path_str + "/../shaders/menu_vert.glsl").c_str(),
-                     (path_str + "/../shaders/menu_frag.glsl").c_str()),
-      model(1.f), position(position), color(color), idx(idx) {
-
-    glfwGetWindowSize(window, &win_width, &win_height);
-}
-
-MenuItem::MenuItem(std::string path_str, GLFWwindow *window, glm::vec3 position, int idx)
-    : shader_program((path_str + "/../shaders/menu_vert.glsl").c_str(),
-                     (path_str + "/../shaders/menu_frag.glsl").c_str()),
-      model(1.f), position(position), color(1.f), idx(idx) {
-
-    glfwGetWindowSize(window, &win_width, &win_height);
-}
+        glfwGetWindowSize(window, &win_width, &win_height);
+    }
 
 MenuItem::~MenuItem() { glDeleteProgram(shader_program.program_ID); }
 
@@ -39,7 +15,9 @@ void MenuItem::set_shaders() {
     shader_program.use();
 
     model = glm::mat4(1.f);
-    set_vertices();
+    circular
+        ? set_circular_vertices()
+        : set_vertices();
     set_model();
     set_color();
 
@@ -58,6 +36,10 @@ void MenuItem::set_shaders() {
 
 void MenuItem::set_color() {
     shader_program.set_vec3("aColor", color);
+}
+
+void MenuItem::set_circular_vertices() {
+    std::cout << "gtfo" << std::endl;
 }
 
 int MenuItem::handle_cursor(double x_pos, double y_pos, bool clicking) {

@@ -5,6 +5,7 @@ Menu::Menu(std::string path_str, GLFWwindow *window) {
     glm::vec3 offset = glm::vec3(pxls::to_float(win_width - OFFSET, win_width),
                        pxls::to_float(win_height - OFFSET, win_height), 0);
     items.push_back(new Dropdown(path_str, window, DROPDOWN_ARROW_SIZE, offset));
+    items.push_back(new Radial(path_str, window, DROPDOWN_ARROW_SIZE, glm::vec3(0.f)));
 
 }
 

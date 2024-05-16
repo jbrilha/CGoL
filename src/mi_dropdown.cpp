@@ -1,31 +1,8 @@
-#include "dropdown_mi.hpp"
+#include "mi_dropdown.hpp"
 #include "src/constants.hpp"
+#include "src/mi_button.hpp"
 #include "util/glm_colors.hpp"
 #include "util/pxls.hpp"
-
-Dropdown::Dropdown(std::string path_str, GLFWwindow *window, int size,
-                   glm::vec3 position)
-    : MenuItem(path_str, window, position), center(0.f), collapsed(true),
-      size(size) {
-
-    float nx = pxls::to_float(sin(glm::radians(30.f)) * size, win_width);
-    float ny = pxls::to_float(cos(glm::radians(30.f)) * size, win_height);
-    center = glm::vec3(nx, ny, 0.f);
-
-    float button_gap = pxls::to_float(BUTTON_HEIGHT * 3, win_height);
-    std::vector<glm::vec3> colors = {
-        purple, green, light_blue, red, green,
-        blue, purple, red, orange, sand_yellow
-    };
-
-    for (int i = 0; i < 10; i++) {
-        glm::vec3 button_pos = position - glm::vec3(-nx, button_gap * (i + 1), 0.f);
-
-        items.push_back(new Button( path_str, window, BUTTON_WIDTH, BUTTON_HEIGHT, button_pos, colors[i], i + 1));
-    }
-
-    set_shaders();
-}
 
 Dropdown::Dropdown(std::string path_str, GLFWwindow *window, int size,
                    glm::vec3 position, glm::vec3 color)
@@ -45,7 +22,7 @@ Dropdown::Dropdown(std::string path_str, GLFWwindow *window, int size,
     for (int i = 0; i < 10; i++) {
         glm::vec3 button_pos = position - glm::vec3(-nx, button_gap * (i + 1), 0.f);
 
-        items.push_back(new Button( path_str, window, BUTTON_WIDTH, BUTTON_HEIGHT, button_pos, colors[i]));
+        items.push_back(new Button( path_str, window, BUTTON_WIDTH, BUTTON_HEIGHT, button_pos, colors[i], i + 1));
     }
 
     set_shaders();

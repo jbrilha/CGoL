@@ -13,11 +13,11 @@
 #include "src/constants.hpp"
 
 Simulation::Simulation(char *argv0)
-    : path_str(get_path(argv0)), win_height(WIN_HEIGHT), win_width(WIN_WIDTH),
-      radius(RADIUS), automaton(nullptr), cursor(nullptr), menu(nullptr), nb_frames(0),
-      last_time(0), FPS(""), cell_count(0), seeding(true), ready(READY),
-      update_size(false), plague(false), water(true), delta_time(0.f),
-      last_frame(0.f), counter(0), tickrate(TICKRATE), clicking(false) {
+    : path_str(get_path(argv0)), clicking(false), win_height(WIN_HEIGHT),
+      win_width(WIN_WIDTH), radius(RADIUS), automaton(nullptr), cursor(nullptr), menu(nullptr),
+      nb_frames(0), last_time(0), FPS(""), cell_count(0), seeding(true),
+      ready(READY), update_size(false), plague(false), water(true),
+      delta_time(0.f), last_frame(0.f), counter(0), tickrate(TICKRATE) {
 
     if (path_str.empty()) {
         std::cerr << "Error: Failed to retrieve executable path" << std::endl;
