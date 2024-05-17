@@ -31,7 +31,7 @@ Radial::Radial(std::string path_str, GLFWwindow *window, int size,
 glm::vec3 Radial::determine_position(int idx){
     float nx = pxls::to_float(sin(glm::radians((float) ((idx * 36)))) * BUTTON_WIDTH * 3, win_width);
     float ny = pxls::to_float(cos(glm::radians((float) ((idx * 36)))) * BUTTON_WIDTH * 3, win_height);
-    std::cout << nx << std::endl;
+    // std::cout << nx << std::endl;
     // center = glm::vec3(nx, ny, 0.f);
 
     return center - glm::vec3(nx, ny, 0.f);

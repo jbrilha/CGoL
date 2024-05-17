@@ -170,7 +170,7 @@ void Simulation::process_input() {
             val = 0;
         }
         if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-            val = s ? 5 : 1;
+            val = s ? SOLID : 1;
         }
 
         double x_pos, y_pos;

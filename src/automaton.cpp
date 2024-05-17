@@ -184,7 +184,7 @@ void Automaton::set_value(double x_pos, double y_pos, int val, int radius, bool 
                 offset = r * cols + c;
 
                 if (r >= 0 && r < rows && c < cols && c >= 0 &&
-                    (val == 0 || cells[offset] != 5) &&
+                    (val == 0 || cells[offset] != SOLID) &&
                     (!circular ||   // cursor check for short circuiting.
                                     // micro optimizations babyyyy
                      sqrt(pow(abs(r - row), 2) + pow(abs(c - col), 2)) <=

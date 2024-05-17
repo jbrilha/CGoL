@@ -37,7 +37,6 @@ class MenuItem {
 
   protected:
     unsigned int quad_VAO;
-    int square_size;
     void set_shaders();
     void hover();
 
