@@ -2,6 +2,7 @@
 #define BUTTON_MENU_ITEM_HPP
 
 #include "src/menu_item.hpp"
+#include "src/constants.hpp"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -12,6 +13,7 @@ using namespace glm_colors;
 class Button : public MenuItem {
   private:
     void set_vertices() override;
+    void set_circular_vertices() override;
     void set_model() override;
 
     unsigned int quad_VAO;
@@ -23,7 +25,7 @@ class Button : public MenuItem {
   public:
     Button();
     Button(std::string path_str, GLFWwindow *window, int width, int height,
-               glm::vec3 position, glm::vec3 color = white, int idx = -1, float angle = -1.f);
+               glm::vec3 position, glm::vec3 color = white, int idx = -1, float angle = -1.f, bool circular = false);
     ~Button();
 
     void click() override;

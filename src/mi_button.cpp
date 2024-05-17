@@ -3,8 +3,8 @@
 #include "util/pxls.hpp"
 
 Button::Button(std::string path_str, GLFWwindow *window, int width, int height,
-        glm::vec3 position, glm::vec3 color, int idx, float angle)
-    : MenuItem(path_str, window, position, color, idx, angle), height(height),
+        glm::vec3 position, glm::vec3 color, int idx, float angle, bool circular)
+    : MenuItem(path_str, window, position, color, idx, angle, circular), height(height),
       width(width), clicked(false) {
 
     set_shaders();
@@ -33,6 +33,27 @@ void Button::set_vertices() {
         glm::vec2(-x_vert, -y_vert), // bot left
         glm::vec2(-x_vert, y_vert),
     };
+}
+
+
+void Button::set_circular_vertices() {
+    quad_vertices.clear();
+    int size = std::min(width, height);
+
+    int segments = size < 20 ? 32 : 64;
+    float angle_step = 2.f * M_PI / segments;
+    int dimensions = size;
+
+    for (int i = 0; i < segments; i++) {
+        float x_vert =
+            pxls::to_float(dimensions * cos(angle_step * i) + GAP,
+            win_width);
+        float y_vert =
+            pxls::to_float(dimensions * sin(angle_step * i) + GAP,
+            win_height);
+
+        quad_vertices.push_back(glm::vec2(x_vert, y_vert));
+    }
 }
 
 // int Button::handle_cursor(double x_pos, double y_pos, bool clicking) {
