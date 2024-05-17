@@ -6,6 +6,7 @@ In C++ with raw OpenGL :D
 ## Currently available controls:
 - ESC: Closes the application;
 - ENTER: Start/stop simulation;
+- SPACE: Expand menu(s);
 - M1 / LEFT MOUSE: Make cell "alive" at cursor;
 - SHIFT + M1: "Kill" cell at cursor;
 - R: Randomly fills the grid with "live" cells;
@@ -22,6 +23,8 @@ In C++ with raw OpenGL :D
 - 8: [Rule 90](https://en.wikipedia.org/wiki/Rule_90) Automaton;
 - 9: [Seeds](https://en.wikipedia.org/wiki/Seeds_(cellular_automaton)) Automaton;
 - 0: Sand Simulation;
+    - W: Toggles between Water and Sand cells;
+    - CTRL + Click: Immovable cells;
 - "+": Step once through simulation*;
 - SHIFT + "+": Continuously step through simulation*;
 - ARROW UP & DOWN: Increase/decrease tickrate (higher is slower);
@@ -30,7 +33,7 @@ In C++ with raw OpenGL :D
 
 \* GLFW reads this as GLFW_KEY_EQUAL on MacOs so it might not be the same key depending on your layout.
 
-## Build instructions -- REQUIRES CMAKE AND g++ COMPILER
+## Build instructions -- REQUIRES CMAKE, g++ COMPILER AND GLFW3
 Copy into your terminal while on the parent directory:
 
 ```sh
@@ -38,6 +41,8 @@ cmake -B build --fresh && cmake --build build
 ```
 
 If everything goes as it's supposed to, you should find the built executable in the bin directory.
+If you're on Windows, good luck!
+
 To run it:
 ```sh
 ./bin/cgol
