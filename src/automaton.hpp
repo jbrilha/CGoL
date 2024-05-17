@@ -43,7 +43,7 @@ class Automaton {
     Automaton();
     Automaton(std::string path_str, GLFWwindow *window,
               int square_size, glm::vec3 color);
-    virtual ~Automaton(){};
+    virtual ~Automaton();
     virtual std::string get_type() = 0;
 
     virtual void update() = 0;

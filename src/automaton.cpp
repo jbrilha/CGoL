@@ -29,6 +29,8 @@ Automaton::Automaton(std::string path_str, GLFWwindow *window, int square_size,
     set_shaders();
 }
 
+Automaton::~Automaton() { glDeleteProgram(shader_program.program_ID); }
+
 void Automaton::update_grid() {
     rows = win_height / cell_size;
     cols = win_width / cell_size;
@@ -88,11 +90,11 @@ void Automaton::set_shaders() {
 
     glGenBuffers(2, instance_VBOs);
     glBindBuffer(GL_ARRAY_BUFFER, instance_VBOs[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * (cell_count), &offsets[0],
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * (cell_count), offsets.data(),
                  GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, instance_VBOs[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(int) * (cell_count), &cells[0],
+    glBufferData(GL_ARRAY_BUFFER, sizeof(int) * (cell_count), cells.data(),
                  GL_STREAM_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -126,7 +128,8 @@ void Automaton::set_shaders() {
     glBindBuffer(GL_ARRAY_BUFFER,
                  instance_VBOs[1]); // this attribute comes from a different
                                     // vertex buffer
-    glVertexAttribPointer(2, 1, GL_INT, GL_FALSE, 1 * sizeof(int), (void *)0);
+    // glVertexAttribPointer(2, 1, GL_INT, GL_FALSE, sizeof(int), (void *)0);
+    glVertexAttribIPointer(2, 1, GL_INT, sizeof(int), (void *)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glVertexAttribDivisor(
         2, 1); // tell OpenGL this is an instanced vertex attribute.
@@ -145,10 +148,8 @@ void Automaton::set_square_vertices() {
 }
 
 void Automaton::update_states() {
-    // shader_program.use();
-
     glBindBuffer(GL_ARRAY_BUFFER, instance_VBOs[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(int) * (cell_count), &cells[0],
+    glBufferData(GL_ARRAY_BUFFER, sizeof(int) * (cell_count), cells.data(),
                  GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

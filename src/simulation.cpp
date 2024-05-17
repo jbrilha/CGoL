@@ -11,6 +11,7 @@
 #include "seeds.hpp"
 #include "src/automaton.hpp"
 #include "src/constants.hpp"
+#include <cstring>
 
 Simulation::Simulation(char *argv0)
     : path_str(get_path(argv0)), clicking(false), win_height(WIN_HEIGHT),

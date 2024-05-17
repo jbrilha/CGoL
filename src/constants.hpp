@@ -2,15 +2,15 @@
 #define CONSTANTS
 
 static const int GAP = 0;
-static const int SQUARE_SIZE = 2;
+static const int SQUARE_SIZE = 20;
 
 static const int BUTTON_HEIGHT = 24;
 static const int BUTTON_WIDTH = BUTTON_HEIGHT * 3;
 
 static const int DROPDOWN_ARROW_SIZE = 30;
 
-static const int WIN_WIDTH = 1000;
-static const int WIN_HEIGHT = 1000;
+static const int WIN_WIDTH = 600;
+static const int WIN_HEIGHT = 600;
 static const int RADIUS = 1;
 static const int TICKRATE = 0;
 

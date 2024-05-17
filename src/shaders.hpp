@@ -39,7 +39,7 @@ class Shader {
             vert_code = vert_shader_stream.str();
             frag_code = frag_shader_stream.str();
 
-        } catch (std::ifstream::failure e) {
+        } catch (std::ifstream::failure &e) {
             std::cout << "ERROR:SHADERS::FILES_FAILED_TO_READ" << std::endl;
         }
 
@@ -94,6 +94,7 @@ class Shader {
 
     // void set_vec3(const std::string &name, float x, float y, float z) const {
     //     glUniform3f(glGetUniformLocation(program_ID, name.c_str()), x, y, z);
+    //
     // }
 
     void set_vec3(const std::string &name, const glm::vec3 &value) const {
