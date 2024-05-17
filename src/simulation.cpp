@@ -29,13 +29,13 @@ Simulation::Simulation(char *argv0)
 }
 
 Simulation::~Simulation() {
-    delete automaton;
+    // delete automaton;
     automaton = nullptr;
 
-    delete cursor;
+    // delete cursor;
     cursor = nullptr;
 
-    delete menu;
+    // delete menu;
     menu = nullptr;
 }
 
