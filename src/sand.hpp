@@ -11,7 +11,6 @@ class Sand : public Automaton {
     std::string get_type() override;
 
   private:
-    int apply_rules(int offset) override;
     bool look_ahead(int offset, int state);
 };
 #endif

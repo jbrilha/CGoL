@@ -5,7 +5,7 @@
 
 Radial::Radial(std::string path_str, GLFWwindow *window, int size,
                    glm::vec3 position, glm::vec3 color)
-    : MenuItem(path_str, window, position, color, -1, -1.f, true), center(0.f), collapsed(true),
+    : MenuItem(path_str, window, position, color, -1, -1.f, false), center(0.f), collapsed(true),
       size(size) {
 
     float nx = pxls::to_float(sin(glm::radians(30.f)) * size, win_width);
@@ -19,7 +19,7 @@ Radial::Radial(std::string path_str, GLFWwindow *window, int size,
     };
 
     for (int i = 0; i < 10; i++) {
-        glm::vec3 button_pos = determine_position(i);
+        glm::vec3 button_pos = position + determine_position(i);
         int angle = i * 36;
 
         items.push_back(new Button( path_str, window, BUTTON_WIDTH, BUTTON_HEIGHT, button_pos, colors[i], i + 1, angle));

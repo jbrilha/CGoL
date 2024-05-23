@@ -31,7 +31,6 @@ class Automaton {
     void set_shaders();
     void set_square_vertices();
 
-    virtual int apply_rules(int offset) = 0;
 
     float origin_x;
     float origin_y;

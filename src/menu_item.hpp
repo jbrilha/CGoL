@@ -22,7 +22,9 @@ class MenuItem {
 
   public:
     MenuItem();
-    MenuItem(std::string path_str, GLFWwindow *window, glm::vec3 position, glm::vec3 color = white, int idx = -1, float angle = -1.f, bool circular = false);
+    MenuItem(std::string path_str, GLFWwindow *window, glm::vec3 position,
+             glm::vec3 color = white, int idx = -1, float angle = -1.f,
+             bool circular = false);
     virtual ~MenuItem();
 
     virtual void draw();

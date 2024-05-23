@@ -3,7 +3,7 @@
 Automaton::Automaton(std::string path_str, GLFWwindow *window, int square_size,
                      glm::vec3 color)
     : square_size(square_size), cell_size(square_size + GAP), window(window),
-      plague(false), main_color(color), 
+      plague(false), main_color(color),
       shader_program((path_str + "/../shaders/vert.glsl").c_str(),
                      (path_str + "/../shaders/frag.glsl").c_str()) {
 

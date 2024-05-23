@@ -70,7 +70,7 @@ class Simulation {
     bool update_size;
     bool plague;
     bool step;
-    bool water;
+    bool toggle_val;
 
     float delta_time;
     float last_frame;

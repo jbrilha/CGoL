@@ -11,6 +11,5 @@ class LFoD : public Automaton {
     std::string get_type() override;
 
   private:
-    int apply_rules(int offset) override;
 };
 #endif

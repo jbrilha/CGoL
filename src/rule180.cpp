@@ -10,19 +10,12 @@ Rule180::~Rule180() { glDeleteProgram(shader_program.program_ID); }
 
 void Rule180::update() {
     for (int offset = 0; offset < cell_count; offset++) {
-        update_cells[offset] = apply_rules(offset);
+        update_cells[offset] = (cells[offset - (cols)] != cells[offset + (cols)]) !=
+           (cells[offset - 1] != cells[offset + 1]);
     }
     cells = update_cells;
 
     update_states();
-}
-
-int Rule180::apply_rules(int offset) {
-    if (!((offset) % cols))
-        return 0;
-
-    return (cells[offset - (cols)] != cells[offset + (cols)]) !=
-           (cells[offset - 1] != cells[offset + 1]);
 }
 
 std::string Rule180::get_type() {

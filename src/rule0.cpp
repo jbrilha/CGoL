@@ -10,18 +10,11 @@ Rule0::~Rule0() { glDeleteProgram(shader_program.program_ID); }
 
 void Rule0::update() {
     for (int offset = 0; offset < cell_count; offset++) {
-        update_cells[offset] = apply_rules(offset);
+        update_cells[offset] = cells[offset - cols] != cells[offset + cols];
     }
     cells = update_cells;
 
     update_states();
-}
-
-int Rule0::apply_rules(int offset) {
-    if (!((offset) % cols))
-        return 0;
-
-    return cells[offset - cols] != cells[offset + cols];
 }
 
 std::string Rule0::get_type() {

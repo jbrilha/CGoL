@@ -5,6 +5,8 @@
 #include "lfod.hpp"
 #include "life.hpp"
 #include "rule0.hpp"
+#include "rps.hpp"
+#include "rnd.hpp"
 #include "rule180.hpp"
 #include "rule90.hpp"
 #include "sand.hpp"
@@ -17,7 +19,7 @@ Simulation::Simulation(char *argv0)
     : path_str(get_path(argv0)), clicking(false), win_height(WIN_HEIGHT),
       win_width(WIN_WIDTH), radius(RADIUS), automaton(nullptr), cursor(nullptr), menu(nullptr),
       nb_frames(0), last_time(0), FPS(""), cell_count(0), seeding(true),
-      ready(READY), update_size(false), plague(false), water(true),
+      ready(READY), update_size(false), plague(false), toggle_val(false),
       delta_time(0.f), last_frame(0.f), counter(0), tickrate(TICKRATE) {
 
     if (path_str.empty()) {
@@ -49,7 +51,7 @@ void Simulation::set_automaton(Automaton *automaton) {
 }
 
 void Simulation::init() {
-    automaton = new Sand(path_str, window, SQUARE_SIZE);
+    automaton = new RND(path_str, window, SQUARE_SIZE);
     cell_count = automaton->get_cell_count();
 
     // cursor = new Cursor(path_str, win_width, win_height, SQUARE_SIZE,
@@ -101,8 +103,8 @@ void Simulation::run() {
         }
 
         automaton->draw();
-        menu->draw();
 
+        menu->draw();
         cursor->draw();
 
         glfwSwapBuffers(window);
@@ -163,14 +165,16 @@ void Simulation::process_input() {
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !clicking) {
         bool s = automaton->get_type().find("Sand") != std::string::npos;
-        bool sw = s & water;
+        bool w = s & toggle_val;
+        bool rps = automaton->get_type().find("RPS") != std::string::npos;
+        bool rnd = automaton->get_type().find("RND") != std::string::npos;
 
-        int val = sw ? WATER : 1;
+        int val = toggle_val ? w ? WATER : SEC : PRIM;
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
             val = 0;
         }
-        if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-            val = s ? SOLID : 1;
+        if ((s || rps || rnd) && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+            val = (rps || rnd) ? SEC + 2 : SOLID;
         }
 
         double x_pos, y_pos;
@@ -242,11 +246,11 @@ void Simulation::mouse_button_callback(GLFWwindow *window, int button, int actio
             case 0: break;
             case 1:
                 set_automaton(
-                    new Brain(path_str, window, this->automaton->get_square_size()));
+                    new RPS(path_str, window, this->automaton->get_square_size()));
                 break;
             case 2:
                 set_automaton(
-                    new DayNNite(path_str, window, this->automaton->get_square_size()));
+                    new RND(path_str, window, this->automaton->get_square_size()));
                 break;
             case 3:
                 set_automaton(
@@ -354,7 +358,7 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
         tickrate = std::min(tickrate + val, 1000);
     }
     if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-        water = !water;
+        toggle_val = !toggle_val;
     }
     if (key == GLFW_KEY_P && action == GLFW_PRESS) {
         plague = !plague;
@@ -493,7 +497,8 @@ void Simulation::update_title_bar() {
         GAME_VERSION_NAME + " - " + FPS +
         " FPS | tickrate: " + std::to_string(tickrate) + " | " +
         std::to_string(cell_count) + " cells" + " | " + automaton->get_type() +
-        " | cell size: " + std::to_string(automaton->get_square_size());
+        " | cell size: " + std::to_string(automaton->get_square_size()) + 
+        (toggle_val ? "*" : "");
 
     glfwSetWindowTitle(window, TITLE_BAR.c_str());
 }

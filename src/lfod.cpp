@@ -14,7 +14,19 @@ void LFoD::update() {
     for (int offset = 0; offset < cell_count; offset++) {
         state = cells[offset];
 
-        int neighbors = apply_rules(offset);
+        int neighbors = 0;
+        int bot = offset + cols;
+        int top = offset - cols;
+        int lft = offset - 1;
+        int rgt = offset + 1;
+
+        std::array<int, 8> nghbr_at = {top - 1, top, top + 1, lft,
+                                           rgt,     bot - 1, bot,     bot + 1};
+
+        for (const int at : nghbr_at) {
+            if (at >= 0 && at < cell_count && cells[at])
+                neighbors++;
+        }
 
         if (state && !neighbors) {
             update_cells[offset] = 1;
@@ -27,29 +39,6 @@ void LFoD::update() {
     cells = update_cells;
 
     update_states();
-}
-
-int LFoD::apply_rules(int offset) {
-    int neighbors = 0;
-    int row = offset / cols;
-    int col = offset % cols;
-
-    for (int i = -1; i < 2; i++) {
-        for (int j = -1; j < 2; j++) {
-            if (i == 0 && j == 0)
-                continue;
-
-            int neigh_row = (row + i + rows) % rows;
-            int neigh_col = (col + j + cols) % cols;
-            int offset = neigh_row * cols + neigh_col;
-
-            if (offset >= 0 && offset < cell_count && cells[offset]) {
-                neighbors++;
-            }
-        }
-    }
-
-    return neighbors;
 }
 
 std::string LFoD::get_type() {
