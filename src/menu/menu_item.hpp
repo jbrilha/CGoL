@@ -2,8 +2,8 @@
 #define MENU_ITEM_HPP
 
 #include "shaders.hpp"
-#include "util/glm_colors.hpp"
-#include "util/pxls.hpp"
+#include "utils/glm_colors.hpp"
+#include "utils/pxls.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>

@@ -1,6 +1,4 @@
 #include "mi_button.hpp"
-#include "glm/ext/matrix_transform.hpp"
-#include "util/pxls.hpp"
 
 Button::Button(std::string path_str, GLFWwindow *window, int width, int height,
         glm::vec3 position, glm::vec3 color, int idx, float angle, bool circular)

@@ -7,7 +7,20 @@
 #include "automaton.hpp"
 #include "cursor.hpp"
 #include "menu.hpp"
-#include "constants.hpp"
+#include "brain.hpp"
+#include "day_n_nite.hpp"
+#include "disease.hpp"
+#include "lfod.hpp"
+#include "life.hpp"
+#include "rule0.hpp"
+#include "rps.hpp"
+#include "rnd.hpp"
+#include "rule180.hpp"
+#include "rule90.hpp"
+#include "sand.hpp"
+#include "seeds.hpp"
+#include "spiral.hpp"
+#include "utils/constants.hpp"
 
 #define GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
@@ -15,6 +28,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <cstring>
 
 class Simulation {
   public:

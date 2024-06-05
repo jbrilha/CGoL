@@ -1,6 +1,4 @@
 #include "rnd.hpp"
-#include <array>
-#include <cstdlib>
 
 RND::RND(std::string path_str, GLFWwindow *window, int square_size)
     : Automaton(path_str, window, square_size, red) {

@@ -2,9 +2,9 @@
 #define AUTOMATON_HPP
 
 #include "shaders.hpp"
-#include "constants.hpp"
-#include "util/glm_colors.hpp"
-#include "util/pxls.hpp"
+#include "utils/constants.hpp"
+#include "utils/glm_colors.hpp"
+#include "utils/pxls.hpp"
 #include "cursor.hpp"
 
 #include <GLFW/glfw3.h>

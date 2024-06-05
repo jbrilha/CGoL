@@ -2,12 +2,12 @@
 #define MENU_HPP
 
 #include "shaders.hpp"
-#include "constants.hpp"
-#include "util/glm_colors.hpp"
-#include "util/pxls.hpp"
-#include "src/menu_item.hpp"
-#include "src/mi_dropdown.hpp"
-#include "src/mi_radial.hpp"
+#include "utils/constants.hpp"
+#include "utils/glm_colors.hpp"
+#include "utils/pxls.hpp"
+#include "menu_item.hpp"
+#include "mi_dropdown.hpp"
+#include "mi_radial.hpp"
 
 #include <vector>
 #include <glad/glad.h>

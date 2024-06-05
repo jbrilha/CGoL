@@ -1,20 +1,4 @@
 #include "simulation.hpp"
-#include "brain.hpp"
-#include "day_n_nite.hpp"
-#include "disease.hpp"
-#include "lfod.hpp"
-#include "life.hpp"
-#include "rule0.hpp"
-#include "rps.hpp"
-#include "rnd.hpp"
-#include "rule180.hpp"
-#include "rule90.hpp"
-#include "sand.hpp"
-#include "seeds.hpp"
-#include "spiral.hpp"
-#include "src/automaton.hpp"
-#include "src/constants.hpp"
-#include <cstring>
 
 Simulation::Simulation(char *argv0)
     : path_str(get_path(argv0)), clicking(false), win_height(WIN_HEIGHT),

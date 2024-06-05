@@ -1,7 +1,4 @@
 #include "mi_radial.hpp"
-#include "src/constants.hpp"
-#include "util/glm_colors.hpp"
-#include "util/pxls.hpp"
 
 Radial::Radial(std::string path_str, GLFWwindow *window, int size,
                    glm::vec3 position, glm::vec3 color)

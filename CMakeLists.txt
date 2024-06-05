@@ -21,13 +21,22 @@ find_package(OpenGL REQUIRED)
 include_directories(
     ${OPENGL_INCLUDE_DIR}
     ${CMAKE_SOURCE_DIR}/includes
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/automata
+    ${CMAKE_SOURCE_DIR}/src/menu
 )
 
 add_subdirectory(includes)
-add_subdirectory(util)
+add_subdirectory(utils)
 
-file(GLOB SOURCES "src/*.cpp")
+file(GLOB SOURCES_SRC "src/*.cpp")
+file(GLOB SOURCES_AUTO "src/automata/*.cpp")
+file(GLOB SOURCES_MENU "src/menu/*.cpp")
+list(APPEND SOURCES ${SOURCES_SRC})
+list(APPEND SOURCES ${SOURCES_AUTO})
+list(APPEND SOURCES ${SOURCES_MENU})
+# message(STATUS "SOURCES: ${SOURCES}")
 
 add_executable(cgol ${SOURCES})
 
-target_link_libraries(cgol PRIVATE ${OpenGL_gl_LIBRARY} glfw glad util)
+target_link_libraries(cgol PRIVATE ${OpenGL_gl_LIBRARY} glfw glad utils)

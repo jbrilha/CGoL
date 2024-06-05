@@ -2,9 +2,9 @@
 #define CURSOR_HPP
 
 #include "shaders.hpp"
-#include "util/glm_colors.hpp"
-#include "util/pxls.hpp"
-#include "constants.hpp"
+#include "utils/glm_colors.hpp"
+#include "utils/pxls.hpp"
+#include "utils/constants.hpp"
 
 #include <vector>
 #include <glad/glad.h>
@@ -43,7 +43,6 @@ class Cursor {
 
   public:
     Cursor();
-    // Cursor(std::string path_str, int win_width, int win_height, int square_size, int radius);
     Cursor(std::string path_str, GLFWwindow *window, int square_size, int radius);
     ~Cursor();
 

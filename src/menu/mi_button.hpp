@@ -1,8 +1,8 @@
 #ifndef BUTTON_MENU_ITEM_HPP
 #define BUTTON_MENU_ITEM_HPP
 
-#include "src/menu_item.hpp"
-#include "src/constants.hpp"
+#include "menu_item.hpp"
+#include "utils/constants.hpp"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>

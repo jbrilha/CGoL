@@ -1,8 +1,4 @@
 #include "mi_dropdown.hpp"
-#include "src/constants.hpp"
-#include "src/mi_button.hpp"
-#include "util/glm_colors.hpp"
-#include "util/pxls.hpp"
 
 Dropdown::Dropdown(std::string path_str, GLFWwindow *window, int size,
                    glm::vec3 position, glm::vec3 color)

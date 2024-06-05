@@ -1,12 +1,12 @@
-#ifndef DROPDOWN_MENU_ITEM_HPP
-#define DROPDOWN_MENU_ITEM_HPP
+#ifndef RADIAL_MENU_ITEM_HPP
+#define RADIAL_MENU_ITEM_HPP
 
 #include "shaders.hpp"
-#include "constants.hpp"
-#include "src/menu_item.hpp"
-#include "util/glm_colors.hpp"
-#include "util/pxls.hpp"
-#include "src/mi_button.hpp"
+#include "utils/constants.hpp"
+#include "menu_item.hpp"
+#include "utils/glm_colors.hpp"
+#include "utils/pxls.hpp"
+#include "mi_button.hpp"
 
 #include <vector>
 #include <glad/glad.h>
@@ -15,25 +15,27 @@
 
 using namespace glm_colors;
 
-class Dropdown : public MenuItem {
+class Radial : public MenuItem {
   private:
     glm::vec3 center;
     std::vector<MenuItem*> items;
 
     void set_vertices() override;
+    void set_circular_vertices() override;
     void set_model() override;
     void init(std::string path_str);
     void collapse();
     void expand();
+    glm::vec3 determine_position(int idx);
 
     bool collapsed;
 
     int size;
 
   public:
-    Dropdown();
-    Dropdown(std::string path_str, GLFWwindow *window, int dimensions, glm::vec3 position, glm::vec3 color = white);
-    ~Dropdown();
+    Radial();
+    Radial(std::string path_str, GLFWwindow *window, int dimensions, glm::vec3 position, glm::vec3 color = white);
+    ~Radial();
 
     void draw() override;
     void click() override;
