@@ -1,7 +1,7 @@
-#include "rps.hpp"
+#include "spiral.hpp"
 #include <array>
 
-RPS::RPS(std::string path_str, GLFWwindow *window, int square_size)
+Spiral::Spiral(std::string path_str, GLFWwindow *window, int square_size)
     : Automaton(path_str, window, square_size, red) {
 
     colors.push_back(green);
@@ -10,17 +10,17 @@ RPS::RPS(std::string path_str, GLFWwindow *window, int square_size)
     set_cell_colors();
 };
 
-RPS::~RPS() { glDeleteProgram(shader_program.program_ID); }
+Spiral::~Spiral() { glDeleteProgram(shader_program.program_ID); }
 
 enum rps { RCK = 0b100, PPR = 0b010, SZA = 0b001 };
-void RPS::update() {
+void Spiral::update() {
     for (int offset = 0; offset < cell_count; offset++) {
         int row = offset % cols;
         if (cells[offset]
             && offset >= 0
             && offset < cell_count
-            && row < cols
-            && row >= 0
+            && row < (cols - 1)
+            && row > 0
         ) {
             int bot = offset + cols;
             int top = offset - cols;
@@ -32,8 +32,6 @@ void RPS::update() {
                                                bot - 1, bot, bot + 1};
             std::vector<int> free_at;
             free_at.reserve(COUNT);
-            std::vector<int> opp_at;
-            opp_at.reserve(COUNT);
 
             int state = cells[offset];
             for (const int at : nghbr_at) {
@@ -46,37 +44,21 @@ void RPS::update() {
 
                 int winner = 0;
                 switch (state_at | state) {
-                    case PPR | RCK: winner = PPR; break;
-                    case SZA | PPR: winner = SZA; break;
-                    case RCK | SZA: winner = RCK; break;
-                    default: break;
+                case PPR | RCK: winner = PPR; break;
+                case SZA | PPR: winner = SZA; break;
+                case RCK | SZA: winner = RCK; break;
+                default:
+                    break;
                 }
 
-                // if (!state_at && !update_cells[at]) {
-                if (!update_cells[at]) {
+                if (state == winner || (!state_at && !update_cells[at])) {
                     free_at.push_back(at);
                 }
-                if (state == winner) {
-                    opp_at.push_back(at);
-                }
-            }
-
-            if (!opp_at.empty()) {
-                int ridx = rand() % opp_at.size();
-                int idx = opp_at[ridx];
-                std::cout << "ridx oa: " << ridx << std::endl;
-                update_cells[idx] = state;
-                // cells[offset] = 0;
-                update_cells[offset] = 0;
-                continue;
             }
 
             if (!free_at.empty()) {
-                int ridx = rand() % free_at.size();
-                std::cout << "ridx fa: " << ridx << std::endl;
-                int idx = free_at[ridx];
+                int idx = free_at[rand() % free_at.size()];
                 update_cells[idx] = state;
-                update_cells[offset] = 0;
             }
         }
     }
@@ -85,9 +67,7 @@ void RPS::update() {
     update_states();
 }
 
-// enum moores { TL, T, TR, L, R, BL, B, BR, COUNT };
-
-std::string RPS::get_type() {
+std::string Spiral::get_type() {
     std::string type_name = typeid(*this).name();
     std::string clean_name(type_name.begin() + 1, type_name.end());
 

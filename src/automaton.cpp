@@ -1,9 +1,9 @@
 #include "automaton.hpp"
 
 Automaton::Automaton(std::string path_str, GLFWwindow *window, int square_size,
-                     glm::vec3 color)
+                     glm::vec3 color, bool solid_colors)
     : square_size(square_size), cell_size(square_size + GAP), window(window),
-      plague(false), main_color(color),
+      plague(false), solid_colors(solid_colors), main_color(color),
       shader_program((path_str + "/../shaders/vert.glsl").c_str(),
                      (path_str + "/../shaders/frag.glsl").c_str()) {
 
@@ -90,8 +90,8 @@ void Automaton::set_shaders() {
 
     glGenBuffers(2, instance_VBOs);
     glBindBuffer(GL_ARRAY_BUFFER, instance_VBOs[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * (cell_count), offsets.data(),
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * (cell_count),
+                 offsets.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, instance_VBOs[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(int) * (cell_count), cells.data(),
@@ -154,7 +154,8 @@ void Automaton::update_states() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Automaton::set_value(double x_pos, double y_pos, int val, int radius, bool circular) {
+void Automaton::set_value(double x_pos, double y_pos, int val, int radius,
+                          bool circular) {
     if (x_pos < (double)wid_margin / 2 ||
         x_pos > win_width - (double)wid_margin / 2 ||
         y_pos < (double)hei_margin / 2 ||
@@ -185,8 +186,8 @@ void Automaton::set_value(double x_pos, double y_pos, int val, int radius, bool 
 
                 if (r >= 0 && r < rows && c < cols && c >= 0 &&
                     (val == 0 || cells[offset] != SOLID) &&
-                    (!circular ||   // cursor check for short circuiting.
-                                    // micro optimizations babyyyy
+                    (!circular || // cursor check for short circuiting.
+                                  // micro optimizations babyyyy
                      sqrt(pow(abs(r - row), 2) + pow(abs(c - col), 2)) <=
                          radius + 0.1)) {
 
@@ -233,7 +234,9 @@ void Automaton::clear(bool all) {
 }
 
 void Automaton::set_cell_colors() {
-    for (int i = 0; i < colors.size(); i++) {
+    shader_program.set_bool("solid_colors", solid_colors);
+
+    for (int i = 0; i < (int)colors.size(); i++) {
         shader_program.set_vec3(("colors[" + std::to_string(i) + "]"),
                                 colors[i]);
     }
@@ -263,7 +266,7 @@ void Automaton::load() {
 
     std::string cells_str;
     getline(input, cells_str);
-    for (int i = 0; i < cells_str.length() && i < cell_count; i++) {
+    for (int i = 0; i < (int)cells_str.length() && i < cell_count; i++) {
         cells[i] = cells_str[i] - 0x30;
     }
     update_cells = cells;

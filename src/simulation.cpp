@@ -11,6 +11,7 @@
 #include "rule90.hpp"
 #include "sand.hpp"
 #include "seeds.hpp"
+#include "spiral.hpp"
 #include "src/automaton.hpp"
 #include "src/constants.hpp"
 #include <cstring>
@@ -51,7 +52,7 @@ void Simulation::set_automaton(Automaton *automaton) {
 }
 
 void Simulation::init() {
-    automaton = new RND(path_str, window, SQUARE_SIZE);
+    automaton = new Spiral(path_str, window, SQUARE_SIZE);
     cell_count = automaton->get_cell_count();
 
     // cursor = new Cursor(path_str, win_width, win_height, SQUARE_SIZE,
@@ -167,14 +168,15 @@ void Simulation::process_input() {
         bool s = automaton->get_type().find("Sand") != std::string::npos;
         bool w = s & toggle_val;
         bool rps = automaton->get_type().find("RPS") != std::string::npos;
+        bool sprl = automaton->get_type().find("Spiral") != std::string::npos;
         bool rnd = automaton->get_type().find("RND") != std::string::npos;
 
         int val = toggle_val ? w ? WATER : SEC : PRIM;
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
             val = 0;
         }
-        if ((s || rps || rnd) && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-            val = (rps || rnd) ? SEC + 2 : SOLID;
+        if ((s || rps || rnd || sprl) && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+            val = (rps || rnd || sprl) ? SEC + 2 : SOLID;
         }
 
         double x_pos, y_pos;

@@ -4,7 +4,6 @@ Brain::Brain(std::string path_str, GLFWwindow *window,
              int square_size)
     : Automaton(path_str, window, square_size, purple) {
 
-    // colors.push_back(purple);
     colors.push_back(pink);
     set_cell_colors();
 };

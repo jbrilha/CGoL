@@ -41,7 +41,7 @@ class Automaton {
   public:
     Automaton();
     Automaton(std::string path_str, GLFWwindow *window,
-              int square_size, glm::vec3 color);
+              int square_size, glm::vec3 color, bool solid_colors = false);
     virtual ~Automaton();
     virtual std::string get_type() = 0;
 
@@ -74,6 +74,7 @@ class Automaton {
     int cols;
 
     bool plague;
+    bool solid_colors;
 
     std::vector<int> cells;
     std::vector<int> update_cells;
