@@ -63,7 +63,7 @@ void RPS::update() {
             if (!opp_at.empty()) {
                 int ridx = rand() % opp_at.size();
                 int idx = opp_at[ridx];
-                std::cout << "ridx oa: " << ridx << std::endl;
+                // std::cout << "ridx oa: " << ridx << std::endl;
                 update_cells[idx] = state;
                 // cells[offset] = 0;
                 update_cells[offset] = 0;
@@ -72,7 +72,7 @@ void RPS::update() {
 
             if (!free_at.empty()) {
                 int ridx = rand() % free_at.size();
-                std::cout << "ridx fa: " << ridx << std::endl;
+                // std::cout << "ridx fa: " << ridx << std::endl;
                 int idx = free_at[ridx];
                 update_cells[idx] = state;
                 update_cells[offset] = 0;

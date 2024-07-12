@@ -1,40 +1,30 @@
-#include "mi_radial.hpp"
+#include "mi_dropdown.hpp"
 
-Radial::Radial(std::string path_str, GLFWwindow *window, int size,
+Dropdown::Dropdown(std::string path_str, GLFWwindow *window, int size, int button_count,
                    glm::vec3 position, glm::vec3 color)
     : MenuItem(path_str, window, position, color, -1, -1.f, false), center(0.f), collapsed(true),
-      size(size) {
+      button_count(button_count), size(size) {
 
     float nx = pxls::to_float(sin(glm::radians(30.f)) * size, win_width);
     float ny = pxls::to_float(cos(glm::radians(30.f)) * size, win_height);
     center = glm::vec3(nx, ny, 0.f);
 
-    // float button_gap = pxls::to_float(BUTTON_HEIGHT * 3, win_height);
+    float button_gap = pxls::to_float(BUTTON_HEIGHT * 3, win_height);
     std::vector<glm::vec3> colors = {
         purple, green, light_blue, red, green,
         blue, purple, red, orange, sand_yellow
     };
 
-    for (int i = 0; i < 10; i++) {
-        glm::vec3 button_pos = position + determine_position(i);
-        int angle = i * 36;
+    for (int i = 0; i < button_count; i++) {
+        glm::vec3 button_pos = position - glm::vec3(-nx, button_gap * (i + 1), 0.f);
 
-        items.push_back(new Button( path_str, window, BUTTON_WIDTH, BUTTON_HEIGHT, button_pos, colors[i], i + 1, angle));
+        items.push_back(new Button( path_str, window, BUTTON_WIDTH, BUTTON_HEIGHT, button_pos, colors[i], i + 1));
     }
 
     set_shaders();
 }
 
-glm::vec3 Radial::determine_position(int idx){
-    float nx = pxls::to_float(sin(glm::radians((float) ((idx * 36)))) * BUTTON_WIDTH * 3, win_width);
-    float ny = pxls::to_float(cos(glm::radians((float) ((idx * 36)))) * BUTTON_WIDTH * 3, win_height);
-    // std::cout << nx << std::endl;
-    // center = glm::vec3(nx, ny, 0.f);
-
-    return center - glm::vec3(nx, ny, 0.f);
-}
-
-void Radial::update_dimensions(int win_width, int win_height) {
+void Dropdown::update_dimensions(int win_width, int win_height) {
     this->win_width = win_width;
     this->win_height = win_height;
 
@@ -45,7 +35,7 @@ void Radial::update_dimensions(int win_width, int win_height) {
     set_shaders();
 }
 
-Radial::~Radial() {
+Dropdown::~Dropdown() {
     glDeleteProgram(shader_program.program_ID);
 
     for (auto item : items) {
@@ -53,7 +43,7 @@ Radial::~Radial() {
     }
 }
 
-void Radial::set_model() {
+void Dropdown::set_model() {
     shader_program.use();
 
     model = glm::translate(model, center + position);
@@ -62,7 +52,7 @@ void Radial::set_model() {
     shader_program.set_mat4("model", model);
 }
 
-void Radial::set_vertices() {
+void Dropdown::set_vertices() {
     float vert =
         pxls::to_float(DROPDOWN_ARROW_SIZE, std::max(win_height, win_width));
 
@@ -73,7 +63,7 @@ void Radial::set_vertices() {
     };
 }
 
-int Radial::handle_cursor(double x_pos, double y_pos, bool clicking) {
+int Dropdown::handle_cursor(double x_pos, double y_pos, bool clicking) {
     glm::vec2 vert0 = quad_vertices[0] + glm::vec2(center.x + position.x, center.y + position.y); //bot right
     glm::vec2 vert1 = quad_vertices[1] + glm::vec2(center.x + position.x, center.y + position.y); //bot left
     glm::vec2 vert2 = quad_vertices[2] + glm::vec2(center.x + position.x, center.y + position.y); //top
@@ -110,30 +100,28 @@ int Radial::handle_cursor(double x_pos, double y_pos, bool clicking) {
     return action;
 }
 
-void Radial::collapse() {
+void Dropdown::collapse() {
     std::cout << "collapse" << std::endl;
 
-    size /= 2;
     model = glm::rotate(model, glm::radians(-90.f), glm::vec3(0.f, 0.f, 1.f));
 }
 
-void Radial::click() {
+void Dropdown::click() {
     collapsed = !collapsed;
-    collapsed ? size /= 2 : size *= 2;
-    set_shaders();
+    // collapsed ? collapse() : expand();
 
     model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.f, 0.f, 1.f));
     shader_program.use();
     shader_program.set_mat4("model", model);
 }
 
-void Radial::expand() {
+void Dropdown::expand() {
     std::cout << "expand" << std::endl;
 
     model = glm::rotate(model, glm::radians(90.f), glm::vec3(0.f, 0.f, 1.f));
 }
 
-void Radial::set_circular_vertices() {
+void Dropdown::set_circular_vertices() {
     quad_vertices.clear();
 
     int segments = size < 20 ? 32 : 64;
@@ -152,33 +140,33 @@ void Radial::set_circular_vertices() {
     }
 }
 
-// void Radial::update_position(double x_pos, double y_pos) {
+// void Dropdown::update_position(double x_pos, double y_pos) {
 //     cursor_pos = glm::vec2(2 * pxls::to_float(x_pos, win_width) - 1.f,
 //                            -2 * pxls::to_float(y_pos, win_height) + 1.f);
 //
 //     shader_program.set_vec2("cursor_pos", cursor_pos);
 // }
 //
-// void Radial::update_square_size(int square_size) {
+// void Dropdown::update_square_size(int square_size) {
 //     this->square_size = square_size;
 //
 //     set_shaders();
 // }
 //
-// void Radial::update_dimensions(int win_width, int win_height) {
+// void Dropdown::update_dimensions(int win_width, int win_height) {
 //     this->win_width = win_width;
 //     this->win_height = win_height;
 //
 //     set_shaders();
 // }
 //
-// void Radial::update_radius(int radius) {
+// void Dropdown::update_radius(int radius) {
 //     this->radius = radius;
 //
 //     set_shaders();
 // }
 
-void Radial::draw() {
+void Dropdown::draw() {
     if (!collapsed) {
         if (!items.empty()) {
             for (auto item : items) {

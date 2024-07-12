@@ -1,5 +1,5 @@
-#ifndef RADIAL_MENU_ITEM_HPP
-#define RADIAL_MENU_ITEM_HPP
+#ifndef DROPDOWN_MENU_ITEM_HPP
+#define DROPDOWN_MENU_ITEM_HPP
 
 #include "shaders.hpp"
 #include "utils/constants.hpp"
@@ -15,7 +15,7 @@
 
 using namespace glm_colors;
 
-class Radial : public MenuItem {
+class Dropdown : public MenuItem {
   private:
     glm::vec3 center;
     std::vector<MenuItem*> items;
@@ -26,16 +26,16 @@ class Radial : public MenuItem {
     void init(std::string path_str);
     void collapse();
     void expand();
-    glm::vec3 determine_position(int idx);
 
     bool collapsed;
 
+    int button_count;
     int size;
 
   public:
-    Radial();
-    Radial(std::string path_str, GLFWwindow *window, int dimensions, glm::vec3 position, glm::vec3 color = white);
-    ~Radial();
+    Dropdown();
+    Dropdown(std::string path_str, GLFWwindow *window, int dimensions, int button_count, glm::vec3 position, glm::vec3 color = white);
+    ~Dropdown();
 
     void draw() override;
     void click() override;

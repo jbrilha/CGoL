@@ -23,7 +23,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/includes
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/automata
-    ${CMAKE_SOURCE_DIR}/src/menu
+    ${CMAKE_SOURCE_DIR}/src/ui
 )
 
 add_subdirectory(includes)
@@ -31,7 +31,7 @@ add_subdirectory(utils)
 
 file(GLOB SOURCES_SRC "src/*.cpp")
 file(GLOB SOURCES_AUTO "src/automata/*.cpp")
-file(GLOB SOURCES_MENU "src/menu/*.cpp")
+file(GLOB SOURCES_MENU "src/ui/*.cpp")
 list(APPEND SOURCES ${SOURCES_SRC})
 list(APPEND SOURCES ${SOURCES_AUTO})
 list(APPEND SOURCES ${SOURCES_MENU})

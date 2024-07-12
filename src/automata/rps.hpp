@@ -4,6 +4,7 @@
 #include "automaton.hpp"
 
 using namespace glm_colors;
+using std::cout, std::endl;
 
 class RPS : public Automaton {
   public:

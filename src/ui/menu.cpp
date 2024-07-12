@@ -4,10 +4,12 @@ Menu::Menu(std::string path_str, GLFWwindow *window) {
     glfwGetWindowSize(window, &win_width, &win_height);
     glm::vec3 offset = glm::vec3(pxls::to_float(win_width - OFFSET, win_width),
                        pxls::to_float(win_height - OFFSET, win_height), 0);
-    glm::vec3 opposite_offset = glm::vec3(pxls::to_float(-(win_width - OFFSET), win_width),
-                       pxls::to_float(win_height - OFFSET, win_height), 0);
-    items.push_back(new Dropdown(path_str, window, DROPDOWN_ARROW_SIZE, offset));
-    items.push_back(new Radial(path_str, window, DROPDOWN_ARROW_SIZE, opposite_offset));
+    glm::vec3 opposite_offset = glm::vec3(-offset.x, offset.y, 0);
+    // glm::vec3 opposite_offset = glm::vec3(pxls::to_float(-(win_width - OFFSET), win_width),
+    //                    pxls::to_float(win_height - OFFSET, win_height), 0);
+    items.push_back(new Dropdown(path_str, window, DROPDOWN_ARROW_SIZE, 10, offset));
+    // items.push_back(new Radial(path_str, window, DROPDOWN_ARROW_SIZE, 10, glm::vec3(0.f)));
+    items.push_back(new Radial(path_str, window, DROPDOWN_ARROW_SIZE, 10, opposite_offset));
 
 }
 
