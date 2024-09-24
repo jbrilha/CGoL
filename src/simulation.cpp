@@ -1,4 +1,5 @@
 #include "simulation.hpp"
+#include "thread_test.hpp"
 
 Simulation::Simulation(char *argv0)
     : path_str(get_path(argv0)), clicking(false), win_height(WIN_HEIGHT),
@@ -36,7 +37,7 @@ void Simulation::set_automaton(Automaton *automaton) {
 }
 
 void Simulation::init() {
-    automaton = new Spiral(path_str, window, SQUARE_SIZE);
+    automaton = new ThreadTest(path_str, window, SQUARE_SIZE);
     cell_count = automaton->get_cell_count();
 
     // cursor = new Cursor(path_str, win_width, win_height, SQUARE_SIZE,
@@ -240,7 +241,7 @@ void Simulation::mouse_button_callback(GLFWwindow *window, int button, int actio
                 break;
             case 3:
                 set_automaton(
-                    new Disease(path_str, window, this->automaton->get_square_size()));
+                    new Spiral(path_str, window, this->automaton->get_square_size()));
                 break;
             case 4:
                 set_automaton(
