@@ -1,16 +1,25 @@
 #include "simulation.hpp"
+#include "thread_pool.hpp"
 #include "thread_test.hpp"
 
 Simulation::Simulation(char *argv0)
     : path_str(get_path(argv0)), clicking(false), win_height(WIN_HEIGHT),
-      win_width(WIN_WIDTH), radius(RADIUS), automaton(nullptr), cursor(nullptr), menu(nullptr),
-      nb_frames(0), last_time(0), FPS(""), cell_count(0), seeding(true),
-      ready(READY), update_size(false), plague(false), toggle_val(false),
-      delta_time(0.f), last_frame(0.f), counter(0), tickrate(TICKRATE) {
+      win_width(WIN_WIDTH), radius(RADIUS), automaton(nullptr),
+      cursor(nullptr), menu(nullptr), nb_frames(0), last_time(0), FPS(""),
+      cell_count(0), seeding(true), ready(READY), update_size(false),
+      plague(false), toggle_val(false), delta_time(0.f), last_frame(0.f),
+      counter(0), tickrate(TICKRATE), threaded(false) {
 
     if (path_str.empty()) {
         std::cerr << "Error: Failed to retrieve executable path" << std::endl;
         exit(EXIT_FAILURE);
+    }
+
+    if (threaded) {
+        thread_pool = new ThreadPool();
+        std::cout << "nt sim: " << thread_pool->num_threads << std::endl;
+    } else {
+
     }
 
     init_GLFW();
@@ -82,7 +91,17 @@ void Simulation::run() {
 
         if (counter > tickrate) {
             if ((!seeding && ready) || step) {
-                automaton->update();
+                if (threaded) {
+                    for (size_t i = 0; i < thread_pool->num_threads; i++) {
+                        thread_pool->enqueue(
+                            [=, this]() { automaton->update_chunk(i, thread_pool->num_threads); });
+                    }
+
+                    automaton->update_cell_states();
+                } else {
+                    automaton->update();
+                }
+
                 step = false;
             }
             counter = 0;
@@ -149,7 +168,8 @@ void Simulation::process_input() {
         step = true;
     }
 
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !clicking) {
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS &&
+        !clicking) {
         bool s = automaton->get_type().find("Sand") != std::string::npos;
         bool w = s & toggle_val;
         bool rps = automaton->get_type().find("RPS") != std::string::npos;
@@ -160,7 +180,8 @@ void Simulation::process_input() {
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
             val = 0;
         }
-        if ((s || rps || rnd || sprl) && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+        if ((s || rps || rnd || sprl) &&
+            glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
             val = (rps || rnd || sprl) ? SEC + 2 : SOLID;
         }
 
@@ -223,60 +244,62 @@ void Simulation::set_callbacks() {
         });
 }
 
-void Simulation::mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
-    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+void Simulation::mouse_button_callback(GLFWwindow *window, int button,
+                                       int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         double x_pos, y_pos;
         glfwGetCursorPos(window, &x_pos, &y_pos);
-        int action =  menu->handle_cursor(x_pos, y_pos, true);
-        if(action >= 0) clicking = true;
+        int action = menu->handle_cursor(x_pos, y_pos, true);
+        if (action >= 0)
+            clicking = true;
         switch (action) {
-            case 0: break;
-            case 1:
-                set_automaton(
-                    new RPS(path_str, window, this->automaton->get_square_size()));
-                break;
-            case 2:
-                set_automaton(
-                    new RND(path_str, window, this->automaton->get_square_size()));
-                break;
-            case 3:
-                set_automaton(
-                    new Spiral(path_str, window, this->automaton->get_square_size()));
-                break;
-            case 4:
-                set_automaton(
-                    new LFoD(path_str, window, this->automaton->get_square_size()));
-                break;
-            case 5:
-                set_automaton(
-                    new Life(path_str, window, this->automaton->get_square_size()));
-                break;
-            case 6:
-                set_automaton(
-                    new Rule0(path_str, window, this->automaton->get_square_size()));
-                break;
-            case 7:
-                set_automaton(
-                    new Rule180(path_str, window, this->automaton->get_square_size()));
-                break;
-            case 8:
-                set_automaton(
-                    new Rule90(path_str, window, this->automaton->get_square_size()));
-                break;
-            case 9:
-                set_automaton(
-                    new Seeds(path_str, window, this->automaton->get_square_size()));
-                break;
-            case 10:
-                set_automaton(
-                    new Sand(path_str, window, this->automaton->get_square_size()));
-                break;
-            default:
-                clicking = false;
-                break;
+        case 0:
+            break;
+        case 1:
+            set_automaton(
+                new RPS(path_str, window, this->automaton->get_square_size()));
+            break;
+        case 2:
+            set_automaton(
+                new RND(path_str, window, this->automaton->get_square_size()));
+            break;
+        case 3:
+            set_automaton(new Spiral(path_str, window,
+                                     this->automaton->get_square_size()));
+            break;
+        case 4:
+            set_automaton(
+                new LFoD(path_str, window, this->automaton->get_square_size()));
+            break;
+        case 5:
+            set_automaton(
+                new Life(path_str, window, this->automaton->get_square_size()));
+            break;
+        case 6:
+            set_automaton(new Rule0(path_str, window,
+                                    this->automaton->get_square_size()));
+            break;
+        case 7:
+            set_automaton(new Rule180(path_str, window,
+                                      this->automaton->get_square_size()));
+            break;
+        case 8:
+            set_automaton(new Rule90(path_str, window,
+                                     this->automaton->get_square_size()));
+            break;
+        case 9:
+            set_automaton(new Seeds(path_str, window,
+                                    this->automaton->get_square_size()));
+            break;
+        case 10:
+            set_automaton(
+                new Sand(path_str, window, this->automaton->get_square_size()));
+            break;
+        default:
+            clicking = false;
+            break;
         }
     }
-
 }
 
 void Simulation::mouse_pos_callback(GLFWwindow *window, double x_pos_in,
@@ -292,7 +315,7 @@ void Simulation::mouse_pos_callback(GLFWwindow *window, double x_pos_in,
     }
 
     // if(x_pos > win_width - BUTTON_WIDTH && x_pos < win_width) {
-        menu->handle_cursor(x_pos, y_pos, false);
+    menu->handle_cursor(x_pos, y_pos, false);
     // }
 }
 
@@ -484,7 +507,7 @@ void Simulation::update_title_bar() {
         GAME_VERSION_NAME + " - " + FPS +
         " FPS | tickrate: " + std::to_string(tickrate) + " | " +
         std::to_string(cell_count) + " cells" + " | " + automaton->get_type() +
-        " | cell size: " + std::to_string(automaton->get_square_size()) + 
+        " | cell size: " + std::to_string(automaton->get_square_size()) +
         (toggle_val ? "*" : "");
 
     glfwSetWindowTitle(window, TITLE_BAR.c_str());

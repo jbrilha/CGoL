@@ -66,6 +66,67 @@ void Spiral::update() {
     update_states();
 }
 
+void Spiral::update_chunk(int thread_idx, size_t thread_count) {
+    int chunk_size = cell_count / thread_count;
+    int start = thread_idx * chunk_size;
+    int end = start + chunk_size;
+    std::cout << start << "|" << chunk_size << "|" << end << std::endl;
+
+    for (int offset = start; offset < end; offset++) {
+        int row = offset % cols;
+        if (cells[offset]
+            && offset >= 0
+            && offset < cell_count
+            && row < (cols - 1)
+            && row > 0
+        ) {
+            int bot = offset + cols;
+            int top = offset - cols;
+            int lft = offset - 1;
+            int rgt = offset + 1;
+
+            const int COUNT = 8;
+            std::array<int, COUNT> nghbr_at = {top - 1, top, top + 1, lft, rgt,
+                                               bot - 1, bot, bot + 1};
+            std::vector<int> free_at;
+            free_at.reserve(COUNT);
+
+            int state = cells[offset];
+            for (const int at : nghbr_at) {
+                if (at < 0 || at > cell_count)
+                    continue;
+
+                int state_at = cells[at];
+                if (state_at == state)
+                    continue;
+
+                int winner = 0;
+                switch (state_at | state) {
+                case PPR | RCK: winner = PPR; break;
+                case SZA | PPR: winner = SZA; break;
+                case RCK | SZA: winner = RCK; break;
+                default:
+                    break;
+                }
+
+                if (state == winner || (!state_at && !update_cells[at])) {
+                    free_at.push_back(at);
+                }
+            }
+
+            if (!free_at.empty()) {
+                int idx = free_at[rand() % free_at.size()];
+                update_cells[idx] = state;
+            }
+        }
+    }
+}
+
+void Spiral::update_cell_states() {
+    cells = update_cells;
+    update_states();
+}
+
 std::string Spiral::get_type() {
     std::string type_name = typeid(*this).name();
     std::string clean_name(type_name.begin() + 1, type_name.end());

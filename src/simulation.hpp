@@ -7,6 +7,7 @@
 #include "automaton.hpp"
 #include "cursor.hpp"
 #include "menu.hpp"
+#include "thread_pool.hpp"
 #include "brain.hpp"
 #include "day_n_nite.hpp"
 #include "disease.hpp"
@@ -50,6 +51,8 @@ class Simulation {
 
     int radius;
 
+    ThreadPool *thread_pool;
+
     Automaton *automaton;
     Cursor *cursor;
     Menu *menu;
@@ -85,6 +88,7 @@ class Simulation {
     bool plague;
     bool step;
     bool toggle_val;
+    bool threaded;
 
     float delta_time;
     float last_frame;

@@ -12,11 +12,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
+#include <array>
+#include <thread>
 
 using namespace glm_colors;
 
 class Automaton {
   private:
+    // std::vector<std::thread> thread_pool;
     int square_size;
     int cell_size;
 
@@ -46,6 +49,9 @@ class Automaton {
     virtual std::string get_type() = 0;
 
     virtual void update() = 0;
+    virtual void update_chunk(int thread_idx, size_t thread_count) = 0;
+    virtual void update_cell_states() = 0;
+
     void update_dimensions(int win_width, int win_height);
     void update_square_size(int square_size);
     void clear(bool all);

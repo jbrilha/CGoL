@@ -138,6 +138,137 @@ void Sand::update() {
     update_states();
 }
 
+void Sand::update_chunk(int thread_idx, size_t thread_count) {
+    int chunk_size = cell_count / thread_count;
+    int start = thread_idx * chunk_size;
+    int end = start + chunk_size;
+
+    for (int offset = start; offset < end; offset++) {
+        int state = cells[offset];
+        if (state && state != SOLID) {
+            state = state < 3 ? SAND : WATER;
+            int B = offset + cols; // (B)ot
+
+            if (B >= cell_count) {
+                cells[offset] = state;
+                continue;
+            }
+
+            int L = offset - 1; // (L)eft
+            int R = offset + 1; // (R)ight
+
+            int BL = B - 1; // (B)ot (L)eft
+            int BR = B + 1; // (B)ot (R)ight
+
+            bool go_b_left = false, go_b_right = false;
+
+            if (state == WATER)
+                goto water;
+
+            if (!cells[B]) {
+                update_cells[offset] = 0;
+                update_cells[B] = FALLING_SAND;
+                continue;
+            } else {
+                if (!cells[L] && (!cells[BL] || cells[BL] == FALLING_SAND) &&
+                    !update_cells[BL] && look_ahead(L - 1, SAND) &&
+                    (BL + 1) % cols
+                    // && L > 0
+                ) {
+                    go_b_left = true;
+                }
+                if (!cells[R] && (!cells[BR] || cells[BR] == FALLING_SAND) &&
+                    !update_cells[BR] && BR % cols
+                    // && BR < cell_count
+                ) {
+                    go_b_right = true;
+                }
+
+                if (!(go_b_left || go_b_right)) {
+                    update_cells[offset] = SAND;
+                    continue;
+                }
+
+                int idx = 0;
+                if (go_b_left && go_b_right) {
+                    idx = (double)rand() / RAND_MAX < 0.5 ? BL : BR;
+                } else {
+                    idx = go_b_left ? BL : BR;
+                }
+
+                update_cells[idx] = SAND;
+                update_cells[offset] = 0;
+                continue;
+            }
+
+        water:
+            bool go_left = false, go_right = false;
+            // if (!(cells[B] % 2)) { // shower kinda
+            // if (cells[B] && !(cells[B] % 2)) {
+            if (!cells[B] && !update_cells[B]) {
+                update_cells[offset] = 0;
+                update_cells[B] = FALLING_WATER;
+                continue;
+            } else {
+                if (!cells[L] &&
+                    !update_cells[L]
+                    // && look_ahead(offset - 1, WATER)
+                    && look_ahead(L - 1, WATER) && (L + 1) % cols) {
+                    if ((!cells[BL] || cells[BL] == FALLING_WATER) &&
+                        !update_cells[BL] && look_ahead(L - 1, WATER) &&
+                        (BL + 1) % cols
+                        // && L > 0
+                    ) {
+                        go_b_left = true;
+                    } else {
+                        go_left = true;
+                    }
+                }
+                if (!cells[R] &&
+                    !update_cells[R]
+                    // && look_ahead(L - 1, WATER)
+                    && R % cols && R < cell_count) {
+                    if ((!cells[BR] || cells[BR] == FALLING_WATER) &&
+                        !update_cells[BR] && BR % cols
+                        // && BR < cell_count
+                    ) {
+                        go_b_right = true;
+                    } else {
+                        go_right = true;
+                    }
+                }
+
+                if (!(go_b_left || go_b_right || go_left || go_right)) {
+                    update_cells[offset] = WATER;
+                    continue;
+                }
+
+                int idx = 0;
+                if (go_b_left && go_b_right) {
+                    idx = (double)rand() / RAND_MAX < 0.5 ? BL : BR;
+                } else if (go_b_left || go_b_right) {
+                    idx = go_b_left ? BL : BR;
+                } else if (go_right && go_left) {
+                    idx = (double)rand() / RAND_MAX < 0.5 ? L : R;
+                } else {
+                    idx = go_left ? L : R;
+                }
+
+                update_cells[idx] = WATER;
+                update_cells[offset] = 0;
+                continue;
+            }
+        }
+    }
+}
+
+void Sand::update_cell_states() {
+    cells = update_cells;
+    update_states();
+}
+
+
+
 bool Sand::look_ahead(int look_ahead_offset, int state) {
     if (cells[look_ahead_offset] == state && (double)rand() / RAND_MAX < 0.5) {
         return false;

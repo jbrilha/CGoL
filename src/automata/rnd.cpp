@@ -43,6 +43,43 @@ void RND::update() {
     update_states();
 }
 
+void RND::update_chunk(int thread_idx, size_t thread_count) {
+    const int COUNT = 8;
+    int chunk_size = cell_count / thread_count;
+    int start = thread_idx * chunk_size;
+    int end = start + chunk_size;
+
+    for (int offset = start; offset < end; offset++) {
+        int col = offset % cols;
+        if (cells[offset]
+            && offset >= 0
+            && offset < cell_count
+            && col < (cols - 1)
+            && col > 0
+        ) {
+            int bot = offset + cols;
+            int top = offset - cols;
+            int lft = offset - 1;
+            int rgt = offset + 1;
+
+            const std::array<int, COUNT> nghbr_at = {
+                top - 1, top, top + 1, lft, rgt, bot - 1, bot, bot + 1};
+
+            // if (rand() % 100 > 66) {
+                int rdx = rand() % nghbr_at.size();
+                int idx = nghbr_at[rdx];
+                if (idx < 0 || idx > cell_count) continue;
+                update_cells[idx] = cells[offset];
+            // }
+        }
+    }
+}
+
+void RND::update_cell_states() {
+    cells = update_cells;
+    update_states();
+}
+
 std::string RND::get_type() {
     std::string type_name = typeid(*this).name();
     std::string clean_name(type_name.begin() + 1, type_name.end());
