@@ -29,7 +29,11 @@ Automaton::Automaton(std::string path_str, GLFWwindow *window, int square_size,
     set_shaders();
 }
 
-Automaton::~Automaton() { glDeleteProgram(shader_program.program_ID); }
+Automaton::~Automaton() {
+    cells.clear();
+    update_cells.clear();
+    glDeleteProgram(shader_program.program_ID);
+}
 
 void Automaton::update_grid() {
     rows = win_height / cell_size;

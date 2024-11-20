@@ -9,7 +9,7 @@ Menu::Menu(std::string path_str, GLFWwindow *window) {
     //                    pxls::to_float(win_height - OFFSET, win_height), 0);
     items.push_back(new Dropdown(path_str, window, DROPDOWN_ARROW_SIZE, 10, offset));
     // items.push_back(new Radial(path_str, window, DROPDOWN_ARROW_SIZE, 10, glm::vec3(0.f)));
-    items.push_back(new Radial(path_str, window, DROPDOWN_ARROW_SIZE, 10, opposite_offset));
+    // items.push_back(new Radial(path_str, window, DROPDOWN_ARROW_SIZE, 10, opposite_offset));
 
 }
 

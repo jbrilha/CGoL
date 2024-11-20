@@ -87,7 +87,7 @@ void RPS::update_chunk(int thread_idx, size_t thread_count) {
     int chunk_size = cell_count / thread_count;
     int start = thread_idx * chunk_size;
     int end = start + chunk_size;
-    std::cout << start << "|" << chunk_size << "|" << end << std::endl;
+    // std::cout << start << "|" << chunk_size << "|" << end << std::endl;
 
     for (int offset = start; offset < end; offset++) {
         int row = offset % cols;

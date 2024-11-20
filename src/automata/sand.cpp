@@ -165,27 +165,32 @@ void Sand::update_chunk(int thread_idx, size_t thread_count) {
             if (state == WATER)
                 goto water;
 
-            if (!cells[B]) {
-                update_cells[offset] = 0;
+            if (!cells[B] || cells[B] == WATER) {
+                update_cells[offset] = cells[B];
                 update_cells[B] = FALLING_SAND;
                 continue;
             } else {
-                if (!cells[L] && (!cells[BL] || cells[BL] == FALLING_SAND) &&
-                    !update_cells[BL] && look_ahead(L - 1, SAND) &&
+                if (!cells[L] && 
+                    (!cells[BL] || cells[BL] == FALLING_SAND) &&
+                    !update_cells[BL] &&
+                    look_ahead(L - 1, SAND) &&
                     (BL + 1) % cols
                     // && L > 0
                 ) {
                     go_b_left = true;
                 }
-                if (!cells[R] && (!cells[BR] || cells[BR] == FALLING_SAND) &&
-                    !update_cells[BR] && BR % cols
+                if (!cells[R]
+                    && (!cells[BR] || cells[BR] == FALLING_SAND) &&
+                    !update_cells[BR] &&
+                    look_ahead(R - 1, SAND) &&
+                    BR % cols
                     // && BR < cell_count
                 ) {
                     go_b_right = true;
                 }
 
                 if (!(go_b_left || go_b_right)) {
-                    update_cells[offset] = SAND;
+                    update_cells[offset] = SAND; // no longer falling
                     continue;
                 }
 
@@ -196,7 +201,7 @@ void Sand::update_chunk(int thread_idx, size_t thread_count) {
                     idx = go_b_left ? BL : BR;
                 }
 
-                update_cells[idx] = SAND;
+                update_cells[idx] = SAND; // shold this be falling?
                 update_cells[offset] = 0;
                 continue;
             }
@@ -204,57 +209,59 @@ void Sand::update_chunk(int thread_idx, size_t thread_count) {
         water:
             bool go_left = false, go_right = false;
             // if (!(cells[B] % 2)) { // shower kinda
-            // if (cells[B] && !(cells[B] % 2)) {
             if (!cells[B] && !update_cells[B]) {
                 update_cells[offset] = 0;
                 update_cells[B] = FALLING_WATER;
                 continue;
             } else {
-                if (!cells[L] &&
-                    !update_cells[L]
-                    // && look_ahead(offset - 1, WATER)
-                    && look_ahead(L - 1, WATER) && (L + 1) % cols) {
-                    if ((!cells[BL] || cells[BL] == FALLING_WATER) &&
-                        !update_cells[BL] && look_ahead(L - 1, WATER) &&
-                        (BL + 1) % cols
+                if (!cells[L] && (BL + 1) % cols) {
+                    if(!update_cells[L] &&
+                        look_ahead(L, WATER) ) {
+                        go_left = true;
+                    }
+
+                    if (go_left &&
+                        (!cells[BL] || cells[BL] == FALLING_WATER) &&
+                        !update_cells[BL] &&
+                        look_ahead(L - 1, WATER)
                         // && L > 0
                     ) {
                         go_b_left = true;
-                    } else {
-                        go_left = true;
                     }
                 }
-                if (!cells[R] &&
-                    !update_cells[R]
-                    // && look_ahead(L - 1, WATER)
-                    && R % cols && R < cell_count) {
-                    if ((!cells[BR] || cells[BR] == FALLING_WATER) &&
-                        !update_cells[BR] && BR % cols
-                        // && BR < cell_count
+                if (!cells[R] && BR % cols) {
+                    if(!update_cells[R] &&
+                        look_ahead(R, WATER) ) {
+                        go_right = true;
+                    }
+
+                    if (go_right &&
+                        (!cells[BR] || cells[BR] == FALLING_WATER) &&
+                        !update_cells[BR] &&
+                        look_ahead(R - 1, WATER)
+                        // && R > 0
                     ) {
                         go_b_right = true;
-                    } else {
-                        go_right = true;
                     }
                 }
 
-                if (!(go_b_left || go_b_right || go_left || go_right)) {
-                    update_cells[offset] = WATER;
+                if (!(go_left || go_right)) {
+                    update_cells[offset] = WATER; // no longer falling
                     continue;
                 }
 
                 int idx = 0;
                 if (go_b_left && go_b_right) {
                     idx = (double)rand() / RAND_MAX < 0.5 ? BL : BR;
-                } else if (go_b_left || go_b_right) {
+                } else if(go_b_left || go_b_right) {
                     idx = go_b_left ? BL : BR;
-                } else if (go_right && go_left) {
+                } else if (go_left && go_right) {
                     idx = (double)rand() / RAND_MAX < 0.5 ? L : R;
                 } else {
                     idx = go_left ? L : R;
                 }
 
-                update_cells[idx] = WATER;
+                update_cells[idx] = WATER; // shold this be falling?
                 update_cells[offset] = 0;
                 continue;
             }
@@ -270,7 +277,7 @@ void Sand::update_cell_states() {
 
 
 bool Sand::look_ahead(int look_ahead_offset, int state) {
-    if (cells[look_ahead_offset] == state && (double)rand() / RAND_MAX < 0.5) {
+    if (update_cells[look_ahead_offset] == state && (double)rand() / RAND_MAX < 0.5) {
         return false;
     }
 

@@ -4,11 +4,11 @@
 
 Simulation::Simulation(char *argv0)
     : path_str(get_path(argv0)), clicking(false), win_height(WIN_HEIGHT),
-      win_width(WIN_WIDTH), radius(RADIUS), automaton(nullptr),
-      cursor(nullptr), menu(nullptr), nb_frames(0), last_time(0), FPS(""),
-      cell_count(0), seeding(true), ready(READY), update_size(false),
-      plague(false), toggle_val(false), delta_time(0.f), last_frame(0.f),
-      counter(0), tickrate(TICKRATE), threaded(false) {
+      win_width(WIN_WIDTH), radius(RADIUS), automaton(nullptr), cursor(nullptr),
+      menu(nullptr), nb_frames(0), last_time(0), FPS(""), cell_count(0),
+      seeding(true), ready(READY), update_size(false), plague(false),
+      toggle_val(false), threaded(true), delta_time(0.f), last_frame(0.f),
+      counter(0), tickrate(TICKRATE) {
 
     if (path_str.empty()) {
         std::cerr << "Error: Failed to retrieve executable path" << std::endl;
@@ -19,21 +19,23 @@ Simulation::Simulation(char *argv0)
         thread_pool = new ThreadPool();
         std::cout << "nt sim: " << thread_pool->num_threads << std::endl;
     } else {
-
     }
 
     init_GLFW();
 }
 
 Simulation::~Simulation() {
-    // delete automaton;
+    delete automaton;
     automaton = nullptr;
 
-    // delete cursor;
+    delete cursor;
     cursor = nullptr;
 
-    // delete menu;
+    delete menu;
     menu = nullptr;
+
+    delete thread_pool;
+    thread_pool = nullptr;
 }
 
 void Simulation::set_automaton(Automaton *automaton) {
@@ -93,13 +95,16 @@ void Simulation::run() {
             if ((!seeding && ready) || step) {
                 if (threaded) {
                     for (size_t i = 0; i < thread_pool->num_threads; i++) {
-                        thread_pool->enqueue(
-                            [=, this]() { automaton->update_chunk(i, thread_pool->num_threads); });
+                        thread_pool->enqueue([i, this]() {
+                            automaton->update_chunk(i,
+                                                    thread_pool->num_threads);
+                        });
                     }
 
                     automaton->update_cell_states();
                 } else {
-                    automaton->update();
+                    automaton->update_chunk(0, 1);
+                    automaton->update_cell_states();
                 }
 
                 step = false;
@@ -369,6 +374,18 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
     }
     if (key == GLFW_KEY_W && action == GLFW_PRESS) {
         toggle_val = !toggle_val;
+    }
+    if (key == GLFW_KEY_T && action == GLFW_PRESS) {
+        threaded = !threaded;
+
+        if (threaded && thread_pool == NULL) {
+            std::cout << "new pool" << std::endl;
+            thread_pool = new ThreadPool();
+        } else {
+            delete thread_pool;
+        }
+        std::cout << "Simulation is " << (threaded ? "now" : "no longer")
+                  << "threaded" << std::endl;
     }
     if (key == GLFW_KEY_P && action == GLFW_PRESS) {
         plague = !plague;
