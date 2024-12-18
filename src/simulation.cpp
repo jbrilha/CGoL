@@ -378,14 +378,14 @@ void Simulation::key_callback(GLFWwindow *window, int key, int scancode,
     if (key == GLFW_KEY_T && action == GLFW_PRESS) {
         threaded = !threaded;
 
-        if (threaded && thread_pool == NULL) {
-            std::cout << "new pool" << std::endl;
+        if (threaded && thread_pool == nullptr) {
             thread_pool = new ThreadPool();
         } else {
             delete thread_pool;
+            thread_pool = nullptr;
         }
         std::cout << "Simulation is " << (threaded ? "now" : "no longer")
-                  << "threaded" << std::endl;
+                  << " threaded" << std::endl;
     }
     if (key == GLFW_KEY_P && action == GLFW_PRESS) {
         plague = !plague;
