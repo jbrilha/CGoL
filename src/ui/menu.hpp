@@ -32,6 +32,6 @@ class Menu {
     void click();
     void update_position(double x_pos, double y_pos);
     void update_dimensions(int win_width, int win_height);
-    int handle_cursor(double x_pos, double y_pos, bool clicking);
+    int handle_cursor(float delta_time, double x_pos, double y_pos, bool clicking);
 };
 #endif

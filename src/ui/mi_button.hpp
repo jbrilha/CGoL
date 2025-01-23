@@ -29,7 +29,7 @@ class Button : public MenuItem {
     ~Button();
 
     void click() override;
-    // void handle_cursor(double x_pos, double y_pos, bool clicking) override;
+    // void handle_cursor(float delta_time, double x_pos, double y_pos, bool clicking) override;
 
     bool clicked;
 };

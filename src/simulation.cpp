@@ -20,8 +20,6 @@ Simulation::Simulation(char *argv0)
         std::cout << "nt sim: " << thread_pool->num_threads << std::endl;
     } else {
     }
-
-    init_GLFW();
 }
 
 Simulation::~Simulation() {
@@ -48,6 +46,8 @@ void Simulation::set_automaton(Automaton *automaton) {
 }
 
 void Simulation::init() {
+    init_GLFW();
+
     automaton = new ThreadTest(path_str, window, SQUARE_SIZE);
     cell_count = automaton->get_cell_count();
 
@@ -251,10 +251,11 @@ void Simulation::set_callbacks() {
 
 void Simulation::mouse_button_callback(GLFWwindow *window, int button,
                                        int action, int mods) {
+    (void)mods;
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         double x_pos, y_pos;
         glfwGetCursorPos(window, &x_pos, &y_pos);
-        int action = menu->handle_cursor(x_pos, y_pos, true);
+        int action = menu->handle_cursor(delta_time, x_pos, y_pos, true);
         if (action >= 0)
             clicking = true;
         switch (action) {
@@ -305,6 +306,9 @@ void Simulation::mouse_button_callback(GLFWwindow *window, int button,
             break;
         }
     }
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
+        clicking = false;
+    }
 }
 
 void Simulation::mouse_pos_callback(GLFWwindow *window, double x_pos_in,
@@ -320,7 +324,7 @@ void Simulation::mouse_pos_callback(GLFWwindow *window, double x_pos_in,
     }
 
     // if(x_pos > win_width - BUTTON_WIDTH && x_pos < win_width) {
-    menu->handle_cursor(x_pos, y_pos, false);
+    menu->handle_cursor(delta_time, x_pos, y_pos, false);
     // }
 }
 

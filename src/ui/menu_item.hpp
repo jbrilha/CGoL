@@ -18,7 +18,6 @@ class MenuItem {
     virtual void set_vertices() = 0;
     virtual void set_circular_vertices();
     virtual void set_model() = 0;
-    void set_color();
 
   public:
     MenuItem();
@@ -31,7 +30,7 @@ class MenuItem {
     void update_position(double x_pos, double y_pos);
     virtual void update_dimensions(int win_width, int win_height);
     void change_shape();
-    virtual int handle_cursor(double x_pos, double y_pos, bool clicking);
+    virtual int handle_cursor(float delta_time ,double x_pos, double y_pos, bool clicking);
 
     int get_radius();
     int get_index();
@@ -39,7 +38,8 @@ class MenuItem {
 
   protected:
     unsigned int quad_VAO;
-    void set_shaders();
+    virtual void set_shaders();
+    void set_color();
     void hover();
 
     Shader shader_program;

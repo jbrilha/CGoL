@@ -63,7 +63,7 @@ void Dropdown::set_vertices() {
     };
 }
 
-int Dropdown::handle_cursor(double x_pos, double y_pos, bool clicking) {
+int Dropdown::handle_cursor(float delta_time, double x_pos, double y_pos, bool clicking) {
     glm::vec2 vert0 = quad_vertices[0] + glm::vec2(center.x + position.x, center.y + position.y); //bot right
     glm::vec2 vert1 = quad_vertices[1] + glm::vec2(center.x + position.x, center.y + position.y); //bot left
     glm::vec2 vert2 = quad_vertices[2] + glm::vec2(center.x + position.x, center.y + position.y); //top
@@ -90,7 +90,7 @@ int Dropdown::handle_cursor(double x_pos, double y_pos, bool clicking) {
 
     if(!collapsed) {
         for(const auto item : items) {
-            int action = item->handle_cursor(x_pos, y_pos, clicking);
+            int action = item->handle_cursor(delta_time, x_pos, y_pos, clicking);
             if(action > 0) {
                 return action;
             }

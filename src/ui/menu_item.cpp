@@ -42,7 +42,7 @@ void MenuItem::set_circular_vertices() {
     std::cout << "gtfo" << std::endl;
 }
 
-int MenuItem::handle_cursor(double x_pos, double y_pos, bool clicking) {
+int MenuItem::handle_cursor(float delta_time ,double x_pos, double y_pos, bool clicking) {
     glm::vec2 vert0 = quad_vertices[0] + glm::vec2(position.x, position.y); // top right
     glm::vec2 vert2 = quad_vertices[2] + glm::vec2(position.x, position.y); // bot left
 

@@ -46,7 +46,6 @@ void Brain::update_chunk(int thread_idx, size_t thread_count) {
     int chunk_size = cell_count / thread_count;
     int start = thread_idx * chunk_size;
     int end = start + chunk_size;
-    // std::cout << "ti: " << thread_idx << " | " << "s: " << "start: " << start << " | " << "cs: " << chunk_size << " | " << "e: " << end << std::endl;
     int state = 0;
 
     for (int offset = start; offset < end; offset++) {

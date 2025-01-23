@@ -4,8 +4,8 @@ Automaton::Automaton(std::string path_str, GLFWwindow *window, int square_size,
                      glm::vec3 color, bool solid_colors)
     : square_size(square_size), cell_size(square_size + GAP), window(window),
       plague(false), solid_colors(solid_colors), main_color(color),
-      shader_program((path_str + "/../shaders/vert.glsl").c_str(),
-                     (path_str + "/../shaders/frag.glsl").c_str()) {
+      shader_program((path_str + "/../shaders/aut_vert.glsl").c_str(),
+                     (path_str + "/../shaders/aut_frag.glsl").c_str()) {
 
     glfwGetWindowSize(window, &win_width, &win_height);
 
@@ -114,7 +114,7 @@ void Automaton::set_shaders() {
                  quad_vertices.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2),
                           (void *)0);
 
     // also set instance data
@@ -122,7 +122,7 @@ void Automaton::set_shaders() {
     glBindBuffer(GL_ARRAY_BUFFER,
                  instance_VBOs[0]); // this attribute comes from a different
                                     // vertex buffer
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2),
                           (void *)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glVertexAttribDivisor(
@@ -140,8 +140,8 @@ void Automaton::set_shaders() {
 }
 
 void Automaton::set_square_vertices() {
-    float x_vert = pxls::to_float(square_size, win_width);
-    float y_vert = pxls::to_float(square_size, win_height);
+    float x_vert = pxls::to_float(square_size, win_width) * 1.2;
+    float y_vert = pxls::to_float(square_size, win_height) * 1.2;
 
     quad_vertices = {
         glm::vec2(x_vert, y_vert),
@@ -251,6 +251,7 @@ void Automaton::save() {
 
     if (!output.is_open()) {
         std::cout << "FAILED TO CREATE SAVE FILE" << std::endl;
+        return;
     }
 
     for (int cell : cells) {
@@ -266,6 +267,7 @@ void Automaton::load() {
 
     if (!input.is_open()) {
         std::cout << "FAILED TO READ SAVE FILE" << std::endl;
+        return;
     }
 
     std::string cells_str;
