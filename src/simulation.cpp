@@ -1,14 +1,17 @@
 #include "simulation.hpp"
+#include "shaders.hpp"
+#include "text/text.hpp"
 #include "thread_pool.hpp"
 #include "thread_test.hpp"
+#include "utils/constants.hpp"
 
 Simulation::Simulation(char *argv0)
     : path_str(get_path(argv0)), clicking(false), win_height(WIN_HEIGHT),
-      win_width(WIN_WIDTH), radius(RADIUS), automaton(nullptr), cursor(nullptr),
-      menu(nullptr), nb_frames(0), last_time(0), FPS(""), cell_count(0),
-      seeding(true), ready(READY), update_size(false), plague(false),
-      toggle_val(false), threaded(true), delta_time(0.f), last_frame(0.f),
-      counter(0), tickrate(TICKRATE) {
+      win_width(WIN_WIDTH), radius(RADIUS), text(nullptr), automaton(nullptr),
+      cursor(nullptr), menu(nullptr), nb_frames(0), last_time(0), FPS(""),
+      cell_count(0), seeding(true), ready(READY), update_size(false),
+      plague(false), toggle_val(false), threaded(true), delta_time(0.f),
+      last_frame(0.f), counter(0), tickrate(TICKRATE) {
 
     if (path_str.empty()) {
         std::cerr << "Error: Failed to retrieve executable path" << std::endl;
@@ -56,10 +59,13 @@ void Simulation::init() {
     cursor = new Cursor(path_str, window, SQUARE_SIZE, radius);
     // automaton->load();
     menu = new Menu(path_str, window);
+
+    text = new Text(path_str, window);
 }
 
 void Simulation::run() {
     std::cout << "Simulation running!" << std::endl;
+    text->load_font("arial.ttf", 12);
     while (!glfwWindowShouldClose(window)) {
         counter++;
         process_input();
@@ -116,6 +122,9 @@ void Simulation::run() {
 
         menu->draw();
         cursor->draw();
+
+        text->render("This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+        text->render("(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -570,4 +579,7 @@ void Simulation::init_GLFW() {
         std::cout << "Failed to initialize GLAD" << std::endl;
         exit(EXIT_FAILURE);
     }
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

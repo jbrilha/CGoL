@@ -4,6 +4,7 @@
 // #include <mach-o/dyld.h> // MacOS only!!
 #include <unistd.h>
 
+#include "text.hpp"
 #include "automaton.hpp"
 #include "cursor.hpp"
 #include "menu.hpp"
@@ -53,6 +54,7 @@ class Simulation {
 
     ThreadPool *thread_pool;
 
+    Text *text;
     Automaton *automaton;
     Cursor *cursor;
     Menu *menu;
