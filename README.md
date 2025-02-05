@@ -1,7 +1,7 @@
-# Seagull!
+# CGoL
 ![seagull](https://images.pexels.com/photos/56618/seagull-sky-holiday-bird-56618.jpeg)
 A "playground" for cellular automata. Initially just Conway's Game of Life (hence the name, C GoL...) \
-In C++ with raw OpenGL :D
+In C++ with raw OpenGL
 
 ## Currently available controls:
 - ESC: Closes the application;
@@ -9,6 +9,7 @@ In C++ with raw OpenGL :D
 - SPACE: Expand menu(s);
 - M1 / LEFT MOUSE: Make cell "alive" at cursor;
 - SHIFT + M1: "Kill" cell at cursor;
+- T: Toggles thread usage (WIP — can break)
 - R: Randomly fills the grid with "live" cells;
 - C: Clears the grid;
 - X: Toggle cursor shape;
@@ -33,7 +34,7 @@ In C++ with raw OpenGL :D
 
 \* GLFW reads this as GLFW_KEY_EQUAL on MacOs so it might not be the same key depending on your layout.
 
-## Build instructions -- REQUIRES CMAKE, g++ COMPILER AND GLFW3
+## Build instructions -- REQUIRES CMAKE, g++/clang++ COMPILER AND GLFW3
 Copy into your terminal while on the parent directory:
 
 ```sh
